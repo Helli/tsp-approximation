@@ -1,10 +1,8 @@
-session TSP_Approximation = HOL +
+session TSP_Approximation = Sepref_IICF +
   options [document = pdf, document_output = "output"]
-(*theories [document = false]
-    A
-    B
+  sessions
+    Kruskal
   theories
-    C
-    D*)
+    Specification
   document_files
     "root.tex"
