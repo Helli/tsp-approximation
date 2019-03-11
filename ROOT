@@ -5,4 +5,5 @@ session TSP_Approximation = Sepref_IICF +
   theories
     Specification
   document_files
-    "root.tex"
+    root.tex
+    root.bib

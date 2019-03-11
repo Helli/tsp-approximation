@@ -10,4 +10,6 @@ term nodes
 definition tour
 *) \<comment> \<open>see @{const is_path_undir}\<close>
 
+text \<open>Citation test: @{cite lawler}.\<close>
+
 end
