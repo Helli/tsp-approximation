@@ -4,3 +4,4 @@ session Thesis = TSP_Approximation +
     Thesis
   document_files
     root.tex
+    root.bib
