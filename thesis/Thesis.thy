@@ -13,7 +13,7 @@ This observation gives rise to an easy 2-approximation(to-do:explain): Generate 
  tree does this. It uses every edge twice (once on discovering an edge, and once on backtracking from
  it). Thus it generates a sequence with at most twice the cost of the optimal one.
 
-Duplicate visits to cities can be dropped afterwards, this does not increase
+Duplicate visits to cities can be dropped afterwards. This does not increase
 the cost, as these shortcuts satisfy the triangle inequality.
 \<close>
 
