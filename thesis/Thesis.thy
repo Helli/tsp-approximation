@@ -1,5 +1,7 @@
 (*<*)theory Thesis imports "TSP_Approximation.Specification" begin(*>*)
 
+text\<open>dummy citation: @{cite fixme}\<close>
+
 section \<open>MST Heuristic\<close>
 
 text \<open>Because the removal of an edge transforms a TSP tour into a spanning tree, the Minimum
