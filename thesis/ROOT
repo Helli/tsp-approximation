@@ -1,4 +1,4 @@
-session Thesis = TSP_Approximation +
+session Thesis = TSP +
   options [document = pdf, document_output = "output"]
   theories
     Thesis

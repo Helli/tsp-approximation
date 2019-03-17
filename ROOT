@@ -1,4 +1,4 @@
-session TSP_Approximation = Sepref_IICF +
+session TSP = Sepref_IICF +
   options [document = pdf, document_output = "output"]
   sessions
     Kruskal

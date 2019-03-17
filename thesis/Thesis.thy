@@ -1,4 +1,4 @@
-(*<*)theory Thesis imports "TSP_Approximation.Specification" begin(*>*)
+(*<*)theory Thesis imports "TSP.Specification" begin(*>*)
 
 text\<open>dummy citation:~@{cite fixme}\<close>
 
