@@ -12,4 +12,11 @@ definition tour
 
 text \<open>Citation test: @{cite lawler}.\<close>
 
+subsection \<open>Manhattan Distance\<close>
+
+text \<open>1d-coordinates:\<close>
+
+lemma "\<bar>c-a\<bar> \<le> \<bar>b-a\<bar> + \<bar>c-b\<bar>" for a :: int
+  by simp
+
 end
