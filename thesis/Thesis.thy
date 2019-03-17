@@ -19,4 +19,10 @@ the cost, as these shortcuts satisfy the triangle inequality.
 
 section \<open>Metrics, Input graph\<close>
 
+text \<open>To generate a graph that satisfies the triangle inequality, we put some points into a
+ space with integer coordinates and compute the pairwise distances. Special care is to be put in the
+choice of the metric function: The standard euclidean distance may generated graph edges with
+ irrational weights, which are difficult to represent in way that allows easy comparison.
+\<close>
+
 (*<*)end(*>*)
