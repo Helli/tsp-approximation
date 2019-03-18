@@ -1,7 +1,7 @@
-session TSP = Sepref_IICF +
+session TSP = Kruskal +
   options [document = pdf, document_output = "output"]
   sessions
-    Kruskal
+    Koenigsberg_Friendship
   theories
     Specification
   document_files

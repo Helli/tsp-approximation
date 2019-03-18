@@ -1,8 +1,11 @@
 section \<open>Specification\<close>
 theory Specification
-  imports Refine_Imperative_HOL.IICF
+  imports
+    Koenigsberg_Friendship.KoenigsbergBridge
     Kruskal.Graph_Definition_Aux
 begin
+
+hide_const a b c d
 
 term nodes
 
