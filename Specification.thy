@@ -16,8 +16,6 @@ fun is_path_undir' :: "('v, 'w) graph \<Rightarrow> 'v \<Rightarrow> ('v,'w) pat
 
 abbreviation "nodes_connected' G a b \<equiv> \<exists>p. is_path_undir' G a p b"
 
-term nodes
-
 (*
 definition tour
 *) \<comment> \<open>see @{const is_path_undir}\<close>
