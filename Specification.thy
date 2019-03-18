@@ -4,6 +4,7 @@ theory Specification
     Koenigsberg_Friendship.KoenigsbergBridge
     Kruskal.Graph_Definition_Aux
 begin hide_const a b c d
+hide_const "connected"
 
 subsection \<open>Adapting Definitions\<close>
 
@@ -15,6 +16,16 @@ fun is_path_undir' :: "('v, 'w) graph \<Rightarrow> 'v \<Rightarrow> ('v,'w) pat
        ) \<and> is_path_undir' G v2 p v'"
 
 abbreviation "nodes_connected' G a b \<equiv> \<exists>p. is_path_undir' G a p b"
+
+definition symhull where
+  "symhull G = G\<lparr>edges := {(v1,w,v2) | v1 w v2. (v1,w,v2) \<in> edges G \<or> (v2,w,v1) \<in> edges G}\<rparr>"
+    \<comment> \<open>to-do: use \<^const>\<open>hull\<close>\<close>
+
+lemma
+  assumes "valid_mgraph G"
+  assumes no_id[simp]:"\<And>v w.(v,w,v) \<notin> edges G"
+  shows "valid_unMultigraph (symhull G)"
+  oops
 
 (*
 definition tour
