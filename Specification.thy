@@ -8,6 +8,7 @@ hide_const "connected"
 
 subsection \<open>Adapting Definitions\<close>
 
+text \<open>see @{const is_path_undir}\<close>
 fun is_path_undir' :: "('v, 'w) graph \<Rightarrow> 'v \<Rightarrow> ('v,'w) path \<Rightarrow> 'v \<Rightarrow> bool" where
     "is_path_undir' G v [] v' \<longleftrightarrow> v=v' \<and> v'\<in>nodes G" |
     "is_path_undir' G v ((v1,w,v2)#p) v'
@@ -25,11 +26,15 @@ lemma
   assumes "valid_mgraph G"
   assumes no_id[simp]:"\<And>v w.(v,w,v) \<notin> edges G"
   shows "valid_unMultigraph (symhull G)"
-  oops
+  apply unfold_locales
+     apply (auto simp: symhull_def)
+     apply (simp_all add: assms(1) valid_graph.E_validD(1) valid_mgraph.axioms)
+   apply (simp_all add: assms(1) valid_graph.E_validD(2) valid_mgraph.axioms)
+  done
 
 (*
 definition tour
-*) \<comment> \<open>see @{const is_path_undir}\<close>
+*)
 
 text \<open>Citation test: @{cite lawler}.\<close>
 
