@@ -19,7 +19,7 @@ subsection \<open>Manhattan Distance\<close>
 
 text \<open>1d-coordinates:\<close>
 
-lemma "\<bar>c-a\<bar> \<le> \<bar>b-a\<bar> + \<bar>c-b\<bar>" for a :: int
-  by simp
+lemma "nat\<bar>c-a\<bar> \<le> nat\<bar>b-a\<bar> + nat\<bar>c-b\<bar>" for a :: int
+  by (simp add: nat_le_iff)
 
 end
