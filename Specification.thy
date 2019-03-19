@@ -18,6 +18,8 @@ fun is_path_undir' :: "('v, 'w) graph \<Rightarrow> 'v \<Rightarrow> ('v,'w) pat
 
 abbreviation "nodes_connected' G a b \<equiv> \<exists>p. is_path_undir' G a p b"
 
+subsubsection \<open>Undirected Hull\<close> \<comment> \<open>or rather: symmetric hull\<close>
+
 definition symhull where
   "symhull G = G\<lparr>edges := {(v1,w,v2) | v1 w v2. (v1,w,v2) \<in> edges G \<or> (v2,w,v1) \<in> edges G}\<rparr>"
 
