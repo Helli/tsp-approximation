@@ -32,9 +32,9 @@ lemma (in valid_graph) valid_unMultigraph_symhull:
 
 lemma (in valid_graph) symhull_altdef:
   assumes no_id:"\<And>v w.(v,w,v) \<notin> E"
-  shows "symhull G = G\<lparr>edges := (\<lambda>E. valid_unMultigraph (G\<lparr>edges := E\<rparr>)) hull E\<rparr>"
+  shows "symhull G = G\<lparr>edges := (\<lambda>E'. valid_unMultigraph (G\<lparr>edges := E'\<rparr>)) hull E\<rparr>"
 proof -
-  have "edges (symhull G) = (\<lambda>E. valid_unMultigraph (G\<lparr>edges := E\<rparr>)) hull E"
+  have "edges (symhull G) = (\<lambda>E'. valid_unMultigraph (G\<lparr>edges := E'\<rparr>)) hull E"
     apply (simp add: symhull_def)
     apply (rule hull_unique[symmetric])
     apply auto
@@ -50,6 +50,11 @@ proof -
   then show ?thesis
     by (simp add: symhull_def)
 qed
+
+lemma maximally_connected_symhull:
+  "maximally_connected H G \<Longrightarrow> maximally_connected H (symhull G)"
+  apply (simp add: maximally_connected_def) apply auto
+  oops
 
 text \<open>Citation test: @{cite lawler}.\<close>
 
