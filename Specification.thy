@@ -20,25 +20,26 @@ abbreviation "nodes_connected' G a b \<equiv> \<exists>p. is_path_undir' G a p b
 
 subsubsection \<open>Undirected Hull\<close> \<comment> \<open>or rather: symmetric hull\<close>
 
+context valid_graph
+begin
+
 definition symhull where
-  "symhull G = G\<lparr>edges := {(v1,w,v2) | v1 w v2. (v1,w,v2) \<in> edges G \<or> (v2,w,v1) \<in> edges G}\<rparr>"
+  "symhull = {(v1,w,v2) | v1 w v2. (v1,w,v2) \<in> E \<or> (v2,w,v1) \<in> E}"
 
 lemma (in valid_graph) valid_unMultigraph_symhull:
   assumes no_id[simp]:"\<And>v w.(v,w,v) \<notin> E"
-  shows "valid_unMultigraph (symhull G)"
+  shows "valid_unMultigraph (G\<lparr>edges := symhull\<rparr>)"
   apply unfold_locales
      apply (auto simp: symhull_def)
   using E_validD by blast+
 
 lemma (in valid_graph) symhull_altdef:
   assumes no_id:"\<And>v w.(v,w,v) \<notin> E"
-  shows "symhull G = G\<lparr>edges := (\<lambda>E'. valid_unMultigraph (G\<lparr>edges := E'\<rparr>)) hull E\<rparr>"
-proof -
-  have "edges (symhull G) = (\<lambda>E'. valid_unMultigraph (G\<lparr>edges := E'\<rparr>)) hull E"
+  shows "symhull = (\<lambda>E'. valid_unMultigraph (G\<lparr>edges := E'\<rparr>)) hull E"
     apply (simp add: symhull_def)
     apply (rule hull_unique[symmetric])
     apply auto
-     apply (metis no_id symhull_def valid_unMultigraph_symhull)
+   apply (metis no_id symhull_def valid_unMultigraph_symhull)
   proof goal_cases
     case (1 t' v1 w v2)
     then have "(v2, w, v1) \<in> t'"
@@ -47,14 +48,13 @@ proof -
       using valid_unMultigraph.corres by fastforce
     then show ?case.
   qed
-  then show ?thesis
-    by (simp add: symhull_def)
-qed
 
 lemma maximally_connected_symhull:
-  "maximally_connected H G \<Longrightarrow> maximally_connected H (symhull G)"
+  "maximally_connected H G \<Longrightarrow> maximally_connected (H\<lparr>edges:=symhull\<rparr>) G"
   apply (simp add: maximally_connected_def) apply auto
   oops
+
+end
 
 text \<open>Citation test: @{cite lawler}.\<close>
 
