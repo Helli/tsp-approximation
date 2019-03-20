@@ -33,17 +33,14 @@ definition symhull where
 lemma subset_eq_symhull: "E \<subseteq> symhull E"
   by (auto simp: symhull_def)
 
-context valid_graph
-begin
-
-lemma valid_unMultigraph_symhull:
+lemma (in valid_graph) valid_unMultigraph_symhull:
   assumes no_id[simp]:"\<And>v w.(v,w,v) \<notin> E"
   shows "valid_unMultigraph (G\<lparr>edges := symhull E\<rparr>)"
   apply unfold_locales
      apply (auto simp: symhull_def)
   using E_validD by blast+
 
-lemma symhull_hull:
+lemma (in valid_graph) symhull_hull:
   assumes no_id:"\<And>v w.(v,w,v) \<notin> E"
   shows "symhull E = (\<lambda>E'. valid_unMultigraph (G\<lparr>edges := E'\<rparr>)) hull E"
     apply (simp add: symhull_def)
@@ -58,8 +55,6 @@ lemma symhull_hull:
       using valid_unMultigraph.corres by fastforce
     then show ?case.
   qed
-
-end
 
 lemma is_path_undir_symhull:
   "is_path_undir \<lparr>nodes=V, edges=symhull E\<rparr> v p v' \<Longrightarrow> is_path_undir \<lparr>nodes=V, edges=E\<rparr> v p v'"
