@@ -109,4 +109,59 @@ text \<open>1d-coordinates:\<close>
 lemma "nat\<bar>c-a\<bar> \<le> nat\<bar>b-a\<bar> + nat\<bar>c-b\<bar>" for a :: int
   by (simp add: nat_le_iff)
 
+context valid_graph begin
+context assumes
+  finE: "finite E"
+begin
+
+definition dg where "dg v R = card {(w,v'). (v,w,v')\<in>R} + card {(v',w).(v',w,v)\<in>R}"
+
+lemma assumes "finite R'" "R \<subseteq> R'" shows dg_mono: "dg v R \<le> dg v R'"
+proof -
+  from assms(1) have "finite {(w,v').(v,w,v')\<in>R'}" (is "finite ?A")
+  proof -
+    from \<open>finite R'\<close> have "finite ((fst o snd) ` R')" "finite ((snd o snd) ` R')"
+      by blast+
+    then have f: "finite {(w,v'). w \<in> (fst o snd) ` R' \<and> v' \<in> ((snd o snd) ` R')}"
+      by simp
+    have "?A = {(w,v'). (v,w,v')\<in>R' \<and> w \<in> (fst o snd) ` R' \<and> v' \<in> ((snd o snd) ` R')}"
+      by (auto simp: rev_image_eqI)
+    also have "\<dots> \<subseteq> {(w,v'). w \<in> (fst o snd) ` R' \<and> v' \<in> ((snd o snd) ` R')}"
+      by blast
+    finally show ?thesis
+      using f finite_subset by blast
+  qed
+  with assms(2) have l: "card {(w,v').(v,w,v')\<in>R} \<le> card {(w,v').(v,w,v')\<in>R'}"
+    by (smt Collect_mono_iff card_mono case_prodE case_prodI2 subsetD)
+  from assms(1) have "finite {(v',w).(v',w,v)\<in>R'}" (is "finite ?B")
+  proof -
+    from \<open>finite R'\<close> have "finite (fst ` R')" "finite ((fst o snd) ` R')"
+      by blast+
+    then have f: "finite {(w,v'). w \<in> fst ` R' \<and> v' \<in> ((fst o snd) ` R')}"
+      by simp
+    have "?B = {(v',w). (v',w,v)\<in>R' \<and> v' \<in> fst ` R' \<and> w \<in> ((fst o snd) ` R')}"
+      by (auto simp: rev_image_eqI)
+    also have "\<dots> \<subseteq> {(v',w). v' \<in> fst ` R' \<and> w \<in> ((fst o snd) ` R')}"
+      by blast
+    finally show ?thesis
+      using f finite_subset by blast
+  qed
+  with assms(2) have r: "card {(v',w).(v',w,v)\<in>R} \<le> card {(v',w).(v',w,v)\<in>R'}"
+    by (smt Collect_mono_iff card_mono case_prodD case_prodI2 subsetD)
+  from l r show ?thesis
+    by (simp add: dg_def)
+qed
+
+lemma "indep_system E (\<lambda>E'. E'\<subseteq>E \<and> (\<forall>v\<in>V. dg v E' \<le> 1))"
+  apply standard
+     apply (simp add: finE)
+    apply blast
+   apply (rule exI[of _ "{}"])
+   apply (simp add: dg_def)
+  apply auto
+  by (meson dg_mono finE finite_subset le_trans)
+
+end
+end
+
 end
