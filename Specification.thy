@@ -30,7 +30,7 @@ corollary nodes_connected_mono:
 definition symhull where
   "symhull E = {(v1,w,v2) | v1 w v2. (v1,w,v2) \<in> E \<or> (v2,w,v1) \<in> E}"
 
-lemma symhull_supset_eq: "symhull E \<supseteq> E"
+lemma subset_eq_symhull: "E \<subseteq> symhull E"
   by (auto simp: symhull_def)
 
 context valid_graph
