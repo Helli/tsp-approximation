@@ -2,7 +2,7 @@ section \<open>Specification\<close>
 theory Specification
   imports
     Koenigsberg_Friendship.KoenigsbergBridge
-    Kruskal.Graph_Definition_Aux
+    Kruskal.Graph_Definition_Impl
 begin hide_const a b c d
 hide_const "connected"
 
@@ -79,6 +79,24 @@ lemma spanning_forest_symhull:
   "spanning_forest F G \<Longrightarrow> spanning_forest F (G\<lparr>edges := symhull (edges G)\<rparr>)"
   unfolding spanning_forest_def
   using maximally_connected_symhull subgraph_trans supergraph_symhull by blast
+
+lemma infinite_edge_weight: "infinite (edges G) \<Longrightarrow> edge_weight G = 0"
+  by (simp add: edge_weight_def)
+
+find_theorems name: "Spanning_Forest"
+thm fromlist.spanning_forest_eq
+
+lemma spanning_forest_symhull_preimage:
+  assumes "spanning_forest F (G\<lparr>edges:=symhull (edges G)\<rparr>)"
+  shows "\<exists>F'. spanning_forest F G \<and> edge_weight F = edge_weight F'"
+  oops
+
+lemma optimal_forest_symhull:
+  "optimal_forest F G \<Longrightarrow> optimal_forest F (G\<lparr>edges := symhull (edges G)\<rparr>)"
+  unfolding optimal_forest_def
+  apply auto
+  apply (simp add: symhull_def)
+  oops
 
 find_theorems SPEC spanning_forest
 
