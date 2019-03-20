@@ -20,17 +20,12 @@ abbreviation "nodes_connected' G a b \<equiv> \<exists>p. is_path_undir' G a p b
 
 subsubsection \<open>Undirected Hull\<close> \<comment> \<open>or rather: symmetric hull\<close>
 
-lemma
-  assumes "nodes_connected \<lparr>nodes=V, edges=E\<rparr> a b" "E \<subseteq> E'"
-  shows "nodes_connected \<lparr>nodes=V, edges=E'\<rparr> a b"
-proof -
-  from assms obtain p where "is_path_undir \<lparr>nodes=V, edges=E\<rparr> a p b"
-    by blast
-  with assms(2) have "is_path_undir \<lparr>nodes=V, edges=E'\<rparr> a p b"
-    by (induction "\<lparr>nodes=V, edges=E'\<rparr>" a p b rule: is_path_undir.induct) auto
-  then show ?thesis
-    by blast
-qed
+lemma is_path_undir_mono:
+  "is_path_undir \<lparr>nodes=V, edges=E\<rparr> v p v' \<Longrightarrow> E \<subseteq> E' \<Longrightarrow> is_path_undir \<lparr>nodes=V, edges=E'\<rparr> v p v'"
+  by (induction "\<lparr>nodes=V, edges=E'\<rparr>" v p v' rule: is_path_undir.induct) auto
+corollary nodes_connected_mono:
+  "nodes_connected \<lparr>nodes=V, edges=E\<rparr> v v' \<Longrightarrow> E \<subseteq> E' \<Longrightarrow> nodes_connected \<lparr>nodes=V, edges=E'\<rparr> v v'"
+  using is_path_undir_mono by metis
 
 definition symhull where
   "symhull E = {(v1,w,v2) | v1 w v2. (v1,w,v2) \<in> E \<or> (v2,w,v1) \<in> E}"
