@@ -43,7 +43,7 @@ lemma valid_unMultigraph_symhull:
      apply (auto simp: symhull_def)
   using E_validD by blast+
 
-lemma symhull_altdef:
+lemma symhull_hull:
   assumes no_id:"\<And>v w.(v,w,v) \<notin> E"
   shows "symhull E = (\<lambda>E'. valid_unMultigraph (G\<lparr>edges := E'\<rparr>)) hull E"
     apply (simp add: symhull_def)
@@ -59,16 +59,21 @@ lemma symhull_altdef:
     then show ?case.
   qed
 
-lemma nodes_connected_symhull:
-  "nodes_connected G a b \<Longrightarrow> nodes_connected (G\<lparr>edges := symhull E\<rparr>) a b"
-  oops
-
 end
 
+lemma is_path_undir_symhull:
+  "is_path_undir \<lparr>nodes=V, edges=symhull E\<rparr> v p v' \<Longrightarrow> is_path_undir \<lparr>nodes=V, edges=E\<rparr> v p v'"
+  apply (induction "\<lparr>nodes=V, edges=symhull E\<rparr>" v p v' rule: is_path_undir.induct)
+   apply (simp_all add: symhull_def) by fast
+corollary nodes_connected_symhull:
+  "nodes_connected \<lparr>nodes=V, edges=symhull E\<rparr> v v' \<Longrightarrow> nodes_connected \<lparr>nodes=V, edges=E\<rparr> v v'"
+  by (meson is_path_undir_symhull)
+
 lemma maximally_connected_symhull:
-  shows "maximally_connected H G \<Longrightarrow> maximally_connected (H\<lparr>edges:=symhull (edges H)\<rparr>) G"
-  apply (simp add: maximally_connected_def) apply auto
-  oops
+  shows "maximally_connected H G \<Longrightarrow> maximally_connected H (G\<lparr>edges:=symhull (edges G)\<rparr>)"
+  apply (simp add: maximally_connected_def)
+  using nodes_connected_symhull
+  by (metis graph.cases graph.select_convs(2) graph.update_convs(2))
 
 text \<open>Citation test: @{cite lawler}.\<close>
 
