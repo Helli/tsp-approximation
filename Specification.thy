@@ -20,8 +20,23 @@ abbreviation "nodes_connected' G a b \<equiv> \<exists>p. is_path_undir' G a p b
 
 subsubsection \<open>Undirected Hull\<close> \<comment> \<open>or rather: symmetric hull\<close>
 
+lemma
+  assumes "nodes_connected \<lparr>nodes=V, edges=E\<rparr> a b" "E \<subseteq> E'"
+  shows "nodes_connected \<lparr>nodes=V, edges=E'\<rparr> a b"
+proof -
+  from assms obtain p where "is_path_undir \<lparr>nodes=V, edges=E\<rparr> a p b"
+    by blast
+  with assms(2) have "is_path_undir \<lparr>nodes=V, edges=E'\<rparr> a p b"
+    by (induction "\<lparr>nodes=V, edges=E'\<rparr>" a p b rule: is_path_undir.induct) auto
+  then show ?thesis
+    by blast
+qed
+
 definition symhull where
   "symhull E = {(v1,w,v2) | v1 w v2. (v1,w,v2) \<in> E \<or> (v2,w,v1) \<in> E}"
+
+lemma symhull_supset_eq: "symhull E \<supseteq> E"
+  by (auto simp: symhull_def)
 
 context valid_graph
 begin
@@ -49,10 +64,11 @@ lemma symhull_altdef:
     then show ?case.
   qed
 
-end
+lemma nodes_connected_symhull:
+  "nodes_connected G a b \<Longrightarrow> nodes_connected (G\<lparr>edges := symhull E\<rparr>) a b"
+  oops
 
-lemma symhull_supset_eq: "symhull E \<supseteq> E"
-  by (auto simp: symhull_def)
+end
 
 lemma maximally_connected_symhull:
   shows "maximally_connected H G \<Longrightarrow> maximally_connected (H\<lparr>edges:=symhull (edges H)\<rparr>) G"
