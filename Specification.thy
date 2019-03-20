@@ -67,10 +67,20 @@ corollary nodes_connected_symhull:
   by (meson is_path_undir_symhull)
 
 lemma maximally_connected_symhull:
-  shows "maximally_connected H G \<Longrightarrow> maximally_connected H (G\<lparr>edges:=symhull (edges G)\<rparr>)"
+  "maximally_connected H G \<Longrightarrow> maximally_connected H (G\<lparr>edges:=symhull (edges G)\<rparr>)"
   apply (simp add: maximally_connected_def)
   using nodes_connected_symhull
   by (metis graph.cases graph.select_convs(2) graph.update_convs(2))
+
+lemma subgraph_trans: "subgraph G H \<Longrightarrow> subgraph H I \<Longrightarrow> subgraph G I"
+  by (auto simp: subgraph_def) \<comment> \<open>Maybe interpret \<^class>\<open>order_bot\<close>?\<close>
+
+lemma spanning_forest_symhull:
+  "spanning_forest F G \<Longrightarrow> spanning_forest F (G\<lparr>edges := symhull (edges G)\<rparr>)"
+  unfolding spanning_forest_def
+  using maximally_connected_symhull subgraph_trans supergraph_symhull by blast
+
+find_theorems SPEC spanning_forest
 
 text \<open>Citation test: @{cite lawler}.\<close>
 
