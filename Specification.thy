@@ -83,7 +83,9 @@ lemma spanning_forest_symhull:
 lemma infinite_edge_weight: "infinite (edges G) \<Longrightarrow> edge_weight G = 0"
   by (simp add: edge_weight_def)
 
-find_theorems name: "Spanning_Forest"
+find_theorems name: "SpanningForest"
+thm "indep_system.basis_def"
+thm "spanning_forest_def"
 thm fromlist.spanning_forest_eq
 
 lemma spanning_forest_symhull_preimage:
