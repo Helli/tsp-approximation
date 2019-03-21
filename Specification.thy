@@ -27,6 +27,10 @@ corollary nodes_connected_mono:
   "nodes_connected \<lparr>nodes=V, edges=E\<rparr> v v' \<Longrightarrow> E \<subseteq> E' \<Longrightarrow> nodes_connected \<lparr>nodes=V, edges=E'\<rparr> v v'"
   using is_path_undir_mono by metis
 
+lemma maximally_connected_antimono:
+  "maximally_connected H \<lparr>nodes=V, edges=E'\<rparr> \<Longrightarrow> E \<subseteq> E' \<Longrightarrow> maximally_connected H \<lparr>nodes=V, edges=E\<rparr>"
+  by (simp add: maximally_connected_def nodes_connected_mono)
+
 definition symhull where
   "symhull E = {(v1,w,v2) | v1 w v2. (v1,w,v2) \<in> E \<or> (v2,w,v1) \<in> E}"
 
@@ -89,9 +93,29 @@ thm "spanning_forest_def"
 thm fromlist.spanning_forest_eq
 
 lemma spanning_forest_symhull_preimage:
-  assumes "spanning_forest F (G\<lparr>edges:=symhull (edges G)\<rparr>)"
-  shows "\<exists>F'. spanning_forest F G \<and> edge_weight F = edge_weight F'"
-  oops
+  assumes "finite (edges F)" "spanning_forest F (G\<lparr>edges:=symhull (edges G)\<rparr>)"
+  shows "\<exists>F'. spanning_forest F' G \<and> edge_weight F = edge_weight F'"
+  using assms(1)
+proof (induction "edges F" set: finite)
+  case empty
+  with assms(2) have "spanning_forest F G"
+    unfolding spanning_forest_def using subset_eq_symhull maximally_connected_antimono apply auto
+  proof -
+    assume a1: "maximally_connected F (G\<lparr>edges := symhull (edges G)\<rparr>)"
+    obtain AA :: "('a, 'b) graph \<Rightarrow> 'a set" and PP :: "('a, 'b) graph \<Rightarrow> ('a \<times> 'b \<times> 'a) set" where
+      f2: "\<forall>g. g = \<lparr>nodes = AA g, edges = PP g\<rparr>"
+      by (meson graph.cases)
+    have "maximally_connected F (edges_update symhull G)"
+      using a1 by (metis graph.unfold_congs(2))
+    then show "maximally_connected F G"
+      using f2 by (metis (full_types) graph.update_convs(2) maximally_connected_antimono subset_eq_symhull)
+  qed (simp add: subgraph_def)
+    then show ?case
+      by blast
+next
+  case (insert x F)
+  then show ?case sorry
+qed
 
 lemma optimal_forest_symhull:
   "optimal_forest F G \<Longrightarrow> optimal_forest F (G\<lparr>edges := symhull (edges G)\<rparr>)"
