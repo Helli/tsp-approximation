@@ -93,28 +93,17 @@ thm "spanning_forest_def"
 thm fromlist.spanning_forest_eq
 
 lemma spanning_forest_symhull_preimage:
-  assumes "finite (edges F)" "spanning_forest F (G\<lparr>edges:=symhull (edges G)\<rparr>)"
-  shows "\<exists>F'. spanning_forest F' G \<and> edge_weight F = edge_weight F'"
-  using assms(1)
-proof (induction "edges F" set: finite)
+  assumes "finite E" "spanning_forest \<lparr>nodes=V, edges=E\<rparr> \<lparr>nodes=V', edges=symhull E'\<rparr>"
+  shows "\<exists>F. spanning_forest F \<lparr>nodes=V', edges=E'\<rparr> \<and> edge_weight \<lparr>nodes=V, edges=E\<rparr> = edge_weight F"
+  using assms
+proof (induction E arbitrary: V' set: finite)
   case empty
-  with assms(2) have "spanning_forest F G"
-    unfolding spanning_forest_def using subset_eq_symhull maximally_connected_antimono apply auto
-  proof -
-    assume a1: "maximally_connected F (G\<lparr>edges := symhull (edges G)\<rparr>)"
-    obtain AA :: "('a, 'b) graph \<Rightarrow> 'a set" and PP :: "('a, 'b) graph \<Rightarrow> ('a \<times> 'b \<times> 'a) set" where
-      f2: "\<forall>g. g = \<lparr>nodes = AA g, edges = PP g\<rparr>"
-      by (meson graph.cases)
-    have "maximally_connected F (edges_update symhull G)"
-      using a1 by (metis graph.unfold_congs(2))
-    then show "maximally_connected F G"
-      using f2 by (metis (full_types) graph.update_convs(2) maximally_connected_antimono subset_eq_symhull)
-  qed (simp add: subgraph_def)
-    then show ?case
-      by blast
+  show ?case
+    by (smt empty.prems empty_subsetI graph.select_convs(1) graph.select_convs(2) maximally_connected_antimono spanning_forest_def subgraph_def subset_eq_symhull)
 next
   case (insert x F)
-  then show ?case sorry
+  then show ?case sledgehammer
+    sorry
 qed
 
 lemma optimal_forest_symhull:
