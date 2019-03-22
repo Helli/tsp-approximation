@@ -100,7 +100,7 @@ lemma (in valid_graph(*rm?*)) important:
   assumes no_id:"\<And>v w.(v,w,v) \<notin> E" (*rm*)
   \<comment> \<open>Should be derived from \<^session>\<open>Kruskal\<close>, but needs refactoring there (maybe make \<^locale>\<open>weighted_matroid\<close> an import of \<^locale>\<open>Kruskal_interface\<close>?\<close>
   shows "matroid E (\<lambda>E'. forest \<lparr>nodes = V, edges = E'\<rparr> \<and>
-       subgraph \<lparr>nodes = V, edges = E'\<rparr> \<lparr>nodes = V, edges = E\<rparr>)"
+     subgraph \<lparr>nodes = V, edges = E'\<rparr> \<lparr>nodes = V, edges = E\<rparr>)"
 proof
   show "finite E"
     oops
