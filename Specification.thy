@@ -94,6 +94,14 @@ thm fromlist.spanning_forest_eq
 
 thm indep_system.basis_in_supI
 
+lemma important: (* V=fst ` E \<union> (snd \<circ> snd) ` E*)
+  \<comment> \<open>Should be derived from \<^session>\<open>Kruskal\<close>, but needs refactoring there (maybe make weighted_matroid an import of \<^locale>\<open>Kruskal_interface\<close>?\<close>
+  "matroid E (\<lambda>E'. forest \<lparr>nodes = V, edges = E'\<rparr> \<and>
+       subgraph \<lparr>nodes = V, edges = E'\<rparr> \<lparr>nodes = V, edges = E\<rparr>)"
+proof
+  show "finite E"
+    oops
+
 lemma spanning_forest_symhull_preimage:
   assumes "finite E" "spanning_forest F \<lparr>nodes=V, edges=symhull E\<rparr>"
   shows "\<exists>F'. spanning_forest F' \<lparr>nodes=V, edges=E\<rparr> \<and> edge_weight F' = edge_weight F"
