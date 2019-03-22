@@ -82,6 +82,8 @@ thm fromlist.spanning_forest_eq
 
 thm indep_system.basis_in_supI
 
+section \<open>Matroid Interpretation\<close>
+
 lemma (in valid_graph(*rm?*)) important:
   (* V=fst ` E \<union> (snd \<circ> snd) ` E*)
   assumes "finite E" "finite V" \<comment> \<open>need a proper locale with the correct assumptions\<close>
