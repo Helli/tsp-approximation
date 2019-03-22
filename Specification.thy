@@ -92,19 +92,16 @@ thm "indep_system.basis_def"
 thm "spanning_forest_def"
 thm fromlist.spanning_forest_eq
 
+thm indep_system.basis_in_supI
+
 lemma spanning_forest_symhull_preimage:
-  assumes "finite E" "spanning_forest \<lparr>nodes=V, edges=E\<rparr> \<lparr>nodes=V', edges=symhull E'\<rparr>"
-  shows "\<exists>F. spanning_forest F \<lparr>nodes=V', edges=E'\<rparr> \<and> edge_weight \<lparr>nodes=V, edges=E\<rparr> = edge_weight F"
+  assumes "finite E" "spanning_forest F \<lparr>nodes=V, edges=symhull E\<rparr>"
+  shows "\<exists>F'. spanning_forest F' \<lparr>nodes=V, edges=E\<rparr> \<and> edge_weight F' = edge_weight F"
   using assms
-proof (induction E arbitrary: V' set: finite)
+proof (induction E set: finite)
   case empty
   show ?case
-    by (smt empty.prems empty_subsetI graph.select_convs(1) graph.select_convs(2) maximally_connected_antimono spanning_forest_def subgraph_def subset_eq_symhull)
-next
-  case (insert x F)
-  then show ?case sledgehammer
-    sorry
-qed
+    oops
 
 lemma optimal_forest_symhull:
   "optimal_forest F G \<Longrightarrow> optimal_forest F (G\<lparr>edges := symhull (edges G)\<rparr>)"
