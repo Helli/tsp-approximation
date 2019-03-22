@@ -95,7 +95,7 @@ thm fromlist.spanning_forest_eq
 thm indep_system.basis_in_supI
 
 lemma important: (* V=fst ` E \<union> (snd \<circ> snd) ` E*)
-  \<comment> \<open>Should be derived from \<^session>\<open>Kruskal\<close>, but needs refactoring there (maybe make weighted_matroid an import of \<^locale>\<open>Kruskal_interface\<close>?\<close>
+  \<comment> \<open>Should be derived from \<^session>\<open>Kruskal\<close>, but needs refactoring there (maybe make \<^locale>\<open>weighted_matroid\<close> an import of \<^locale>\<open>Kruskal_interface\<close>?\<close>
   "matroid E (\<lambda>E'. forest \<lparr>nodes = V, edges = E'\<rparr> \<and>
        subgraph \<lparr>nodes = V, edges = E'\<rparr> \<lparr>nodes = V, edges = E\<rparr>)"
 proof
