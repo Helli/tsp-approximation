@@ -90,10 +90,30 @@ lemma (in valid_graph(*rm?*)) important:
   assumes no_id:"\<And>v w.(v,w,v) \<notin> E" (*rm*)
   \<comment> \<open>Should be derived from \<^session>\<open>Kruskal\<close>, but needs refactoring there (maybe make \<^locale>\<open>weighted_matroid\<close> an import of \<^locale>\<open>Kruskal_interface\<close>?\<close>
   shows "matroid E (\<lambda>E'. forest \<lparr>nodes = V, edges = E'\<rparr> \<and>
-     subgraph \<lparr>nodes = V, edges = E'\<rparr> \<lparr>nodes = V, edges = E\<rparr>)"
+     subgraph \<lparr>nodes = V, edges = E'\<rparr> \<lparr>nodes = V, edges = E\<rparr>)" (is "matroid E ?forest")
 proof
-  show "finite E"
-    oops
+  fix X
+  assume "?forest X"
+  then show "X \<subseteq> E"
+    by (simp add: subgraph_def)
+next
+  have "?forest {}"
+    unfolding subgraph_def apply auto apply unfold_locales apply auto done
+  then show "\<exists>X. ?forest X"
+    by blast
+next
+  fix X Y
+  assume "?forest X" "Y \<subseteq> X"
+  then show "?forest Y"
+    apply auto
+     apply (simp add: forest.subgraph_forest subgraph_def)
+    by (metis graph.select_convs(1) graph.select_convs(2) subgraph_def subset_trans)
+next
+  fix X Y
+  assume "?forest X" "?forest Y" "card X = Suc (card Y)"
+  then show "\<exists>x\<in>X - Y. ?forest (insert x Y)"
+    sorry
+qed (simp add: assms)
 
 lemma spanning_forest_symhull_preimage:
   assumes "finite E" "spanning_forest F \<lparr>nodes=V, edges=symhull E\<rparr>"
