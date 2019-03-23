@@ -114,6 +114,13 @@ next
     sorry
 qed (simp add: assms)
 
+locale finGraph = fixes E::"('a \<times> 'b \<times> 'a) set" and V::"'a set"
+  assumes fE: "finite E" and fV: "finite V"
+begin
+interpretation m: weighted_matroid E "\<lambda>E'. forest \<lparr>nodes = V, edges = E'\<rparr> \<and> subgraph \<lparr>nodes = V,
+  edges = E'\<rparr> \<lparr>nodes = V, edges = E\<rparr>" "edge_weight \<lparr>nodes = V, edges = E\<rparr>"
+  by (simp add: fE important weighted_matroid_def)
+
 lemma spanning_forest_symhull_preimage:
   assumes "finite E" "spanning_forest F \<lparr>nodes=V, edges=symhull E\<rparr>"
   shows "\<exists>F'. spanning_forest F' \<lparr>nodes=V, edges=E\<rparr> \<and> edge_weight F' = edge_weight F"
@@ -130,6 +137,7 @@ lemma optimal_forest_symhull:
   apply (simp add: symhull_def)
   oops
 
+end
 find_theorems SPEC spanning_forest
 
 text \<open>Citation test: @{cite lawler}.\<close>
