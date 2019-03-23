@@ -84,10 +84,9 @@ thm indep_system.basis_in_supI
 
 section \<open>Matroid Interpretation\<close>
 
-lemma (in valid_graph(*rm?*)) important:
+lemma important:
   (* V=fst ` E \<union> (snd \<circ> snd) ` E*)
-  assumes "finite E" "finite V" \<comment> \<open>need a proper locale with the correct assumptions\<close>
-  assumes no_id:"\<And>v w.(v,w,v) \<notin> E" (*rm*)
+  assumes "finite E" \<comment> \<open>need a proper locale with the correct assumptions\<close>
   \<comment> \<open>Should be derived from \<^session>\<open>Kruskal\<close>, but needs refactoring there (maybe make \<^locale>\<open>weighted_matroid\<close> an import of \<^locale>\<open>Kruskal_interface\<close>?\<close>
   shows "matroid E (\<lambda>E'. forest \<lparr>nodes = V, edges = E'\<rparr> \<and>
      subgraph \<lparr>nodes = V, edges = E'\<rparr> \<lparr>nodes = V, edges = E\<rparr>)" (is "matroid E ?forest")
