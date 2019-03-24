@@ -87,9 +87,10 @@ section \<open>Matroid Interpretation\<close>
 lemma matroid_forest:
   (* V=fst ` E \<union> (snd \<circ> snd) ` E*)
   assumes "finite E" \<comment> \<open>need a proper locale with the correct assumptions\<close>
-  \<comment> \<open>Should be derived from \<^session>\<open>Kruskal\<close>, but needs refactoring there (maybe make \<^locale>\<open>weighted_matroid\<close> an import of \<^locale>\<open>Kruskal_interface\<close>?\<close>
   shows "matroid E (\<lambda>E'. forest \<lparr>nodes = V, edges = E'\<rparr> \<and>
      subgraph \<lparr>nodes = V, edges = E'\<rparr> \<lparr>nodes = V, edges = E\<rparr>)" (is "matroid E ?forest")
+\<comment> \<open>should be derived from \<^session>\<open>Kruskal\<close>, but needs refactoring there (maybe make
+    \<^locale>\<open>weighted_matroid\<close> an import of \<^locale>\<open>Kruskal_interface\<close>?\<close>
 proof
   fix X
   assume "?forest X"
