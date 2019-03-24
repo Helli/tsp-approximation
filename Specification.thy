@@ -84,7 +84,7 @@ thm indep_system.basis_in_supI
 
 section \<open>Matroid Interpretation\<close>
 
-lemma important:
+lemma matroid_forest:
   (* V=fst ` E \<union> (snd \<circ> snd) ` E*)
   assumes "finite E" \<comment> \<open>need a proper locale with the correct assumptions\<close>
   \<comment> \<open>Should be derived from \<^session>\<open>Kruskal\<close>, but needs refactoring there (maybe make \<^locale>\<open>weighted_matroid\<close> an import of \<^locale>\<open>Kruskal_interface\<close>?\<close>
@@ -123,7 +123,7 @@ begin \<comment> \<open>@{class weight} might be too special, and @{thm valid_gr
 
 interpretation m: weighted_matroid E "\<lambda>E'. forest \<lparr>nodes = V, edges = E'\<rparr> \<and> subgraph \<lparr>nodes = V,
   edges = E'\<rparr> \<lparr>nodes = V, edges = E\<rparr>" "\<lambda>(_,w,_). w"
-  by (simp add: finite_E important weighted_matroid_def)
+  by (simp add: finite_E matroid_forest weighted_matroid_def)
 
 lemma spanning_forest_symhull_preimage:
   assumes "finite E" "spanning_forest F \<lparr>nodes=V, edges=symhull E\<rparr>"
