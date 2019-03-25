@@ -4,7 +4,6 @@ theory Specification
     Koenigsberg_Friendship.KoenigsbergBridge
     Kruskal.Graph_Definition_Impl
 begin hide_const a b c d
-hide_const "connected"
 
 subsubsection \<open>Undirected Hull\<close> \<comment> \<open>or rather: symmetric hull\<close>
 
@@ -143,7 +142,14 @@ lemma optimal_forest_symhull:
   oops
 
 end
-find_theorems SPEC spanning_forest
+
+context Kruskal_Impl
+begin
+
+lemmas k0 = kruskal0_refine minWeightBasis_refine
+lemma k0_spec: "kruskal0 \<le> SPEC MSF" using k0 unfolding nres_rel_def by auto
+end
+thm "Kruskal_Impl.k0_spec"
 
 text \<open>Citation test: @{cite lawler}.\<close>
 
