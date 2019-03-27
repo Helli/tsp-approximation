@@ -83,7 +83,7 @@ thm indep_system.basis_in_supI
 
 section \<open>Matroid Interpretation\<close>
 
-lemma matroid_forest:
+lemma
   (* V=fst ` E \<union> (snd \<circ> snd) ` E*)
   assumes "finite E" \<comment> \<open>need a proper locale with the correct assumptions\<close>
   shows "matroid E (\<lambda>E'. forest \<lparr>nodes = V, edges = E'\<rparr> \<and>
@@ -122,7 +122,7 @@ begin \<comment> \<open>@{class weight} might be too special, and @{thm valid_gr
 
 interpretation m: weighted_matroid E "\<lambda>E'. forest \<lparr>nodes = V, edges = E'\<rparr> \<and> subgraph \<lparr>nodes = V,
   edges = E'\<rparr> \<lparr>nodes = V, edges = E\<rparr>" "\<lambda>(_,w,_). w"
-  by (simp add: finite_E matroid_forest weighted_matroid_def)
+  by (simp add: s.weighted_matroid_axioms)
 
 lemma spanning_forest_symhull_preimage:
   assumes "finite E" "spanning_forest F \<lparr>nodes=V, edges=symhull E\<rparr>"
