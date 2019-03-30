@@ -102,13 +102,16 @@ interpretation m?: weighted_matroid E subforest "\<lambda>(_,w,_). w"
   by (simp add: s.weighted_matroid_axioms)
 
 lemma spanning_forest_symhull_preimage:
-  assumes "finite E" "spanning_forest F \<lparr>nodes=V, edges=symhull E\<rparr>"
+  assumes "spanning_forest F \<lparr>nodes=V, edges=symhull E\<rparr>"
   shows "\<exists>F'. spanning_forest F' \<lparr>nodes=V, edges=E\<rparr> \<and> edge_weight F' = edge_weight F"
   using assms
-proof (induction E set: finite)
-  case empty
-  show ?case
-    oops
+proof (induction "card E")
+  case 0
+  then show ?case sorry
+next
+  case (Suc x)
+  then show ?case sorry
+qed
 
 lemma optimal_forest_symhull:
   "optimal_forest F G \<Longrightarrow> optimal_forest F (G\<lparr>edges := symhull E\<rparr>)"
