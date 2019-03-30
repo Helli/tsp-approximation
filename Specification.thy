@@ -101,23 +101,10 @@ begin \<comment> \<open>@{class weight} might be too special, and @{thm valid_gr
 interpretation m?: weighted_matroid E subforest "\<lambda>(_,w,_). w"
   by (simp add: s.weighted_matroid_axioms)
 thm s.cl_augment
-find_theorems "m.lower_rank_of"
 lemma spanning_forest_symhull_preimage:
   assumes "subforest F"
   shows "\<exists>F'. subforest F' \<and> edge_weight (ind F') = edge_weight (ind F)"
   using assms by blast
-proof (induction "card E")
-  case 0
-  with finite_E have "E = {}"
-    by force
-  then have "F = {}"
-    using assms unfolding spanning_forest_def
-    by (simp add: subgraph_def symhull_def)
-  then show ?case
-next
-  case (Suc x)
-  then show ?case sorry
-qed
 
 lemma optimal_forest_symhull:
   "optimal_forest F G \<Longrightarrow> optimal_forest F (G\<lparr>edges := symhull E\<rparr>)"
