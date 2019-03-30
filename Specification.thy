@@ -98,8 +98,7 @@ thm class.weight_def thm class.ordered_comm_monoid_add_def
 context finite_weighted_graph \<comment> \<open>first usage in the AFP\<close>
 begin \<comment> \<open>@{class weight} might be too special, and @{thm valid_graph_axioms} unneeded\<close>
 
-interpretation m: weighted_matroid E "\<lambda>E'. forest \<lparr>nodes = V, edges = E'\<rparr> \<and> subgraph \<lparr>nodes = V,
-  edges = E'\<rparr> \<lparr>nodes = V, edges = E\<rparr>" "\<lambda>(_,w,_). w"
+interpretation m: weighted_matroid E subforest "\<lambda>(_,w,_). w"
   by (simp add: s.weighted_matroid_axioms)
 
 lemma spanning_forest_symhull_preimage:
