@@ -98,7 +98,7 @@ thm class.weight_def thm class.ordered_comm_monoid_add_def
 context finite_weighted_graph \<comment> \<open>first usage in the AFP\<close>
 begin \<comment> \<open>@{class weight} might be too special, and @{thm valid_graph_axioms} unneeded\<close>
 
-interpretation m: weighted_matroid E subforest "\<lambda>(_,w,_). w"
+interpretation m?: weighted_matroid E subforest "\<lambda>(_,w,_). w"
   by (simp add: s.weighted_matroid_axioms)
 
 lemma spanning_forest_symhull_preimage:
@@ -111,7 +111,7 @@ proof (induction E set: finite)
     oops
 
 lemma optimal_forest_symhull:
-  "optimal_forest F G \<Longrightarrow> optimal_forest F (G\<lparr>edges := symhull (edges G)\<rparr>)"
+  "optimal_forest F G \<Longrightarrow> optimal_forest F (G\<lparr>edges := symhull E\<rparr>)"
   unfolding optimal_forest_def
   apply auto
   apply (simp add: symhull_def)
