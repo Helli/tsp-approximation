@@ -195,7 +195,8 @@ lemma "indep_system E (\<lambda>E'. E'\<subseteq>E \<and> (\<forall>v\<in>V. dg 
 end
 end
 
-lemma "finite_weighted_graph G \<longleftrightarrow> finite_weighted_graph \<lparr>nodes = nodes G, edges = symhull (edges G)\<rparr>"
+lemma finite_weighted_graph_symhull_iff:
+    "finite_weighted_graph G \<longleftrightarrow> finite_weighted_graph \<lparr>nodes = nodes G, edges = symhull (edges G)\<rparr>"
   unfolding finite_weighted_graph_def finite_graph_def finite_graph_axioms_def apply auto
   using valid_graph.valid_graph_symhull apply blast
   apply (simp add: symhull_altdef)
@@ -204,12 +205,12 @@ proof -
     if "valid_graph \<lparr>nodes = nodes G, edges = symhull (edges G)\<rparr>"
       and "finite (symhull (edges G))"
       and "finite (nodes G)"
-    using that sorry
+    using that subgraph_def subset_eq_symhull valid_graph.valid_subgraph by fastforce
   show "finite (edges G)"
     if "valid_graph \<lparr>nodes = nodes G, edges = symhull (edges G)\<rparr>"
       and "finite (symhull (edges G))"
       and "finite (nodes G)"
-    using that sorry
+    using that infinite_super subset_eq_symhull by blast
 qed
 
 end
