@@ -53,6 +53,9 @@ lemma (in valid_graph) symhull_hull:
     then show ?case.
   qed
 
+lemma symhull_altdef: \<open>symhull E = E \<union> (\<lambda>(v1, w, v2). (v2, w, v1)) ` E\<close>
+  unfolding symhull_def by force
+
 lemma is_path_undir_symhull:
   "is_path_undir \<lparr>nodes=V, edges=symhull E\<rparr> v p v' \<Longrightarrow> is_path_undir \<lparr>nodes=V, edges=E\<rparr> v p v'"
   apply (induction "\<lparr>nodes=V, edges=symhull E\<rparr>" v p v' rule: is_path_undir.induct)
@@ -195,23 +198,8 @@ end
 lemma "finite_weighted_graph G \<longleftrightarrow> finite_weighted_graph \<lparr>nodes = nodes G, edges = symhull (edges G)\<rparr>"
   unfolding finite_weighted_graph_def finite_graph_def finite_graph_axioms_def apply auto
   using valid_graph.valid_graph_symhull apply blast
-    apply (simp add: symhull_def)
-  proof -
-  show "finite {(v1, w, v2) |v1 w v2. (v1, w, v2) \<in> edges G \<or> (v2, w, v1) \<in> edges G}"
-    if "finite (edges G)"
-  proof -
-    have "{(v1, w, v2) |v1 w v2. (v1, w, v2) \<in> edges G \<or> (v2, w, v1) \<in> edges G} =
-      {(v1, w, v2) |v1 w v2. (v1, w, v2) \<in> edges G} \<union> {(v1, w, v2) |v1 w v2. (v2, w, v1) \<in> edges G}"
-      by blast
-    also have "\<dots> = edges G \<union> {(v1, w, v2) |v1 w v2. (v2, w, v1) \<in> edges G}"
-      by auto
-    also have "\<dots> = edges G \<union> (\<lambda>(v1,w,v2). (v2,w,v1)) ` edges G"
-      by force
-    moreover have "finite ..."
-      using that by blast
-    ultimately show "finite {(v1, w, v2) |v1 w v2. (v1, w, v2) \<in> edges G \<or> (v2, w, v1) \<in> edges G}"
-      by auto
-  qed
+  apply (simp add: symhull_altdef)
+proof -
   show "valid_graph G"
     if "valid_graph \<lparr>nodes = nodes G, edges = symhull (edges G)\<rparr>"
       and "finite (symhull (edges G))"
