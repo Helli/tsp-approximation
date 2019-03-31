@@ -56,6 +56,14 @@ lemma (in valid_graph) symhull_hull:
 lemma symhull_altdef: \<open>symhull E = E \<union> (\<lambda>(v1, w, v2). (v2, w, v1)) ` E\<close>
   unfolding symhull_def by force
 
+lemma finite_weighted_graph_symhull_iff:
+    "finite_weighted_graph G \<longleftrightarrow> finite_weighted_graph \<lparr>nodes = nodes G, edges = symhull (edges G)\<rparr>"
+  unfolding finite_weighted_graph_def finite_graph_def finite_graph_axioms_def apply auto
+  using valid_graph.valid_graph_symhull apply blast
+  apply (simp add: symhull_altdef)
+    using subgraph_def subset_eq_symhull valid_graph.valid_subgraph apply fastforce
+    using infinite_super subset_eq_symhull by blast
+
 lemma is_path_undir_symhull:
   "is_path_undir \<lparr>nodes=V, edges=symhull E\<rparr> v p v' \<Longrightarrow> is_path_undir \<lparr>nodes=V, edges=E\<rparr> v p v'"
   apply (induction "\<lparr>nodes=V, edges=symhull E\<rparr>" v p v' rule: is_path_undir.induct)
@@ -194,23 +202,5 @@ lemma "indep_system E (\<lambda>E'. E'\<subseteq>E \<and> (\<forall>v\<in>V. dg 
 
 end
 end
-
-lemma finite_weighted_graph_symhull_iff:
-    "finite_weighted_graph G \<longleftrightarrow> finite_weighted_graph \<lparr>nodes = nodes G, edges = symhull (edges G)\<rparr>"
-  unfolding finite_weighted_graph_def finite_graph_def finite_graph_axioms_def apply auto
-  using valid_graph.valid_graph_symhull apply blast
-  apply (simp add: symhull_altdef)
-proof -
-  show "valid_graph G"
-    if "valid_graph \<lparr>nodes = nodes G, edges = symhull (edges G)\<rparr>"
-      and "finite (symhull (edges G))"
-      and "finite (nodes G)"
-    using that subgraph_def subset_eq_symhull valid_graph.valid_subgraph by fastforce
-  show "finite (edges G)"
-    if "valid_graph \<lparr>nodes = nodes G, edges = symhull (edges G)\<rparr>"
-      and "finite (symhull (edges G))"
-      and "finite (nodes G)"
-    using that infinite_super subset_eq_symhull by blast
-qed
 
 end
