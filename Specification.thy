@@ -27,6 +27,9 @@ lemma subset_eq_symhull: "E \<subseteq> symhull E"
 corollary supergraph_symhull: "subgraph G (G\<lparr>edges := symhull (edges G)\<rparr>)"
   by (simp add: subgraph_def subset_eq_symhull)
 
+lemma (in valid_graph) valid_graph_symhull: "valid_graph \<lparr>nodes = V, edges = symhull E\<rparr>"
+  apply unfold_locales apply auto using E_valid by (auto simp: symhull_def)
+
 lemma (in valid_graph) valid_unMultigraph_symhull:
   assumes no_id[simp]:"\<And>v w.(v,w,v) \<notin> E"
   shows "valid_unMultigraph (G\<lparr>edges := symhull E\<rparr>)"
@@ -188,5 +191,37 @@ lemma "indep_system E (\<lambda>E'. E'\<subseteq>E \<and> (\<forall>v\<in>V. dg 
 
 end
 end
+
+lemma "finite_weighted_graph G \<longleftrightarrow> finite_weighted_graph \<lparr>nodes = nodes G, edges = symhull (edges G)\<rparr>"
+  unfolding finite_weighted_graph_def finite_graph_def finite_graph_axioms_def apply auto
+  using valid_graph.valid_graph_symhull apply blast
+    apply (simp add: symhull_def)
+  proof -
+  show "finite {(v1, w, v2) |v1 w v2. (v1, w, v2) \<in> edges G \<or> (v2, w, v1) \<in> edges G}"
+    if "finite (edges G)"
+  proof -
+    have "{(v1, w, v2) |v1 w v2. (v1, w, v2) \<in> edges G \<or> (v2, w, v1) \<in> edges G} =
+      {(v1, w, v2) |v1 w v2. (v1, w, v2) \<in> edges G} \<union> {(v1, w, v2) |v1 w v2. (v2, w, v1) \<in> edges G}"
+      by blast
+    also have "\<dots> = edges G \<union> {(v1, w, v2) |v1 w v2. (v2, w, v1) \<in> edges G}"
+      by auto
+    also have "\<dots> = edges G \<union> (\<lambda>(v1,w,v2). (v2,w,v1)) ` edges G"
+      by force
+    moreover have "finite ..."
+      using that by blast
+    ultimately show "finite {(v1, w, v2) |v1 w v2. (v1, w, v2) \<in> edges G \<or> (v2, w, v1) \<in> edges G}"
+      by auto
+  qed
+  show "valid_graph G"
+    if "valid_graph \<lparr>nodes = nodes G, edges = symhull (edges G)\<rparr>"
+      and "finite (symhull (edges G))"
+      and "finite (nodes G)"
+    using that sorry
+  show "finite (edges G)"
+    if "valid_graph \<lparr>nodes = nodes G, edges = symhull (edges G)\<rparr>"
+      and "finite (symhull (edges G))"
+      and "finite (nodes G)"
+    using that sorry
+qed
 
 end
