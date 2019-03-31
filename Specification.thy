@@ -3,6 +3,7 @@ theory Specification
   imports
     Koenigsberg_Friendship.KoenigsbergBridge
     Kruskal.Graph_Definition_Impl
+    "HOL-ex.Sketch_and_Explore"
 begin hide_const a b c d
 
 subsubsection \<open>Undirected Hull\<close> \<comment> \<open>or rather: symmetric hull\<close>
@@ -104,6 +105,7 @@ thm s.cl_augment
 lemma spanning_forest_symhull_preimage:
   assumes "subforest F"
   shows "\<exists>F'. subforest F' \<and> edge_weight (ind F') = edge_weight (ind F)"
+  explore -
   using assms by blast
 
 lemma optimal_forest_symhull:
