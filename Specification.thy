@@ -135,20 +135,28 @@ next
     by blast
 next
   case (insert x I)
-  then obtain u w v where "x=(u,w,v)" sorry
-  have "F\<subseteq>symhull E" sorry
-  have "(v,w,u)\<in>E" sorry
+  then obtain u w v where x: "x=(u,w,v)"
+    by (meson prod_cases3)
+  have "F\<subseteq>symhull E"
+    by (metis graph.select_convs(2) insert.prems(2) subgraph_def)
+  have f1: "(u, w, v) \<notin> E"
+    using insert.hyps(4) x by blast
+  have "(u, w, v) \<in> symhull E"
+    by (metis Diff_subset \<open>F \<subseteq> symhull E\<close> insert.hyps(4) insertI1 subset_eq x)
+  then have "\<exists>a b aa. (u, w, v) = (a, b, aa) \<and> ((a, b, aa) \<in> E \<or> (aa, b, a) \<in> E)"
+    by (simp add: symhull_def)
+  then have "(v,w,u)\<in>E"
+    by (simp add: f1)
   with insert  have *: "I = ( (F - {x}) \<union> {(v,w,u)} ) - E"
       and **: "x\<notin>E" and ***: "x\<in>F"
     by blast+
-
   from insert(3)[OF *] obtain F' where
-"(forest \<lparr>nodes = nodes \<lparr>nodes = V, edges = E\<rparr>, edges = F'\<rparr> \<and>
+    "(forest \<lparr>nodes = nodes \<lparr>nodes = V, edges = E\<rparr>, edges = F'\<rparr> \<and>
       subgraph \<lparr>nodes = nodes \<lparr>nodes = V, edges = E\<rparr>, edges = F'\<rparr>
-       \<lparr>nodes = nodes \<lparr>nodes = V, edges = E\<rparr>, edges = edges \<lparr>nodes = V, edges = E\<rparr>\<rparr>) \<and>
+      \<lparr>nodes = nodes \<lparr>nodes = V, edges = E\<rparr>, edges = edges \<lparr>nodes = V, edges = E\<rparr>\<rparr>) \<and>
      edge_weight \<lparr>nodes = V, edges = F'\<rparr> = edge_weight \<lparr>nodes = V, edges = F - {x}  \<union> {(v, w, u)}\<rparr> \<and>
      maximally_connected \<lparr>nodes = V, edges = F'\<rparr> \<lparr>nodes = V, edges = E\<rparr>"
-    sorry
+    apply auto sorry
   then show ?case apply(intro exI[where x="F'"])
      apply safe sorry
 qed
