@@ -147,16 +147,14 @@ next
     by (simp add: symhull_def)
   then have "(v,w,u)\<in>E"
     by (simp add: f1)
-  with insert  have *: "I = ( (F - {x}) \<union> {(v,w,u)} ) - E"
-      and **: "x\<notin>E" and ***: "x\<in>F"
+  with insert have *: "I = F - {x} \<union> {(v,w,u)} - E" and **: "x\<notin>E" and ***: "x\<in>F"
     by blast+
-  from insert(3)[OF *] obtain F' where
-    "(forest \<lparr>nodes = nodes \<lparr>nodes = V, edges = E\<rparr>, edges = F'\<rparr> \<and>
-      subgraph \<lparr>nodes = nodes \<lparr>nodes = V, edges = E\<rparr>, edges = F'\<rparr>
-      \<lparr>nodes = nodes \<lparr>nodes = V, edges = E\<rparr>, edges = edges \<lparr>nodes = V, edges = E\<rparr>\<rparr>) \<and>
+  from "insert.hyps"(3)[OF *, simplified] obtain F' where
+    "(forest \<lparr>nodes = V, edges = F'\<rparr> \<and>
+      subgraph \<lparr>nodes = V, edges = F'\<rparr> \<lparr>nodes = V, edges = E\<rparr>) \<and>
      edge_weight \<lparr>nodes = V, edges = F'\<rparr> = edge_weight \<lparr>nodes = V, edges = F - {x}  \<union> {(v, w, u)}\<rparr> \<and>
      maximally_connected \<lparr>nodes = V, edges = F'\<rparr> \<lparr>nodes = V, edges = E\<rparr>"
-    apply auto sorry
+    apply simp sorry
   then show ?case apply(intro exI[where x="F'"])
      apply safe sorry
 qed
