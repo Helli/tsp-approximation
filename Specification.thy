@@ -115,9 +115,12 @@ begin \<comment> \<open>@{class weight} might be too special, and @{thm valid_gr
 
 interpretation m?: weighted_matroid E subforest "\<lambda>(_,w,_). w"
   by (simp add: s.weighted_matroid_axioms)
-thm s.cl_augment
+
+lemma a: "finite_weighted_graph\<lparr>nodes = V, edges = symhull E\<rparr>"
+  using finite_weighted_graph_axioms finite_weighted_graph_symhull_iff by blast
+
 lemma spanning_forest_symhull_preimage:
-  assumes "subforest F"
+  assumes "finite_weighted_graph.subforest (ind (symhull E)) F"
   shows "\<exists>F'. subforest F' \<and> edge_weight (ind F') = edge_weight (ind F)"
   explore -
   using assms by blast
