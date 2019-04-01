@@ -117,34 +117,30 @@ lemma mirror_single_edge_weight:
 
 lemma spanning_forest_symhull_preimage:
   assumes "finite_weighted_graph \<lparr>nodes=V, edges=E\<rparr>"
-  assumes "finite_weighted_graph.subforest \<lparr>nodes=V, edges=symhull E\<rparr> F"
-    and "maximally_connected \<lparr>nodes=V, edges=F\<rparr> \<lparr>nodes=V, edges=symhull E\<rparr>"
-  shows "\<exists>F'. finite_weighted_graph.subforest \<lparr>nodes=V, edges=E\<rparr> F'
-    \<and> edge_weight \<lparr>nodes=V, edges=F'\<rparr> = edge_weight \<lparr>nodes=V, edges=F\<rparr>
-    \<and> maximally_connected \<lparr>nodes=V, edges=F'\<rparr> \<lparr>nodes=V, edges=E\<rparr>"
+  assumes "spanning_forest \<lparr>nodes=V, edges=F\<rparr> \<lparr>nodes=V, edges=symhull E\<rparr>"
+  shows "\<exists>F'. spanning_forest \<lparr>nodes=V, edges=F'\<rparr> \<lparr>nodes=V, edges=E\<rparr>
+    \<and> edge_weight \<lparr>nodes=V, edges=F'\<rparr> = edge_weight \<lparr>nodes=V, edges=F\<rparr>"
   using assms
 proof (induction "F - E" arbitrary: F rule: infinite_finite_induct)
   case infinite
   have "finite F"
-    by (metis finite_graph.finite_E finite_weighted_graph.a finite_weighted_graph_def graph.select_convs(2) infinite.prems(1) infinite.prems(2) infinite_super subgraph_def)
+    by (metis finite_graph.finite_E finite_weighted_graph.a finite_weighted_graph.axioms graph.select_convs(2) infinite.prems(1) infinite.prems(2) infinite_super spanning_forest_def subgraph_def)
   with infinite show ?case
     by blast
 next
   case empty
-  then have "finite_weighted_graph.subforest \<lparr>nodes=V, edges=E\<rparr> F
-    \<and> edge_weight \<lparr>nodes=V, edges=F\<rparr> = edge_weight \<lparr>nodes=V, edges=F\<rparr>
-    \<and> maximally_connected \<lparr>nodes=V, edges=F\<rparr> \<lparr>nodes=V, edges=E\<rparr>"
-    apply auto
-    using subgraph_def apply fastforce
-    using maximally_connected_antimono subset_eq_symhull by blast
+  then have "subgraph \<lparr>nodes=V, edges=F\<rparr> \<lparr>nodes=V, edges=E\<rparr>"
+    using subgraph_def by fastforce
+  then have "spanning_forest \<lparr>nodes=V, edges=F\<rparr> \<lparr>nodes=V, edges=E\<rparr>"
+    by (meson empty.prems(2) maximally_connected_antimono spanning_forest_def subset_eq_symhull)
   then show ?case
     by blast
 next
   case (insert x I)
   then obtain u w v where x: "x=(u,w,v)"
     by (meson prod_cases3)
-  have "F\<subseteq>symhull E"
-    by (metis graph.select_convs(2) insert.prems(2) subgraph_def)
+  have F_in_symhull: "F \<subseteq> symhull E"
+    by (metis graph.select_convs(2) insert.prems(2) spanning_forest_def subgraph_def)
   have f1: "(u, w, v) \<notin> E"
     using insert.hyps(4) x by blast
   have "(u, w, v) \<in> symhull E"
@@ -157,11 +153,9 @@ next
     by blast+
   then have "(v,w,u) \<notin> F"
     thm spanning_forest_def sorry
-  from "insert.hyps"(3)[OF *, simplified] obtain F' where
-    "(forest \<lparr>nodes = V, edges = F'\<rparr> \<and>
-      subgraph \<lparr>nodes = V, edges = F'\<rparr> \<lparr>nodes = V, edges = E\<rparr>) \<and>
-     edge_weight \<lparr>nodes = V, edges = F'\<rparr> = edge_weight \<lparr>nodes = V, edges = F - {x}  \<union> {(v, w, u)}\<rparr> \<and>
-     maximally_connected \<lparr>nodes = V, edges = F'\<rparr> \<lparr>nodes = V, edges = E\<rparr>"
+  from "insert.hyps"(3)[OF *] obtain F' where
+    "spanning_forest \<lparr>nodes = V, edges = F'\<rparr> \<lparr>nodes = V, edges = E\<rparr> \<and>
+     edge_weight \<lparr>nodes = V, edges = F'\<rparr> = edge_weight \<lparr>nodes = V, edges = F - {x}  \<union> {(v, w, u)}\<rparr>"
     apply simp sorry
   then show ?case apply(intro exI[where x="F'"])
      apply safe
