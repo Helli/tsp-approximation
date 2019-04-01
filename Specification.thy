@@ -113,13 +113,16 @@ lemma spanning_forest_symhull_preimage:
   assumes "finite_weighted_graph \<lparr>nodes=V, edges=E\<rparr>"
   assumes "finite_weighted_graph.subforest \<lparr>nodes=V, edges=symhull E\<rparr> F"
     and "maximally_connected \<lparr>nodes=V, edges=F\<rparr> \<lparr>nodes=V, edges=symhull E\<rparr>"
-  shows "\<exists>F'. finite_weighted_graph.subforest \<lparr>nodes=V, edges=E\<rparr> F' \<and> edge_weight \<lparr>nodes=V, edges=F'\<rparr> = edge_weight \<lparr>nodes=V, edges=F\<rparr>
+  shows "\<exists>F'. finite_weighted_graph.subforest \<lparr>nodes=V, edges=E\<rparr> F'
+    \<and> edge_weight \<lparr>nodes=V, edges=F'\<rparr> = edge_weight \<lparr>nodes=V, edges=F\<rparr>
     \<and> maximally_connected \<lparr>nodes=V, edges=F'\<rparr> \<lparr>nodes=V, edges=E\<rparr>"
   using assms
 proof (induction "F - E" arbitrary: F rule: infinite_finite_induct)
-case infinite
-  then show ?case
-    using finite_graph.finite_E finite_weighted_graph_def sorry
+  case infinite
+  have "finite F"
+    by (metis finite_graph.finite_E finite_weighted_graph.a finite_weighted_graph_def graph.select_convs(2) infinite.prems(1) infinite.prems(2) infinite_super subgraph_def)
+  with infinite show ?case
+    by blast
 next
   case empty
   then have "finite_weighted_graph.subforest \<lparr>nodes=V, edges=E\<rparr> F
