@@ -119,29 +119,48 @@ interpretation m?: weighted_matroid E subforest "\<lambda>(_,w,_). w"
 lemma a: "finite_weighted_graph\<lparr>nodes = V, edges = symhull E\<rparr>"
   using finite_weighted_graph_axioms finite_weighted_graph_symhull_iff by blast
 
+end
+
 lemma spanning_forest_symhull_preimage:
-  assumes "finite_weighted_graph.subforest (ind (symhull E)) F"
-    and "maximally_connected (ind F) (ind (symhull E))"
-  shows "\<exists>F'. subforest F' \<and> edge_weight (ind F') = edge_weight (ind F)
-    \<and> maximally_connected (ind F') G"
+  assumes "finite_weighted_graph \<lparr>nodes=V, edges=E\<rparr>"
+  assumes "finite_weighted_graph.subforest \<lparr>nodes=V, edges=symhull E\<rparr> F"
+    and "maximally_connected \<lparr>nodes=V, edges=F\<rparr> \<lparr>nodes=V, edges=symhull E\<rparr>"
+  shows "\<exists>F'. finite_weighted_graph.subforest \<lparr>nodes=V, edges=E\<rparr> F' \<and> edge_weight \<lparr>nodes=V, edges=F'\<rparr> = edge_weight \<lparr>nodes=V, edges=F\<rparr>
+    \<and> maximally_connected \<lparr>nodes=V, edges=F'\<rparr> \<lparr>nodes=V, edges=E\<rparr>"
   using assms
-proof (induction E arbitrary: F rule: infinite_finite_induct)
+proof (induction "F - E" arbitrary: F rule: infinite_finite_induct)
 case infinite
-  then show ?case using s.finiteE by blast
+  then show ?case
+    using finite_graph.finite_E finite_weighted_graph_def sorry
 next
   case empty
-  then have "symhull E = {}"
-    by (simp add: symhull_def)
-  with assms have "F = {}"
-    by (metis empty.prems(1) graph.select_convs(2) subgraph_def subset_empty)
+  then have "finite_weighted_graph.subforest \<lparr>nodes=V, edges=E\<rparr> F
+    \<and> edge_weight \<lparr>nodes=V, edges=F\<rparr> = edge_weight \<lparr>nodes=V, edges=F\<rparr>
+    \<and> maximally_connected \<lparr>nodes=V, edges=F\<rparr> \<lparr>nodes=V, edges=E\<rparr>"
+    apply auto
+    using subgraph_def apply fastforce
+    using maximally_connected_antimono subset_eq_symhull by blast
   then show ?case
-    by (metis (full_types) empty.hyps equals0D graph.surjective old.unit.exhaust s.indep_empty valid_graph.induce_maximally_connected valid_graph_axioms)
+    by blast
 next
-  case (insert x E)
-then show ?case sorry
-qed
+  case (insert x I)
+  then obtain u w v where "x=(u,w,v)" sorry
+  have "F\<subseteq>symhull E" sorry
+  have "(v,w,u)\<in>E" sorry
+  with insert  have *: "I = ( (F - {x}) \<union> {(v,w,u)} ) - E"
+      and **: "x\<notin>E" and ***: "x\<in>F"
+    by blast+
 
-end
+  from insert(3)[OF *] obtain F' where
+"(forest \<lparr>nodes = nodes \<lparr>nodes = V, edges = E\<rparr>, edges = F'\<rparr> \<and>
+      subgraph \<lparr>nodes = nodes \<lparr>nodes = V, edges = E\<rparr>, edges = F'\<rparr>
+       \<lparr>nodes = nodes \<lparr>nodes = V, edges = E\<rparr>, edges = edges \<lparr>nodes = V, edges = E\<rparr>\<rparr>) \<and>
+     edge_weight \<lparr>nodes = V, edges = F'\<rparr> = edge_weight \<lparr>nodes = V, edges = F - {x}  \<union> {(v, w, u)}\<rparr> \<and>
+     maximally_connected \<lparr>nodes = V, edges = F'\<rparr> \<lparr>nodes = V, edges = E\<rparr>"
+    sorry
+  then show ?case apply(intro exI[where x="F'"])
+     apply safe sorry
+qed
 
 lemma edge_weight_same: "edge_weight \<lparr>nodes=V,edges=E\<rparr> = edge_weight \<lparr>nodes=V',edges=E\<rparr>"
   unfolding edge_weight_def by fastforce
