@@ -121,18 +121,40 @@ lemma a: "finite_weighted_graph\<lparr>nodes = V, edges = symhull E\<rparr>"
 
 lemma spanning_forest_symhull_preimage:
   assumes "finite_weighted_graph.subforest (ind (symhull E)) F"
-  shows "\<exists>F'. subforest F' \<and> edge_weight (ind F') = edge_weight (ind F)"
-  explore -
-  using assms by blast
+    and "maximally_connected (ind F) (ind (symhull E))"
+  shows "\<exists>F'. subforest F' \<and> edge_weight (ind F') = edge_weight (ind F)
+    \<and> maximally_connected (ind F') G"
+  using assms
+proof (induction E arbitrary: F rule: infinite_finite_induct)
+case infinite
+  then show ?case using s.finiteE by blast
+next
+  case empty
+  then have "symhull E = {}"
+    by (simp add: symhull_def)
+  with assms have "F = {}"
+    by (metis empty.prems(1) graph.select_convs(2) subgraph_def subset_empty)
+  then show ?case
+    by (metis (full_types) empty.hyps equals0D graph.surjective old.unit.exhaust s.indep_empty valid_graph.induce_maximally_connected valid_graph_axioms)
+next
+  case (insert x E)
+then show ?case sorry
+qed
+
+end
+
+lemma edge_weight_same: "edge_weight \<lparr>nodes=V,edges=E\<rparr> = edge_weight \<lparr>nodes=V',edges=E\<rparr>"
+  unfolding edge_weight_def by fastforce
+
+lemma optimal_forest_mono:
+  assumes "subgraph G G'"
+  assumes "optimal_forest (G\<lparr>edges:=F\<rparr>) G" and "optimal_forest (G'\<lparr>edges:=F'\<rparr>) G'"
+  shows "edge_weight (G\<lparr>edges:=F\<rparr>) \<le> edge_weight (G'\<lparr>edges:=F'\<rparr>)"
+  oops
 
 lemma optimal_forest_symhull:
   "optimal_forest F G \<Longrightarrow> optimal_forest F (G\<lparr>edges := symhull E\<rparr>)"
-  unfolding optimal_forest_def
-  apply auto
-  apply (simp add: symhull_def)
-  oops
-
-end
+  unfolding optimal_forest_def oops
 
 context Kruskal_Impl
 begin
