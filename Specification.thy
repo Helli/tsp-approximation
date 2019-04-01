@@ -98,18 +98,6 @@ thm indep_system.basis_in_supI
 
 section \<open>Matroid Interpretation\<close>
 
-lemma
-  (* V=fst ` E \<union> (snd \<circ> snd) ` E*)
-  assumes "finite E" \<comment> \<open>need a proper locale with the correct assumptions\<close>
-  shows "matroid E (\<lambda>E'. forest \<lparr>nodes = V, edges = E'\<rparr> \<and>
-     subgraph \<lparr>nodes = V, edges = E'\<rparr> \<lparr>nodes = V, edges = E\<rparr>)" (is "matroid E ?forest")
-\<comment> \<open>should be derived from \<^session>\<open>Kruskal\<close>, but needs refactoring there\<close>
-  oops
-
-context weight begin subclass ordered_comm_monoid_add.. end
-\<comment> \<open>could replace @{class ordered_ab_semigroup_add} and @{class comm_monoid_add} in @{class weight}'s def\<close>
-thm class.weight_def thm class.ordered_comm_monoid_add_def
-
 context finite_weighted_graph \<comment> \<open>first usage in the AFP\<close>
 begin \<comment> \<open>@{class weight} might be too special, and @{thm valid_graph_axioms} unneeded\<close>
 
