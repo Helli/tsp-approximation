@@ -109,6 +109,12 @@ lemma a: "finite_weighted_graph\<lparr>nodes = V, edges = symhull E\<rparr>"
 
 end
 
+lemma mirror_single_edge_weight:
+  assumes "(u,w,v) \<in> F" "(v,w,u) \<notin> F"
+  shows "edge_weight \<lparr>nodes=V, edges = insert (v,w,u) (F-{(u,w,v)})\<rparr> = edge_weight \<lparr>nodes=V', edges=F\<rparr>"
+  using assms unfolding edge_weight_def apply simp
+  by (smt Diff_idemp Diff_insert0 Diff_insert2 finite_insert fst_conv insertCI insert_Diff snd_conv sum.infinite sum.insert_remove)
+
 lemma spanning_forest_symhull_preimage:
   assumes "finite_weighted_graph \<lparr>nodes=V, edges=E\<rparr>"
   assumes "finite_weighted_graph.subforest \<lparr>nodes=V, edges=symhull E\<rparr> F"
@@ -149,6 +155,8 @@ next
     by (simp add: f1)
   with insert have *: "I = F - {x} \<union> {(v,w,u)} - E" and **: "x\<notin>E" and ***: "x\<in>F"
     by blast+
+  then have "(v,w,u) \<notin> F"
+    thm spanning_forest_def sorry
   from "insert.hyps"(3)[OF *, simplified] obtain F' where
     "(forest \<lparr>nodes = V, edges = F'\<rparr> \<and>
       subgraph \<lparr>nodes = V, edges = F'\<rparr> \<lparr>nodes = V, edges = E\<rparr>) \<and>
@@ -156,7 +164,10 @@ next
      maximally_connected \<lparr>nodes = V, edges = F'\<rparr> \<lparr>nodes = V, edges = E\<rparr>"
     apply simp sorry
   then show ?case apply(intro exI[where x="F'"])
-     apply safe sorry
+     apply safe
+      apply simp+ unfolding x apply (rule mirror_single_edge_weight)
+    using "***" x apply blast
+    using insert sorry
 qed
 
 lemma edge_weight_same: "edge_weight \<lparr>nodes=V,edges=E\<rparr> = edge_weight \<lparr>nodes=V',edges=E\<rparr>"
