@@ -109,9 +109,11 @@ lemma a: "finite_weighted_graph\<lparr>nodes = V, edges = symhull E\<rparr>"
 
 end
 
+abbreviation "mirror_edge u w v G \<equiv> add_edge v w u (delete_edge u w v G)"
+
 lemma mirror_single_edge_weight:
-  assumes "(u,w,v) \<in> F" "(v,w,u) \<notin> F"
-  shows "edge_weight \<lparr>nodes=V, edges = insert (v,w,u) (F-{(u,w,v)})\<rparr> = edge_weight \<lparr>nodes=V', edges=F\<rparr>"
+  assumes "(u,w,v) \<in> E" "(v,w,u) \<notin> E"
+  shows "edge_weight (mirror_edge u w v \<lparr>nodes=V, edges=E\<rparr>) = edge_weight \<lparr>nodes=V', edges=E\<rparr>"
   using assms unfolding edge_weight_def apply simp
   by (smt Diff_idemp Diff_insert0 Diff_insert2 finite_insert fst_conv insertCI insert_Diff snd_conv sum.infinite sum.insert_remove)
 
@@ -196,21 +198,23 @@ next
     by (metis Diff_subset \<open>F \<subseteq> symhull E\<close> insert.hyps(4) insertI1 subset_eq x)
   then have "\<exists>a b aa. (u, w, v) = (a, b, aa) \<and> ((a, b, aa) \<in> E \<or> (aa, b, a) \<in> E)"
     by (simp add: symhull_def)
-  then have "(v,w,u)\<in>E"
-    by (simp add: f1)
-  with insert have *: "I = F - {x} \<union> {(v,w,u)} - E" and **: "x\<notin>E" and ***: "x\<in>F"
-    by blast+
+  then have "(v,w,u)\<in>E" and **: "x\<notin>E" and ***: "x\<in>F"
+      apply (simp add: f1)
+    apply (simp add: f1 x)
+    using insert.hyps(4) by auto
+  with \<open>x \<in> F\<close> have "(v,w,u) \<notin> F"
+    using forest_no_dups x local.insert(6) spanning_forest_def by fastforce
+  then have *: "I = edges (mirror_edge u w v \<lparr>nodes=V, edges=F\<rparr>) - E"
+    by (smt DiffD2 Diff_insert_absorb Diff_subset \<open>(v, w, u) \<in> E\<close> edges_add_edge edges_delete_edge graph.select_convs(2) in_mono insert.hyps(2) insert.hyps(4) insert_Diff insert_Diff_if set_minus_singleton_eq x)
   have "forest \<lparr>nodes=V, edges=F\<rparr>"
     using insert.prems(2) spanning_forest_def by blast
-  with \<open>x \<in> F\<close> have "(v,w,u) \<notin> F"
-    using forest_no_dups x by fastforce
   from \<open>spanning_forest \<lparr>nodes = V, edges = F\<rparr> \<lparr>nodes = V, edges = symhull E\<rparr>\<close>
   have "spanning_forest \<lparr>nodes = V, edges = F - {x} \<union> {(v, w, u)}\<rparr> \<lparr>nodes = V, edges = symhull E\<rparr>"
     apply (simp add: spanning_forest_def)
     apply auto sorry
   from "insert.hyps"(3)[OF *] obtain F' where
     "spanning_forest \<lparr>nodes = V, edges = F'\<rparr> \<lparr>nodes = V, edges = E\<rparr> \<and>
-     edge_weight \<lparr>nodes = V, edges = F'\<rparr> = edge_weight \<lparr>nodes = V, edges = F - {x}  \<union> {(v, w, u)}\<rparr>"
+     edge_weight \<lparr>nodes = V, edges = F'\<rparr> = edge_weight (mirror_edge u w v \<lparr>nodes = V, edges = F\<rparr>)"
     apply simp sorry
   then show ?case apply(intro exI[where x="F'"])
      apply safe
