@@ -178,7 +178,7 @@ next
      apply safe
       apply simp+ unfolding x apply (rule mirror_single_edge_weight)
     using "***" x apply blast
-    using insert sorry
+    using \<open>(v, w, u) \<notin> F\<close> by blast
 qed
 
 lemma edge_weight_same: "edge_weight \<lparr>nodes=V,edges=E\<rparr> = edge_weight \<lparr>nodes=V',edges=E\<rparr>"
