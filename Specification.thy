@@ -130,6 +130,40 @@ qed
 corollary forest_no_loops: "forest F \<Longrightarrow> (u,w,u) \<notin> edges F"
   by (meson forest_no_dups)
 
+lemma (in forest) mirror_single:
+  assumes "(u,w,v) \<in> E"
+  shows "forest \<lparr>nodes=V, edges=insert (v,w,u) (E-{(u,w,v)})\<rparr>"
+  apply unfold_locales
+  using E_validD apply auto
+  using assms apply auto
+  oops
+
+lemma (in finite_weighted_graph (*?*)) spanning_forest_mirror_single:
+  assumes "spanning_forest \<lparr>nodes=V, edges=F\<rparr> G" and "(u,w,v)\<in>F"
+  shows "spanning_forest \<lparr>nodes=V, edges=insert (v,w,u) (F-{(u,w,v)})\<rparr> G"
+  using assms apply (simp add: spanning_forest_def)
+  apply auto
+  proof -
+  show "forest (ind (insert (v, w, u) (F - {(u, w, v)})))"
+    if "(u, w, v) \<in> F"
+      and "forest (ind F)"
+      and "maximally_connected (ind F) G"
+      and "subgraph (ind F) G"
+    using that sorry
+  show "maximally_connected (ind (insert (v, w, u) (F - {(u, w, v)}))) G"
+    if "(u, w, v) \<in> F"
+      and "forest (ind F)"
+      and "maximally_connected (ind F) G"
+      and "subgraph (ind F) G"
+    using that sorry
+  show "subgraph (ind (insert (v, w, u) (F - {(u, w, v)}))) G"
+    if "(u, w, v) \<in> F"
+      and "forest (ind F)"
+      and "maximally_connected (ind F) G"
+      and "subgraph (ind F) G"
+    using that sorry
+qed
+
 lemma spanning_forest_symhull_preimage:
   assumes "finite_weighted_graph \<lparr>nodes=V, edges=E\<rparr>"
   assumes "spanning_forest \<lparr>nodes=V, edges=F\<rparr> \<lparr>nodes=V, edges=symhull E\<rparr>"
@@ -170,6 +204,10 @@ next
     using insert.prems(2) spanning_forest_def by blast
   with \<open>x \<in> F\<close> have "(v,w,u) \<notin> F"
     using forest_no_dups x by fastforce
+  from \<open>spanning_forest \<lparr>nodes = V, edges = F\<rparr> \<lparr>nodes = V, edges = symhull E\<rparr>\<close>
+  have "spanning_forest \<lparr>nodes = V, edges = F - {x} \<union> {(v, w, u)}\<rparr> \<lparr>nodes = V, edges = symhull E\<rparr>"
+    apply (simp add: spanning_forest_def)
+    apply auto sorry
   from "insert.hyps"(3)[OF *] obtain F' where
     "spanning_forest \<lparr>nodes = V, edges = F'\<rparr> \<lparr>nodes = V, edges = E\<rparr> \<and>
      edge_weight \<lparr>nodes = V, edges = F'\<rparr> = edge_weight \<lparr>nodes = V, edges = F - {x}  \<union> {(v, w, u)}\<rparr>"
