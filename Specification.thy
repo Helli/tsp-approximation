@@ -166,8 +166,10 @@ next
     by (simp add: f1)
   with insert have *: "I = F - {x} \<union> {(v,w,u)} - E" and **: "x\<notin>E" and ***: "x\<in>F"
     by blast+
-  then have "(v,w,u) \<notin> F"
-    sorry
+  have "forest \<lparr>nodes=V, edges=F\<rparr>"
+    using insert.prems(2) spanning_forest_def by blast
+  with \<open>x \<in> F\<close> have "(v,w,u) \<notin> F"
+    using forest_no_dups x by fastforce
   from "insert.hyps"(3)[OF *] obtain F' where
     "spanning_forest \<lparr>nodes = V, edges = F'\<rparr> \<lparr>nodes = V, edges = E\<rparr> \<and>
      edge_weight \<lparr>nodes = V, edges = F'\<rparr> = edge_weight \<lparr>nodes = V, edges = F - {x}  \<union> {(v, w, u)}\<rparr>"
