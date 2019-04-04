@@ -132,13 +132,21 @@ qed
 corollary forest_no_loops: "forest F \<Longrightarrow> (u,w,u) \<notin> edges F"
   by (meson forest_no_dups)
 
+lemma (in valid_graph) delete_mirrored: "u\<in>V \<Longrightarrow> v\<in>V \<Longrightarrow> delete_edge v w u (mirror_edge u w v G) = delete_edge v w u (delete_edge u w v G)"
+  by (simp add: insert_absorb)
+
 lemma (in forest) mirror_single:
   assumes "(u,w,v) \<in> E"
-  shows "forest \<lparr>nodes=V, edges=insert (v,w,u) (E-{(u,w,v)})\<rparr>"
-  apply unfold_locales
-  using E_validD apply auto
-  using assms apply auto
-  oops
+  shows "forest (mirror_edge u w v \<lparr>nodes=V, edges=E\<rparr>)"
+proof unfold_locales
+  show "fst ` edges (mirror_edge u w v \<lparr>nodes = V, edges = E\<rparr>) \<subseteq> nodes (mirror_edge u w v \<lparr>nodes = V, edges = E\<rparr>)"
+    using E_valid(1) image_eqI by auto
+  show "snd ` snd ` edges (mirror_edge u w v \<lparr>nodes = V, edges = E\<rparr>) \<subseteq> nodes (mirror_edge u w v \<lparr>nodes = V, edges = E\<rparr>)"
+    by (metis add_edge_valid forest.delete_edge_valid' forest_axioms graph.surjective old.unit.exhaust valid_graph_def)
+  show "\<forall>(a, wa, b) \<in>edges (mirror_edge u w v \<lparr>nodes = V, edges = E\<rparr>). \<not>nodes_connected (delete_edge a wa b (mirror_edge u w v \<lparr>nodes = V, edges = E\<rparr>)) a b"
+    apply simp
+    sorry
+qed
 
 lemma (in finite_weighted_graph (*?*)) spanning_forest_mirror_single:
   assumes "spanning_forest \<lparr>nodes=V, edges=F\<rparr> G" and "(u,w,v)\<in>F"
