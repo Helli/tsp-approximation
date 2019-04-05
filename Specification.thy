@@ -142,20 +142,34 @@ lemma (in valid_graph) is_path_undir_mirror_single_iff:
     \<longleftrightarrow> (v1,w',v2)\<in>edges G \<or> (v2,w',v1)\<in>edges G"
   using assms by auto
 
-lemma (in valid_graph) [simp]:
+lemma (in valid_graph)[simp]:
   assumes \<open>(u,w,v)\<in>E\<close>
   shows "nodes_connected (mirror_edge u w v G) a b \<longleftrightarrow> nodes_connected G a b"
 proof -
-  assume e: "(u, w, v) \<in> E"
-  have "nodes_connected G a b" if "is_path_undir (mirror_edge u w v G) a p b" for p
-    using that
-  proof (induction \<open>mirror_edge u w v G\<close> a p b rule: is_path_undir.induct)
-    case (1 v v')
-    then show ?case
-      by (metis e insert_absorb is_path_undir.simps(1) nodes_add_edge nodes_delete_edge valid_graph.E_validD(1) valid_graph.E_validD(2) valid_graph_axioms)
-  next
-    case (2 v v1 w' v2 p v')
-    then show ?case (*
+  {
+    assume e: "(u, w, v) \<in> E"
+    have a: "nodes_connected G a b" if "is_path_undir (mirror_edge u w v G) a p b" for p
+      using that
+    proof (induction \<open>mirror_edge u w v G\<close> a p b rule: is_path_undir.induct)
+      case (1 v v')
+      then show ?case
+        by (metis e insert_absorb is_path_undir.simps(1) nodes_add_edge nodes_delete_edge valid_graph.E_validD(1) valid_graph.E_validD(2) valid_graph_axioms)
+    next
+      case (2 v v1 w' v2 p v')
+      then show ?case
+        apply simp
+        by (meson e is_path_undir_simps(2) valid_graph.is_path_undir_append valid_graph_axioms)
+    qed
+    have "nodes_connected (mirror_edge u w v G) a b" if "is_path_undir G a p b" for p
+      using that
+      apply (induction G a p b rule: is_path_undir.induct)
+       apply (metis insert_iff is_path_undir.simps(1) nodes_add_edge nodes_delete_edge)
+      apply simp
+    note a this
+  }
+  then show ?thesis
+    using assms
+ (*
     proof (cases "=")
     then have \<open>nodes_connected G v2 v'\<close> and \<open>(v1, w, v2) \<in> edges (mirror_edge u w v G)\<close>
       apply simp sledgehamme
