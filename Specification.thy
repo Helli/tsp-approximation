@@ -153,7 +153,7 @@ proof -
     proof (induction \<open>mirror_edge u w v G\<close> a p b rule: is_path_undir.induct)
       case (1 v v')
       then show ?case
-        by (metis e insert_absorb is_path_undir.simps(1) nodes_add_edge nodes_delete_edge valid_graph.E_validD(1) valid_graph.E_validD(2) valid_graph_axioms)
+        by (metis e insert_absorb is_path_undir.simps(1) nodes_add_edge nodes_delete_edge valid_graph.E_validD valid_graph_axioms)
     next
       case (2 v v1 w' v2 p v')
       then show ?case
@@ -184,15 +184,20 @@ lemma (in forest) mirror_single_forest:
   shows "forest (mirror_edge u w v G)"
   find_theorems intro
 proof unfold_locales
+  interpret m: valid_graph \<open>mirror_edge u w v G\<close>
+    by (simp add: delete_edge_valid')
   show "fst ` edges (mirror_edge u w v G) \<subseteq> nodes (mirror_edge u w v G)"
     using E_valid(1) image_eqI by auto
   show "snd ` snd ` edges (mirror_edge u w v G) \<subseteq> nodes (mirror_edge u w v G)"
     using E_valid(2) by auto
-  have "u\<in>V" "v\<in>V" if \<open>(u,w,v) \<in> E\<close> for u v w
-    using that E_validD by blast+
+  {
+    fix v1 w' v2
+    assume \<open>(v1,w',v2) \<in> m.E\<close>
+    then have "\<not>nodes_connected (delete_edge v1 w' v2 (mirror_edge u w v G)) v1 v2"
+      sorry
+  }
   then show "\<forall>(a, wa, b) \<in>edges (mirror_edge u w v G). \<not>nodes_connected (delete_edge a wa b (mirror_edge u w v G)) a b"
-    apply simp
-    sorry
+    by blast
 qed
 
 lemma (in finite_weighted_graph (*?*)) spanning_forest_mirror_single:
