@@ -209,13 +209,16 @@ proof unfold_locales
       case False
       then have *: "valid_graph (delete_edge v1 w' v2 G)" and **: "(u, w, v) \<in> edges (delete_edge v1 w' v2 G)"
         using delete_edge_valid' apply blast using False assms mE by auto
-      from cycle_free have "nodes_connected (delete_edge v1 w' v2 G) v1 v2"
-        sorry
+      have \<open>(v1,w',v2) \<in> E\<close>
+        using False mE by auto
+      with cycle_free have ***: "\<not>nodes_connected (delete_edge v1 w' v2 G) v1 v2"
+        by fast
       from False have "delete_edge v1 w' v2 (mirror_edge u w v G) = mirror_edge u w v (delete_edge v1 w' v2 G)"
         by (simp add: swap_delete_add_edge swap_delete_edges)
       moreover have "\<not>nodes_connected \<dots> v1 v2"
-        using valid_graph.nodes_connected_mirror_singe_iff[OF * **] sorry
-      ultimately show ?thesis sorry
+        using valid_graph.nodes_connected_mirror_singe_iff[OF * **] *** by blast
+      ultimately show ?thesis
+        by presburger
     qed
   }
   then show "\<forall>(v1, w', v2) \<in>edges (mirror_edge u w v G). \<not>nodes_connected (delete_edge v1 w' v2 (mirror_edge u w v G)) v1 v2"
