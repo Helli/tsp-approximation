@@ -136,6 +136,12 @@ lemma (in valid_graph) delete_mirrored[simp]:
   "u\<in>V \<Longrightarrow> v\<in>V \<Longrightarrow> delete_edge v w u (mirror_edge u w v G) = delete_edge v w u (delete_edge u w v G)"
   by (simp add: insert_absorb)
 
+lemma (in valid_graph) is_path_undir_mirror_single_iff:
+  assumes \<open>(u,w,v) \<in> E\<close>
+  shows "(v1,w',v2)\<in>edges (mirror_edge u w v G) \<or> (v2,w',v1)\<in>edges (mirror_edge u w v G)
+    \<longleftrightarrow> (v1,w',v2)\<in>edges G \<or> (v2,w',v1)\<in>edges G"
+  using assms by auto
+
 lemma (in valid_graph) [simp]:
   assumes \<open>(u,w,v)\<in>E\<close>
   shows "nodes_connected (mirror_edge u w v G) a b \<longleftrightarrow> nodes_connected G a b"
