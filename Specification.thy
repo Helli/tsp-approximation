@@ -227,23 +227,23 @@ qed
 
 lemma (in finite_weighted_graph (*?*)) spanning_forest_mirror_single:
   assumes "spanning_forest \<lparr>nodes=V, edges=F\<rparr> G" and "(u,w,v)\<in>F"
-  shows "spanning_forest \<lparr>nodes=V, edges=insert (v,w,u) (F-{(u,w,v)})\<rparr> G"
+  shows "spanning_forest (mirror_edge u w v \<lparr>nodes=V, edges=F\<rparr>) G"
   using assms apply (simp add: spanning_forest_def)
   apply auto
   proof -
-  show "forest (ind (insert (v, w, u) (F - {(u, w, v)})))"
+  show "forest (mirror_edge u w v (ind F))"
     if "(u, w, v) \<in> F"
       and "forest (ind F)"
       and "maximally_connected (ind F) G"
       and "subgraph (ind F) G"
     using that sorry
-  show "maximally_connected (ind (insert (v, w, u) (F - {(u, w, v)}))) G"
+  show "maximally_connected (mirror_edge u w v (ind F)) G"
     if "(u, w, v) \<in> F"
       and "forest (ind F)"
       and "maximally_connected (ind F) G"
       and "subgraph (ind F) G"
     using that sorry
-  show "subgraph (ind (insert (v, w, u) (F - {(u, w, v)}))) G"
+  show "subgraph (mirror_edge u w v (ind F)) G"
     if "(u, w, v) \<in> F"
       and "forest (ind F)"
       and "maximally_connected (ind F) G"
