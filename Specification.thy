@@ -157,46 +157,27 @@ proof -
     next
       case (2 v v1 w' v2 p v')
       then show ?case
-        apply simp
+        using [[simp_trace]] apply simp
         by (meson e is_path_undir_simps(2) valid_graph.is_path_undir_append valid_graph_axioms)
     qed
     have "nodes_connected (mirror_edge u w v G) a b" if "is_path_undir G a p b" for p
       using that
-      apply (induction G a p b rule: is_path_undir.induct)
-       apply (metis insert_iff is_path_undir.simps(1) nodes_add_edge nodes_delete_edge)
-      apply simp
+    proof (induction \<open>mirror_edge u w v G\<close> a p b rule: is_path_undir.induct)
+      case (1 v v')
+      then show ?case
+        by (metis insert_iff is_path_undir.simps(1) nodes_add_edge nodes_delete_edge)
+    next
+      case (2 v v1 w' v2 p v')
+      then show ?case
+        apply simp
+        by (meson e is_path_undir.simps(2) valid_graph.is_path_undir_mirror_single_iff valid_graph_axioms)
+    qed
     note a this
   }
   then show ?thesis
     using assms
- (*
-    proof (cases "=")
-    then have \<open>nodes_connected G v2 v'\<close> and \<open>(v1, w, v2) \<in> edges (mirror_edge u w v G)\<close>
-      apply simp sledgehamme
-    then show ?case sorry
-  qed
-  next
-    case (Cons a p)
-    then show ?case
-    proof (cases "a = (u,w,v)")
-      case True
-      then have "(v,w,u) \<in> edges (mirror_edge u w v G)"
-        by auto
-      then show ?thesis
-    next
-      case False
-      then show ?thesis sorry
-    qed
-  qed
-  moreover have "nodes_connected (mirror_edge u w v G) a b"
-    if "(u, w, v) \<in> E"
-      and "is_path_undir G a p b"
-    for p :: "('v \<times> 'w \<times> 'v) list"
-    using that sorry
-  ultimately show ?thesis
-    using assms by auto
-qed*)
-      oops
+    by blast
+qed
 
 lemma (in forest) mirror_single_forest:
   assumes "(u,w,v) \<in> E"
