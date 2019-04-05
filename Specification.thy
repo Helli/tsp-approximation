@@ -132,18 +132,64 @@ qed
 corollary forest_no_loops: "forest F \<Longrightarrow> (u,w,u) \<notin> edges F"
   by (meson forest_no_dups)
 
-lemma (in valid_graph) delete_mirrored: "u\<in>V \<Longrightarrow> v\<in>V \<Longrightarrow> delete_edge v w u (mirror_edge u w v G) = delete_edge v w u (delete_edge u w v G)"
+lemma (in valid_graph) delete_mirrored[simp]:
+  "u\<in>V \<Longrightarrow> v\<in>V \<Longrightarrow> delete_edge v w u (mirror_edge u w v G) = delete_edge v w u (delete_edge u w v G)"
   by (simp add: insert_absorb)
 
-lemma (in forest) mirror_single:
+lemma (in valid_graph) [simp]:
+  assumes \<open>(u,w,v)\<in>E\<close>
+  shows "nodes_connected (mirror_edge u w v G) a b \<longleftrightarrow> nodes_connected G a b"
+proof -
+  assume e: "(u, w, v) \<in> E"
+  have "nodes_connected G a b" if "is_path_undir (mirror_edge u w v G) a p b" for p
+    using that
+  proof (induction \<open>mirror_edge u w v G\<close> a p b rule: is_path_undir.induct)
+    case (1 v v')
+    then show ?case
+      by (metis e insert_absorb is_path_undir.simps(1) nodes_add_edge nodes_delete_edge valid_graph.E_validD(1) valid_graph.E_validD(2) valid_graph_axioms)
+  next
+    case (2 v v1 w' v2 p v')
+    then show ?case
+    proof (cases "=")
+    then have \<open>nodes_connected G v2 v'\<close> and \<open>(v1, w, v2) \<in> edges (mirror_edge u w v G)\<close>
+      apply simp sledgehamme
+    then show ?case sorry
+  qed
+  next
+    case (Cons a p)
+    then show ?case
+    proof (cases "a = (u,w,v)")
+      case True
+      then have "(v,w,u) \<in> edges (mirror_edge u w v G)"
+        by auto
+      then show ?thesis
+    next
+      case False
+      then show ?thesis sorry
+    qed
+  qed
+  moreover have "nodes_connected (mirror_edge u w v G) a b"
+    if "(u, w, v) \<in> E"
+      and "is_path_undir G a p b"
+    for p :: "('v \<times> 'w \<times> 'v) list"
+    using that sorry
+  ultimately show ?thesis
+    using assms by auto
+qed
+
+
+lemma (in forest) mirror_single_forest:
   assumes "(u,w,v) \<in> E"
-  shows "forest (mirror_edge u w v \<lparr>nodes=V, edges=E\<rparr>)"
+  shows "forest (mirror_edge u w v G)"
+  find_theorems intro
 proof unfold_locales
-  show "fst ` edges (mirror_edge u w v \<lparr>nodes = V, edges = E\<rparr>) \<subseteq> nodes (mirror_edge u w v \<lparr>nodes = V, edges = E\<rparr>)"
+  show "fst ` edges (mirror_edge u w v G) \<subseteq> nodes (mirror_edge u w v G)"
     using E_valid(1) image_eqI by auto
-  show "snd ` snd ` edges (mirror_edge u w v \<lparr>nodes = V, edges = E\<rparr>) \<subseteq> nodes (mirror_edge u w v \<lparr>nodes = V, edges = E\<rparr>)"
-    by (metis add_edge_valid forest.delete_edge_valid' forest_axioms graph.surjective old.unit.exhaust valid_graph_def)
-  show "\<forall>(a, wa, b) \<in>edges (mirror_edge u w v \<lparr>nodes = V, edges = E\<rparr>). \<not>nodes_connected (delete_edge a wa b (mirror_edge u w v \<lparr>nodes = V, edges = E\<rparr>)) a b"
+  show "snd ` snd ` edges (mirror_edge u w v G) \<subseteq> nodes (mirror_edge u w v G)"
+    using E_valid(2) by auto
+  have "u\<in>V" "v\<in>V" if \<open>(u,w,v) \<in> E\<close> for u v w
+    using that E_validD by blast+
+  then show "\<forall>(a, wa, b) \<in>edges (mirror_edge u w v G). \<not>nodes_connected (delete_edge a wa b (mirror_edge u w v G)) a b"
     apply simp
     sorry
 qed
