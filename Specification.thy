@@ -182,7 +182,6 @@ qed
 lemma (in forest) mirror_single_forest:
   assumes "(u,w,v) \<in> E"
   shows "forest (mirror_edge u w v G)"
-  find_theorems intro
 proof unfold_locales
   interpret m: valid_graph \<open>mirror_edge u w v G\<close>
     by (simp add: delete_edge_valid')
@@ -192,11 +191,34 @@ proof unfold_locales
     using E_valid(2) by auto
   {
     fix v1 w' v2
-    assume \<open>(v1,w',v2) \<in> m.E\<close>
-    then have "\<not>nodes_connected (delete_edge v1 w' v2 (mirror_edge u w v G)) v1 v2"
-      sorry
+    assume mE: \<open>(v1,w',v2) \<in> m.E\<close>
+    have V: \<open>v1\<in>V\<close> \<open>v2\<in>V\<close>
+      using assms is_path_undir_simps(2) mE by auto
+    have "\<not>nodes_connected (delete_edge v1 w' v2 (mirror_edge u w v G)) v1 v2"
+    proof (cases "(v1,w',v2) = (v,w,u)")
+      case True
+      then have E: \<open>(v2,w',v1) \<in> E\<close>
+        using assms by blast
+      then have *: "delete_edge v1 w' v2 (mirror_edge u w v G) = delete_edge v2 w' v1 G"
+        using True V forest_axioms forest_no_dups by fastforce
+      from cycle_free E True have "\<not>nodes_connected \<dots> v2 v1"
+        by fast
+      then show ?thesis
+        by (metis * delete_edge_valid m.valid_graph_axioms valid_graph.is_path_undir_sym)
+    next
+      case False
+      then have *: "valid_graph (delete_edge v1 w' v2 G)" and **: "(u, w, v) \<in> edges (delete_edge v1 w' v2 G)"
+        using delete_edge_valid' apply blast using False assms mE by auto
+      from cycle_free have "nodes_connected (delete_edge v1 w' v2 G) v1 v2"
+        sorry
+      from False have "delete_edge v1 w' v2 (mirror_edge u w v G) = mirror_edge u w v (delete_edge v1 w' v2 G)"
+        by (simp add: swap_delete_add_edge swap_delete_edges)
+      moreover have "\<not>nodes_connected \<dots> v1 v2"
+        using valid_graph.nodes_connected_mirror_singe_iff[OF * **] sorry
+      ultimately show ?thesis sorry
+    qed
   }
-  then show "\<forall>(a, wa, b) \<in>edges (mirror_edge u w v G). \<not>nodes_connected (delete_edge a wa b (mirror_edge u w v G)) a b"
+  then show "\<forall>(v1, w', v2) \<in>edges (mirror_edge u w v G). \<not>nodes_connected (delete_edge v1 w' v2 (mirror_edge u w v G)) v1 v2"
     by blast
 qed
 
