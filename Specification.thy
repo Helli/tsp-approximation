@@ -225,29 +225,29 @@ proof unfold_locales
     by blast
 qed
 
-lemma (in finite_weighted_graph (*?*)) spanning_forest_mirror_single:
+lemma (in valid_unMultigraph) spanning_forest_mirror_single:
   assumes "spanning_forest \<lparr>nodes=V, edges=F\<rparr> G" and "(u,w,v)\<in>F"
   shows "spanning_forest (mirror_edge u w v \<lparr>nodes=V, edges=F\<rparr>) G"
   using assms apply (simp add: spanning_forest_def)
   apply auto
   proof -
-  show "forest (mirror_edge u w v (ind F))"
+  show "forest (mirror_edge u w v \<lparr>nodes = V, edges = F\<rparr>)"
     if "(u, w, v) \<in> F"
-      and "forest (ind F)"
-      and "maximally_connected (ind F) G"
-      and "subgraph (ind F) G"
+      and "forest \<lparr>nodes = V, edges = F\<rparr>"
+      and "maximally_connected \<lparr>nodes = V, edges = F\<rparr> G"
+      and "subgraph \<lparr>nodes = V, edges = F\<rparr> G"
     using that sorry
-  show "maximally_connected (mirror_edge u w v (ind F)) G"
+  show "maximally_connected (mirror_edge u w v \<lparr>nodes = V, edges = F\<rparr>) G"
     if "(u, w, v) \<in> F"
-      and "forest (ind F)"
-      and "maximally_connected (ind F) G"
-      and "subgraph (ind F) G"
+      and "forest \<lparr>nodes = V, edges = F\<rparr>"
+      and "maximally_connected \<lparr>nodes = V, edges = F\<rparr> G"
+      and "subgraph \<lparr>nodes = V, edges = F\<rparr> G"
     using that sorry
-  show "subgraph (mirror_edge u w v (ind F)) G"
+  show "subgraph (mirror_edge u w v \<lparr>nodes = V, edges = F\<rparr>) G"
     if "(u, w, v) \<in> F"
-      and "forest (ind F)"
-      and "maximally_connected (ind F) G"
-      and "subgraph (ind F) G"
+      and "forest \<lparr>nodes = V, edges = F\<rparr>"
+      and "maximally_connected \<lparr>nodes = V, edges = F\<rparr> G"
+      and "subgraph \<lparr>nodes = V, edges = F\<rparr> G"
     using that sorry
 qed
 
