@@ -142,7 +142,7 @@ lemma (in valid_graph) is_path_undir_mirror_single_iff:
     \<longleftrightarrow> (v1,w',v2)\<in>edges G \<or> (v2,w',v1)\<in>edges G"
   using assms by auto
 
-lemma (in valid_graph)[simp]:
+lemma (in valid_graph) nodes_connected_mirror_singe_iff[simp]:
   assumes \<open>(u,w,v)\<in>E\<close>
   shows "nodes_connected (mirror_edge u w v G) a b \<longleftrightarrow> nodes_connected G a b"
 proof -
