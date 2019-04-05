@@ -157,7 +157,7 @@ proof -
     next
       case (2 v v1 w' v2 p v')
       then show ?case
-        using [[simp_trace]] apply simp
+        apply simp
         by (meson e is_path_undir_simps(2) valid_graph.is_path_undir_append valid_graph_axioms)
     qed
     have "nodes_connected (mirror_edge u w v G) a b" if "is_path_undir G a p b" for p
