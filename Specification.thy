@@ -231,24 +231,22 @@ lemma (in valid_unMultigraph) spanning_forest_mirror_single:
   using assms apply (simp add: spanning_forest_def)
   apply auto
   proof -
-  show "forest (mirror_edge u w v \<lparr>nodes = V, edges = F\<rparr>)"
-    if "(u, w, v) \<in> F"
-      and "forest \<lparr>nodes = V, edges = F\<rparr>"
-      and "maximally_connected \<lparr>nodes = V, edges = F\<rparr> G"
-      and "subgraph \<lparr>nodes = V, edges = F\<rparr> G"
-    using that sorry
+  show forest: "forest (mirror_edge u w v \<lparr>nodes = V, edges = F\<rparr>)"
+    if "(u, w, v) \<in> F" and "forest \<lparr>nodes = V, edges = F\<rparr>"
+    using that by (simp add: forest.mirror_single_forest)
   show "maximally_connected (mirror_edge u w v \<lparr>nodes = V, edges = F\<rparr>) G"
     if "(u, w, v) \<in> F"
       and "forest \<lparr>nodes = V, edges = F\<rparr>"
       and "maximally_connected \<lparr>nodes = V, edges = F\<rparr> G"
       and "subgraph \<lparr>nodes = V, edges = F\<rparr> G"
-    using that sorry
+    using that
+    by (smt forest add_edge_maximally_connected add_edge_preserve_subgraph corres edges_add_edge forest.forest_add_edge forest_no_dups graph.select_convs(2) insert_iff insert_subset nodes_delete_edge subgraph_def swap_delete_add_edge valid_graph.E_validD(1) valid_graph.add_delete_edge valid_graph.delete_edge_maximally_connected valid_graph.valid_subgraph valid_graph_axioms)
   show "subgraph (mirror_edge u w v \<lparr>nodes = V, edges = F\<rparr>) G"
     if "(u, w, v) \<in> F"
       and "forest \<lparr>nodes = V, edges = F\<rparr>"
       and "maximally_connected \<lparr>nodes = V, edges = F\<rparr> G"
       and "subgraph \<lparr>nodes = V, edges = F\<rparr> G"
-    using that sorry
+    using that by (metis (no_types, lifting) corres delete_edge_preserve_subgraph graph.select_convs(2) insert_Diff insert_subset subgraph_def valid_graph.add_edge_preserve_subgraph valid_graph_axioms)
 qed
 
 lemma spanning_forest_symhull_preimage:
