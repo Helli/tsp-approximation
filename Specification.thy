@@ -149,7 +149,7 @@ proof -
       by (metis e insert_absorb is_path_undir.simps(1) nodes_add_edge nodes_delete_edge valid_graph.E_validD(1) valid_graph.E_validD(2) valid_graph_axioms)
   next
     case (2 v v1 w' v2 p v')
-    then show ?case
+    then show ?case (*
     proof (cases "=")
     then have \<open>nodes_connected G v2 v'\<close> and \<open>(v1, w, v2) \<in> edges (mirror_edge u w v G)\<close>
       apply simp sledgehamme
@@ -175,8 +175,8 @@ proof -
     using that sorry
   ultimately show ?thesis
     using assms by auto
-qed
-
+qed*)
+      oops
 
 lemma (in forest) mirror_single_forest:
   assumes "(u,w,v) \<in> E"
