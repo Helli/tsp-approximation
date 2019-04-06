@@ -1,4 +1,4 @@
-section "Undirected Kruskal on Directed Graphs"
+section \<open>Undirected Kruskal on Directed Graphs\<close>
 
 theory Graph_Definition_Impl
 imports
@@ -177,7 +177,7 @@ begin
 end
   
 
-subsection "Interpreting @{locale Kruskal_Impl}"
+subsection \<open>Interpreting @{locale Kruskal_Impl}\<close>
 
 locale fromlist = fixes
   L :: "(nat \<times> int \<times> nat) list" 
