@@ -6,6 +6,8 @@ theory Specification
     "HOL-ex.Sketch_and_Explore"
 begin hide_const a b c d
 
+subsection \<open>Spanning Forests for Graphs of Type @{locale valid_unMultigraph}\<close>
+
 subsubsection \<open>Undirected Hull\<close> \<comment> \<open>or rather: symmetric hull\<close>
 
 lemma is_path_undir_mono:
@@ -89,14 +91,8 @@ lemma spanning_forest_symhull:
 lemma infinite_edge_weight: "infinite (edges G) \<Longrightarrow> edge_weight G = 0"
   by (simp add: edge_weight_def)
 
-find_theorems name: "SpanningForest"
-thm "indep_system.basis_def"
-thm "spanning_forest_def"
-thm fromlist.spanning_forest_eq
 
-thm indep_system.basis_in_supI
-
-section \<open>Matroid Interpretation\<close>
+subsection \<open>Matroid Interpretation\<close>
 
 context finite_weighted_graph \<comment> \<open>first usage in the AFP\<close>
 begin \<comment> \<open>@{class weight} might be too special, and @{thm valid_graph_axioms} unneeded\<close>
@@ -108,6 +104,8 @@ lemma a: "finite_weighted_graph\<lparr>nodes = V, edges = symhull E\<rparr>"
   using finite_weighted_graph_axioms finite_weighted_graph_symhull_iff by blast
 
 end
+
+subsection \<open>Relation To The Digraph's Spanning Forest\<close>
 
 abbreviation "mirror_edge u w v G \<equiv> add_edge v w u (delete_edge u w v G)"
 
@@ -329,12 +327,18 @@ thm "Kruskal_Impl.k0_spec"
 
 text \<open>Citation test: @{cite lawler}.\<close>
 
+
+section \<open>Generating Example Input\<close>
+
 subsection \<open>Manhattan Distance\<close>
 
 text \<open>1d-coordinates:\<close>
 
 lemma "nat\<bar>c-a\<bar> \<le> nat\<bar>b-a\<bar> + nat\<bar>c-b\<bar>" for a :: int
   by (simp add: nat_le_iff)
+
+
+section \<open>Junk\<close>
 
 context valid_graph begin
 context assumes
