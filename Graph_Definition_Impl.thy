@@ -1,4 +1,4 @@
-section "Kruskal on Directed Graphs Which Are Viewed as Undirected Graphs"
+section "Undirected Kruskal on Directed Graphs"
 
 theory Graph_Definition_Impl
 imports
