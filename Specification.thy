@@ -2,7 +2,7 @@ section \<open>Specification\<close>
 theory Specification
   imports
     Koenigsberg_Friendship.KoenigsbergBridge
-    Kruskal.Graph_Definition_Impl
+    Graph_Definition_Impl
     "HOL-ex.Sketch_and_Explore"
 begin hide_const a b c d
 
