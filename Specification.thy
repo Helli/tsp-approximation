@@ -34,16 +34,16 @@ lemma (in valid_graph) valid_graph_symhull: "valid_graph \<lparr>nodes = V, edge
 
 lemma (in valid_graph) valid_unMultigraph_symhull:
   assumes no_id[simp]:"\<And>v w.(v,w,v) \<notin> E"
-  shows "valid_unMultigraph (G\<lparr>edges := symhull E\<rparr>)"
+  shows "valid_unMultigraph \<lparr>nodes = V, edges = symhull E\<rparr>"
   apply unfold_locales
      apply (auto simp: symhull_def)
   using E_validD by blast+
 
 lemma (in valid_graph) symhull_hull:
   assumes no_id:"\<And>v w.(v,w,v) \<notin> E"
-  shows "symhull E = (\<lambda>E'. valid_unMultigraph (G\<lparr>edges := E'\<rparr>)) hull E"
-    apply (simp add: symhull_def)
-    apply (rule hull_unique[symmetric])
+  shows "symhull E = (\<lambda>E'. valid_unMultigraph \<lparr>nodes=V, edges=E'\<rparr>) hull E"
+  apply (simp add: symhull_def)
+  apply (rule hull_unique[symmetric])
     apply auto
    apply (metis no_id symhull_def valid_unMultigraph_symhull)
   proof goal_cases
@@ -289,10 +289,13 @@ next
     by (smt DiffD2 Diff_insert_absorb Diff_subset \<open>(v, w, u) \<in> E\<close> edges_add_edge edges_delete_edge graph.select_convs(2) in_mono insert.hyps(2) insert.hyps(4) insert_Diff insert_Diff_if set_minus_singleton_eq x)
   have "forest \<lparr>nodes=V, edges=F\<rparr>"
     using insert.prems(2) spanning_forest_def by blast
-  from \<open>spanning_forest \<lparr>nodes = V, edges = F\<rparr> \<lparr>nodes = V, edges = symhull E\<rparr>\<close>
-  have "spanning_forest \<lparr>nodes = V, edges = F - {x} \<union> {(v, w, u)}\<rparr> \<lparr>nodes = V, edges = symhull E\<rparr>"
+  have \<open>valid_unMultigraph \<lparr>nodes = V, edges = symhull E\<rparr>\<close>
+    thm valid_graph.valid_unMultigraph_symhull
+    apply (rule valid_graph.valid_unMultigraph_symhull)
+  have "spanning_forest (mirror_edge u w v \<lparr>nodes = V, edges = F\<rparr>) \<lparr>nodes = V, edges = symhull E\<rparr>"
+  using valid_unMultigraph.spanning_forest_mirror_single[simplified, OF _ \<open>spanning_forest \<lparr>nodes = V, edges = F\<rparr> \<lparr>nodes = V, edges = symhull E\<rparr>\<close>] oops
     apply (simp add: spanning_forest_def)
-    apply auto sorry
+    apply auto using "***" forest.mirror_single_forest x apply fastforce
   from "insert.hyps"(3)[OF *] obtain F' where
     "spanning_forest \<lparr>nodes = V, edges = F'\<rparr> \<lparr>nodes = V, edges = E\<rparr> \<and>
      edge_weight \<lparr>nodes = V, edges = F'\<rparr> = edge_weight (mirror_edge u w v \<lparr>nodes = V, edges = F\<rparr>)"
