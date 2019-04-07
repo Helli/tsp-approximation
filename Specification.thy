@@ -279,24 +279,24 @@ next
     by (metis Diff_subset \<open>F \<subseteq> symhull E\<close> insert.hyps(4) insertI1 subset_eq x)
   then have "\<exists>a b aa. (u, w, v) = (a, b, aa) \<and> ((a, b, aa) \<in> E \<or> (aa, b, a) \<in> E)"
     by (simp add: symhull_def)
-  then have "(v,w,u)\<in>E" and **: "x\<notin>E" and ***: "x\<in>F"
+  then have *: "(v,w,u)\<in>E" and **: "x\<notin>E" and ***: "x\<in>F"
       apply (simp add: f1)
     apply (simp add: f1 x)
     using insert.hyps(4) by auto
   with \<open>x \<in> F\<close> have "(v,w,u) \<notin> F"
     using forest_no_dups insert.prems spanning_forest_def x by fastforce
-  then have *: "I = edges (mirror_edge u w v \<lparr>nodes=V, edges=F\<rparr>) - E"
-    by (metis (no_types, lifting) Diff_insert Diff_insert2 Diff_insert_absorb \<open>(v, w, u) \<in> E\<close> edges_add_edge edges_delete_edge graph.select_convs(2) insert.hyps(2) insert.hyps(4) insert_Diff1 x)
+  then have I: "I = edges (mirror_edge u w v \<lparr>nodes=V, edges=F\<rparr>) - E"
+    by (metis (no_types, lifting) Diff_insert Diff_insert2 Diff_insert_absorb * edges_add_edge edges_delete_edge graph.select_convs(2) insert.hyps(2) insert.hyps(4) insert_Diff1 x)
   have "forest \<lparr>nodes=V, edges=F\<rparr>"
     using insert.prems spanning_forest_def by blast
   have \<open>valid_unMultigraph \<lparr>nodes = V, edges = symhull E\<rparr>\<close>
     by (simp add: valid_unMultigraph_symhull)
   then have "spanning_forest (mirror_edge u w v \<lparr>nodes = V, edges = F\<rparr>) \<lparr>nodes = V, edges = symhull E\<rparr>"
     using *** insert.prems(2) valid_unMultigraph.spanning_forest_mirror_single x by fastforce
-  from "insert.hyps"(3)[OF *] obtain F' where
+  then obtain F' where
     "spanning_forest \<lparr>nodes = V, edges = F'\<rparr> \<lparr>nodes = V, edges = E\<rparr> \<and>
      edge_weight \<lparr>nodes = V, edges = F'\<rparr> = edge_weight (mirror_edge u w v \<lparr>nodes = V, edges = F\<rparr>)"
-    apply simp sorry
+    by (metis (no_types, lifting) * insert.hyps(3)[OF I] add_edge_ind delete_edge_def edges_add_edge edges_delete_edge graph.select_convs(1) no_id)
   then show ?case apply(intro exI[where x="F'"])
      apply safe
       apply simp+ unfolding x apply (rule mirror_single_edge_weight)
