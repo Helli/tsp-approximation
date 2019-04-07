@@ -308,10 +308,10 @@ lemma edge_weight_same: "edge_weight \<lparr>nodes=V,edges=E\<rparr> = edge_weig
   unfolding edge_weight_def by fastforce
 
 lemma optimal_forest_mono:
-  assumes "subgraph G G'"
-  assumes "optimal_forest (G\<lparr>edges:=F\<rparr>) G" and "optimal_forest (G'\<lparr>edges:=F'\<rparr>) G'"
-  shows "edge_weight (G\<lparr>edges:=F\<rparr>) \<le> edge_weight (G'\<lparr>edges:=F'\<rparr>)"
-  oops
+  assumes "subgraph \<lparr>nodes=V, edges=E\<rparr> \<lparr>nodes=V, edges=E'\<rparr>" and \<open>E \<subseteq> E'\<close> (*redundant*)
+  assumes "optimal_forest \<lparr>nodes=V,edges=F\<rparr> \<lparr>nodes=V, edges=E\<rparr>" and "optimal_forest \<lparr>nodes=V,edges=F'\<rparr> \<lparr>nodes=V, edges=E'\<rparr>"
+  shows "edge_weight \<lparr>nodes=V, edges=F\<rparr> \<le> edge_weight \<lparr>nodes=V, edges=F'\<rparr>"
+  using assms try oops
 
 lemma optimal_forest_symhull:
   "optimal_forest F G \<Longrightarrow> optimal_forest F (G\<lparr>edges := symhull E\<rparr>)"
