@@ -247,8 +247,7 @@ lemma (in valid_unMultigraph) spanning_forest_mirror_single:
     using that by (metis (no_types, lifting) corres delete_edge_preserve_subgraph graph.select_convs(2) insert_Diff insert_subset subgraph_def valid_graph.add_edge_preserve_subgraph valid_graph_axioms)
 qed
 
-lemma spanning_forest_symhull_preimage:
-  assumes "finite_weighted_graph \<lparr>nodes=V, edges=E\<rparr>"
+lemma (in finite_weighted_graph) spanning_forest_symhull_preimage:
   assumes "spanning_forest \<lparr>nodes=V, edges=F\<rparr> \<lparr>nodes=V, edges=symhull E\<rparr>"
   shows "\<exists>F'. spanning_forest \<lparr>nodes=V, edges=F'\<rparr> \<lparr>nodes=V, edges=E\<rparr>
     \<and> edge_weight \<lparr>nodes=V, edges=F'\<rparr> = edge_weight \<lparr>nodes=V, edges=F\<rparr>"
@@ -256,7 +255,7 @@ lemma spanning_forest_symhull_preimage:
 proof (induction "F - E" arbitrary: F rule: infinite_finite_induct)
   case infinite
   have "finite F"
-    by (metis finite_graph.finite_E finite_weighted_graph.a finite_weighted_graph.axioms graph.select_convs(2) infinite.prems(1) infinite.prems(2) infinite_super spanning_forest_def subgraph_def)
+    by (metis a finite_graph.finite_E finite_weighted_graph.axioms graph.select_convs(2) infinite.prems infinite_super spanning_forest_def subgraph_def)
   with infinite show ?case
     by blast
 next
@@ -264,7 +263,7 @@ next
   then have "subgraph \<lparr>nodes=V, edges=F\<rparr> \<lparr>nodes=V, edges=E\<rparr>"
     using subgraph_def by fastforce
   then have "spanning_forest \<lparr>nodes=V, edges=F\<rparr> \<lparr>nodes=V, edges=E\<rparr>"
-    by (meson empty.prems(2) maximally_connected_antimono spanning_forest_def subset_eq_symhull)
+    by (meson empty.prems maximally_connected_antimono spanning_forest_def subset_eq_symhull)
   then show ?case
     by blast
 next
@@ -272,7 +271,7 @@ next
   then obtain u w v where x: "x=(u,w,v)"
     by (meson prod_cases3)
   have F_in_symhull: "F \<subseteq> symhull E"
-    by (metis graph.select_convs(2) insert.prems(2) spanning_forest_def subgraph_def)
+    by (metis graph.select_convs(2) insert.prems spanning_forest_def subgraph_def)
   have f1: "(u, w, v) \<notin> E"
     using insert.hyps(4) x by blast
   have "(u, w, v) \<in> symhull E"
@@ -284,14 +283,14 @@ next
     apply (simp add: f1 x)
     using insert.hyps(4) by auto
   with \<open>x \<in> F\<close> have "(v,w,u) \<notin> F"
-    using forest_no_dups x local.insert(6) spanning_forest_def by fastforce
+    using forest_no_dups insert.prems spanning_forest_def x by fastforce
   then have *: "I = edges (mirror_edge u w v \<lparr>nodes=V, edges=F\<rparr>) - E"
-    by (smt DiffD2 Diff_insert_absorb Diff_subset \<open>(v, w, u) \<in> E\<close> edges_add_edge edges_delete_edge graph.select_convs(2) in_mono insert.hyps(2) insert.hyps(4) insert_Diff insert_Diff_if set_minus_singleton_eq x)
+    by (metis (no_types, lifting) Diff_insert Diff_insert2 Diff_insert_absorb \<open>(v, w, u) \<in> E\<close> edges_add_edge edges_delete_edge graph.select_convs(2) insert.hyps(2) insert.hyps(4) insert_Diff1 x)
   have "forest \<lparr>nodes=V, edges=F\<rparr>"
-    using insert.prems(2) spanning_forest_def by blast
+    using insert.prems spanning_forest_def by blast
   have \<open>valid_unMultigraph \<lparr>nodes = V, edges = symhull E\<rparr>\<close>
-    thm valid_graph.valid_unMultigraph_symhull
-    apply (rule valid_graph.valid_unMultigraph_symhull)
+    apply (rule valid_unMultigraph_symhull)
+    sorry
   have "spanning_forest (mirror_edge u w v \<lparr>nodes = V, edges = F\<rparr>) \<lparr>nodes = V, edges = symhull E\<rparr>"
   using valid_unMultigraph.spanning_forest_mirror_single[simplified, OF _ \<open>spanning_forest \<lparr>nodes = V, edges = F\<rparr> \<lparr>nodes = V, edges = symhull E\<rparr>\<close>] oops
     apply (simp add: spanning_forest_def)
