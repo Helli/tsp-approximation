@@ -291,10 +291,8 @@ next
     using insert.prems spanning_forest_def by blast
   have \<open>valid_unMultigraph \<lparr>nodes = V, edges = symhull E\<rparr>\<close>
     by (simp add: valid_unMultigraph_symhull)
-  have "spanning_forest (mirror_edge u w v \<lparr>nodes = V, edges = F\<rparr>) \<lparr>nodes = V, edges = symhull E\<rparr>"
-  using valid_unMultigraph.spanning_forest_mirror_single[simplified, OF _ \<open>spanning_forest \<lparr>nodes = V, edges = F\<rparr> \<lparr>nodes = V, edges = symhull E\<rparr>\<close>] oops
-    apply (simp add: spanning_forest_def)
-    apply auto using "***" forest.mirror_single_forest x apply fastforce
+  then have "spanning_forest (mirror_edge u w v \<lparr>nodes = V, edges = F\<rparr>) \<lparr>nodes = V, edges = symhull E\<rparr>"
+    using *** insert.prems(2) valid_unMultigraph.spanning_forest_mirror_single x by fastforce
   from "insert.hyps"(3)[OF *] obtain F' where
     "spanning_forest \<lparr>nodes = V, edges = F'\<rparr> \<lparr>nodes = V, edges = E\<rparr> \<and>
      edge_weight \<lparr>nodes = V, edges = F'\<rparr> = edge_weight (mirror_edge u w v \<lparr>nodes = V, edges = F\<rparr>)"
