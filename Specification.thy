@@ -26,7 +26,7 @@ definition symhull where
 
 lemma subset_eq_symhull: "E \<subseteq> symhull E"
   by (auto simp: symhull_def)
-corollary supergraph_symhull: "subgraph G (G\<lparr>edges := symhull (edges G)\<rparr>)"
+corollary supergraph_symhull: "subgraph \<lparr>nodes=V, edges=E\<rparr> \<lparr>nodes=V, edges= symhull E\<rparr>"
   by (simp add: subgraph_def subset_eq_symhull)
 
 lemma (in valid_graph) valid_graph_symhull: "valid_graph \<lparr>nodes = V, edges = symhull E\<rparr>"
