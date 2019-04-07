@@ -248,6 +248,7 @@ lemma (in valid_unMultigraph) spanning_forest_mirror_single:
 qed
 
 lemma (in finite_weighted_graph) spanning_forest_symhull_preimage:
+  assumes no_id[simp]:"\<And>v w.(v,w,v) \<notin> E"
   assumes "spanning_forest \<lparr>nodes=V, edges=F\<rparr> \<lparr>nodes=V, edges=symhull E\<rparr>"
   shows "\<exists>F'. spanning_forest \<lparr>nodes=V, edges=F'\<rparr> \<lparr>nodes=V, edges=E\<rparr>
     \<and> edge_weight \<lparr>nodes=V, edges=F'\<rparr> = edge_weight \<lparr>nodes=V, edges=F\<rparr>"
@@ -255,7 +256,7 @@ lemma (in finite_weighted_graph) spanning_forest_symhull_preimage:
 proof (induction "F - E" arbitrary: F rule: infinite_finite_induct)
   case infinite
   have "finite F"
-    by (metis a finite_graph.finite_E finite_weighted_graph.axioms graph.select_convs(2) infinite.prems infinite_super spanning_forest_def subgraph_def)
+    by (metis a finite_graph.finite_E finite_weighted_graph.axioms graph.select_convs(2) infinite.prems(2) infinite_super spanning_forest_def subgraph_def)
   with infinite show ?case
     by blast
 next
@@ -271,7 +272,7 @@ next
   then obtain u w v where x: "x=(u,w,v)"
     by (meson prod_cases3)
   have F_in_symhull: "F \<subseteq> symhull E"
-    by (metis graph.select_convs(2) insert.prems spanning_forest_def subgraph_def)
+    by (metis graph.select_convs(2) insert.prems(2) spanning_forest_def subgraph_def)
   have f1: "(u, w, v) \<notin> E"
     using insert.hyps(4) x by blast
   have "(u, w, v) \<in> symhull E"
@@ -289,8 +290,7 @@ next
   have "forest \<lparr>nodes=V, edges=F\<rparr>"
     using insert.prems spanning_forest_def by blast
   have \<open>valid_unMultigraph \<lparr>nodes = V, edges = symhull E\<rparr>\<close>
-    apply (rule valid_unMultigraph_symhull)
-    sorry
+    by (simp add: valid_unMultigraph_symhull)
   have "spanning_forest (mirror_edge u w v \<lparr>nodes = V, edges = F\<rparr>) \<lparr>nodes = V, edges = symhull E\<rparr>"
   using valid_unMultigraph.spanning_forest_mirror_single[simplified, OF _ \<open>spanning_forest \<lparr>nodes = V, edges = F\<rparr> \<lparr>nodes = V, edges = symhull E\<rparr>\<close>] oops
     apply (simp add: spanning_forest_def)
