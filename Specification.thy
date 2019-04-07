@@ -84,9 +84,9 @@ lemma subgraph_trans: "subgraph G H \<Longrightarrow> subgraph H I \<Longrightar
   by (auto simp: subgraph_def) \<comment> \<open>Maybe interpret \<^class>\<open>order_bot\<close>?\<close>
 
 lemma spanning_forest_symhull:
-  "spanning_forest F G \<Longrightarrow> spanning_forest F (G\<lparr>edges := symhull (edges G)\<rparr>)"
+  "spanning_forest F \<lparr>nodes=V, edges = E\<rparr> \<Longrightarrow> spanning_forest F \<lparr>nodes=V, edges = symhull E\<rparr>"
   unfolding spanning_forest_def
-  using maximally_connected_symhull subgraph_trans supergraph_symhull by blast
+  using maximally_connected_symhull subgraph_trans supergraph_symhull by fastforce
 
 lemma infinite_edge_weight: "infinite (edges G) \<Longrightarrow> edge_weight G = 0"
   by (simp add: edge_weight_def)
