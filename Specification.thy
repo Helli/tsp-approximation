@@ -309,7 +309,7 @@ lemma edge_weight_same: "edge_weight \<lparr>nodes=V,edges=E\<rparr> = edge_weig
 
 lemma optimal_forest_mono:
   assumes "subgraph \<lparr>nodes=V, edges=E\<rparr> \<lparr>nodes=V, edges=E'\<rparr>" and \<open>E \<subseteq> E'\<close> (*redundant*)
-  assumes "optimal_forest \<lparr>nodes=V,edges=F\<rparr> \<lparr>nodes=V, edges=E\<rparr>" and "optimal_forest \<lparr>nodes=V,edges=F'\<rparr> \<lparr>nodes=V, edges=E'\<rparr>"
+  assumes "minimum_spanning_forest \<lparr>nodes=V,edges=F\<rparr> \<lparr>nodes=V, edges=E\<rparr>" and "minimum_spanning_forest \<lparr>nodes=V,edges=F'\<rparr> \<lparr>nodes=V, edges=E'\<rparr>"
   shows "edge_weight \<lparr>nodes=V, edges=F\<rparr> \<le> edge_weight \<lparr>nodes=V, edges=F'\<rparr>"
   using assms try oops
 
