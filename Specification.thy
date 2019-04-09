@@ -327,8 +327,8 @@ lemma (in finite_weighted_graph) optimal_forest_symhull':
 
 lemma (in finite_weighted_graph) minimum_spanning_forest_symhull':
   assumes no_id: "\<And>v w.(v,w,v) \<notin> E"
-  assumes "minimum_spanning_forest F' \<lparr>nodes=V, edges = symhull E\<rparr>" "minimum_spanning_forest F \<lparr>nodes=V, edges=E\<rparr>"
-  shows "edge_weight F' = edge_weight F"
+  assumes "minimum_spanning_forest F \<lparr>nodes=V, edges=E\<rparr>" "minimum_spanning_forest F' \<lparr>nodes=V, edges = symhull E\<rparr>"
+  shows "edge_weight F = edge_weight F'"
   using assms
   by (meson antisym minimum_spanning_forest_def optimal_forest_def optimal_forest_symhull optimal_forest_symhull')
 
