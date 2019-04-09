@@ -307,12 +307,6 @@ qed
 lemma edge_weight_same: "edge_weight \<lparr>nodes=V,edges=E\<rparr> = edge_weight \<lparr>nodes=V',edges=E\<rparr>"
   unfolding edge_weight_def by fastforce
 
-lemma optimal_forest_mono:
-  assumes "subgraph \<lparr>nodes=V, edges=E\<rparr> \<lparr>nodes=V, edges=E'\<rparr>" and \<open>E \<subseteq> E'\<close> (*redundant*)
-  assumes "minimum_spanning_forest \<lparr>nodes=V,edges=F\<rparr> \<lparr>nodes=V, edges=E\<rparr>" and "minimum_spanning_forest \<lparr>nodes=V,edges=F'\<rparr> \<lparr>nodes=V, edges=E'\<rparr>"
-  shows "edge_weight \<lparr>nodes=V, edges=F\<rparr> \<ge> edge_weight \<lparr>nodes=V, edges=F'\<rparr>"
-  using assms oops
-
 lemma (in finite_weighted_graph) optimal_forest_symhull:
   assumes no_id: "\<And>v w.(v,w,v) \<notin> E"
   assumes "optimal_forest F \<lparr>nodes=V, edges=E\<rparr>"
