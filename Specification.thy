@@ -310,12 +310,15 @@ lemma edge_weight_same: "edge_weight \<lparr>nodes=V,edges=E\<rparr> = edge_weig
 lemma optimal_forest_mono:
   assumes "subgraph \<lparr>nodes=V, edges=E\<rparr> \<lparr>nodes=V, edges=E'\<rparr>" and \<open>E \<subseteq> E'\<close> (*redundant*)
   assumes "minimum_spanning_forest \<lparr>nodes=V,edges=F\<rparr> \<lparr>nodes=V, edges=E\<rparr>" and "minimum_spanning_forest \<lparr>nodes=V,edges=F'\<rparr> \<lparr>nodes=V, edges=E'\<rparr>"
-  shows "edge_weight \<lparr>nodes=V, edges=F\<rparr> \<le> edge_weight \<lparr>nodes=V, edges=F'\<rparr>"
-  using assms try oops
+  shows "edge_weight \<lparr>nodes=V, edges=F\<rparr> \<ge> edge_weight \<lparr>nodes=V, edges=F'\<rparr>"
+  using assms oops
 
-lemma optimal_forest_symhull:
-  "optimal_forest F G \<Longrightarrow> optimal_forest F (G\<lparr>edges := symhull E\<rparr>)"
-  unfolding optimal_forest_def oops
+lemma (in finite_weighted_graph) optimal_forest_symhull:
+  assumes no_id: "\<And>v w.(v,w,v) \<notin> E"
+  assumes "optimal_forest F \<lparr>nodes=V, edges=E\<rparr>"
+  shows "optimal_forest F \<lparr>nodes=V, edges = symhull E\<rparr>"
+  using assms unfolding optimal_forest_def
+  by (smt graph.cases graph.select_convs(1) spanning_forest_def spanning_forest_symhull_preimage subgraph_def subgraph_node subgraph_trans subsetI)
 
 context Kruskal_Impl
 begin
