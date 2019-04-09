@@ -314,6 +314,24 @@ lemma (in finite_weighted_graph) optimal_forest_symhull:
   using assms unfolding optimal_forest_def
   by (smt graph.cases graph.select_convs(1) spanning_forest_def spanning_forest_symhull_preimage subgraph_def subgraph_node subgraph_trans subsetI)
 
+lemma (in finite_weighted_graph) minimum_spanning_forest_symhull:
+  assumes no_id: "\<And>v w.(v,w,v) \<notin> E"
+  assumes "minimum_spanning_forest F \<lparr>nodes=V, edges=E\<rparr>"
+  shows "minimum_spanning_forest F \<lparr>nodes=V, edges = symhull E\<rparr>"
+  using assms by (simp add: minimum_spanning_forest_def optimal_forest_symhull spanning_forest_symhull)
+
+lemma (in finite_weighted_graph) optimal_forest_symhull':
+  assumes "optimal_forest F \<lparr>nodes=V, edges = symhull E\<rparr>"
+  shows "optimal_forest F \<lparr>nodes=V, edges=E\<rparr>"
+  using assms by (simp add: optimal_forest_def spanning_forest_symhull)
+
+lemma (in finite_weighted_graph) minimum_spanning_forest_symhull':
+  assumes no_id: "\<And>v w.(v,w,v) \<notin> E"
+  assumes "minimum_spanning_forest F' \<lparr>nodes=V, edges = symhull E\<rparr>" "minimum_spanning_forest F \<lparr>nodes=V, edges=E\<rparr>"
+  shows "edge_weight F' = edge_weight F"
+  using assms
+  by (meson antisym minimum_spanning_forest_def optimal_forest_def optimal_forest_symhull optimal_forest_symhull')
+
 context Kruskal_Impl
 begin
 
