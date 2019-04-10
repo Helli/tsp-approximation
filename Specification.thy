@@ -332,11 +332,20 @@ lemma (in finite_weighted_graph) minimum_spanning_forest_symhull_edge_weight:
   using assms
   by (meson antisym minimum_spanning_forest_def optimal_forest_def optimal_forest_symhull optimal_forest_symhull_preimage)
 
+lemma \<open>minimum_spanning_forest F G \<Longrightarrow> nodes F = nodes G\<close> (* OK, then why have it twice? *)
+  by (simp add: minimum_spanning_forest_def spanning_forest_def subgraph_def)
+
 lemma (in finite_weighted_graph) minimum_spanning_tree_symhull_edge_weight:
   assumes \<open>\<And>v w.(v,w,v) \<notin> E\<close>
   assumes "minimum_spanning_tree T \<lparr>nodes=V, edges=E\<rparr>" "minimum_spanning_tree T' \<lparr>nodes=V, edges = symhull E\<rparr>"
   shows "edge_weight T = edge_weight T'"
   using assms oops
+
+  lemma (in finite_weighted_graph)
+  assumes positive_weights: \<open>\<forall>(_,w,_)\<in>E. w\<ge>0\<close>
+  shows "minimum_spanning_tree \<lparr>nodes={}, edges={}\<rparr> G"
+  using assms unfolding minimum_spanning_tree_def spanning_tree_def apply auto apply unfold_locales
+  apply auto unfolding subgraph_def apply auto oops
 
 context Kruskal_Impl
 begin
