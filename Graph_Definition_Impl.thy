@@ -174,6 +174,60 @@ begin
         done
   qed
 
+  subsection \<open>Showing the equivalence of minimum spanning forest definitions\<close>
+
+  text \<open>As the definition of the minimum spanning forest from the minWeightBasis algorithm differs
+    from the one of our graph formalization, we now show their equivalence.\<close>
+
+  lemma spanning_forest_eq: "s.SpanningForest E' = spanning_forest (ind E') (ind E)"
+  proof rule
+    assume t: "s.SpanningForest E'"
+    have f: "(forest (ind E'))" and sub: "subgraph (ind E') (ind E)" and
+        n: "(\<forall>x\<in>E - E'.  \<not> (forest (ind (insert x E')) \<and> subgraph (ind (insert x E')) (ind E)))"
+      using t[unfolded  s.SpanningForest_def ]  by auto
+
+    have vE: "valid_graph (ind E)" apply(rule ind_valid_graph) by simp
+
+    have "\<And>x. x\<in>E-E' \<Longrightarrow> subgraph (ind (insert x E')) (ind E)"
+      using sub unfolding subgraph_def by auto
+    with n have "(\<forall>x\<in>E - E'.  \<not> (forest (ind (insert x E'))))" by blast
+    then have n': "(\<forall>(a,w,b)\<in>edges (ind E) - edges (ind E').  \<not> forest (add_edge a w b (ind E')))"
+      using valid_graph.E_validD[OF vE]  by(auto simp: add_edge_def insert_absorb)
+
+    have mc: "maximally_connected (ind E') (ind E)"
+      apply(rule valid_graph.forest_maximally_connected_incl_max1) by fact+
+
+    show "spanning_forest (ind E') (ind E)"
+      unfolding spanning_forest_def using f sub mc by blast
+  next
+    assume t: "spanning_forest (ind E') (ind E)"
+    have  f: "(forest (ind E'))" and sub: "subgraph (ind E') (ind E)" and
+        n: "maximally_connected (ind E') (ind E)" using t[unfolded spanning_forest_def] by auto
+
+    have i: "\<And>x. x\<in>E-E' \<Longrightarrow> subgraph (ind (insert x E')) (ind E)"
+      using sub unfolding subgraph_def by auto
+    have vE: "valid_graph (ind E)" apply(rule ind_valid_graph) by simp
+
+    have "\<forall>(a, w, b)\<in>edges (ind E) - edges (ind E'). \<not> forest (add_edge a w b (ind E'))"
+      apply(rule valid_graph.forest_maximally_connected_incl_max2) by fact+
+    then have t: "\<And>a w b. (a, w, b)\<in>edges (ind E) - edges (ind E')
+                   \<Longrightarrow> \<not> forest (add_edge a w b (ind E'))"
+      by blast
+
+    have ii: "(\<forall>x\<in>E - E'.  \<not> (forest (ind (insert x E'))))"
+      apply (auto simp: add_edge_def)
+      subgoal for a w b using t[of a w b] valid_graph.E_validD[OF vE]
+        by(auto simp: add_edge_def insert_absorb)
+      done
+
+    from i ii have
+      iii: "(\<forall>x\<in>E - E'. \<not>(forest (ind (insert x E')) \<and> subgraph (ind (insert x E')) (ind E)))"
+      by blast
+
+    show "s.SpanningForest E'"
+      unfolding s.SpanningForest_def using iii f sub by blast
+  qed
+
 end
   
 
@@ -212,60 +266,6 @@ next
   then show ?case apply sepref_to_hoare by sep_auto
 qed
 
-  subsection \<open>Showing the equivalence of minimum spanning forest definitions\<close>
-  
-  text \<open>As the definition of the minimum spanning forest from the minWeightBasis algorithm differs
-    from the one of our graph formalization, we now show their equivalence.\<close>
-
-  lemma spanning_forest_eq: "s.SpanningForest E' = spanning_forest (ind E') (ind E)"
-  proof rule
-    assume t: "s.SpanningForest E'"
-    have f: "(forest (ind E'))" and sub: "subgraph (ind E') (ind E)" and
-        n: "(\<forall>x\<in>E - E'.  \<not> (forest (ind ( insert x E')) \<and> subgraph (ind ( insert x E')) (ind E)))"
-      using t[unfolded  s.SpanningForest_def ]  by auto
-  
-    have vE: "valid_graph (ind E)" apply(rule ind_valid_graph) by simp
-   
-    have "\<And>x. x\<in>E-E' \<Longrightarrow> subgraph (ind ( insert x E')) (ind E)"
-      using sub unfolding subgraph_def by auto
-    with n have "(\<forall>x\<in>E - E'.  \<not> (forest (ind ( insert x E'))))" by blast
-    then have n': "(\<forall>(a,w,b)\<in>edges (ind E) - edges (ind E').  \<not> (forest (add_edge a w b (ind E'))))"
-      using valid_graph.E_validD[OF vE]  by(auto simp: add_edge_def insert_absorb)  
-  
-    have mc: "maximally_connected (ind E') (ind E)"
-      apply(rule valid_graph.forest_maximally_connected_incl_max1) by fact+
-    
-    show " spanning_forest (ind E') (ind E)"
-      unfolding spanning_forest_def using f sub mc by blast
-  next
-    assume t: "spanning_forest (ind E') (ind E)"
-    have  f: "(forest (ind E'))" and sub: "subgraph (ind E') (ind E)" and
-        n: "maximally_connected (ind E') (ind E)" using t[unfolded spanning_forest_def] by auto
-  
-    have i: "\<And>x. x\<in>E-E' \<Longrightarrow> subgraph (ind ( insert x E')) (ind E)"
-      using sub unfolding subgraph_def by auto 
-    have vE: "valid_graph (ind E)" apply(rule ind_valid_graph) by simp
-   
-    have "\<forall>(a, w, b)\<in>edges (ind E) - edges (ind E'). \<not> forest (add_edge a w b (ind E'))"
-      apply(rule valid_graph.forest_maximally_connected_incl_max2) by fact+
-    then have t: "\<And>a w b. (a, w, b)\<in>edges (ind E) - edges (ind E')
-                   \<Longrightarrow> \<not> forest (add_edge a w b (ind E'))" 
-      by blast
-      
-    have ii: "(\<forall>x\<in>E - E'.  \<not> (forest (ind ( insert x E'))))"
-      apply (auto simp: add_edge_def)
-      subgoal for a w b using t[of a w b] valid_graph.E_validD[OF vE] 
-        by(auto simp: add_edge_def insert_absorb) 
-      done
-  
-    from i ii have 
-      iii: "(\<forall>x\<in>E - E'. \<not>(forest (ind ( insert x E')) \<and> subgraph (ind ( insert x E')) (ind E)))"
-      by blast 
-  
-    show "s.SpanningForest E'"
-      unfolding s.SpanningForest_def using iii f sub  by blast 
-  qed
-  
   lemma edge_weight_alt: "edge_weight G = sum (\<lambda>(u,w,v). w) (edges G)"
   proof -
     have f: "fst o snd  = (\<lambda>(u,w,v). w) " by auto

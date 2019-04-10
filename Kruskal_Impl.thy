@@ -257,10 +257,11 @@ begin
 
   
   
-  abbreviation "MSF == minBasis"   
-  abbreviation "SpanningForest == basis"
-  lemmas SpanningForest_def = basis_def
-  lemmas MSF_def = minBasis_def 
+  txt \<open>These should probably be moved to \<^locale>\<open>Kruskal_interface\<close>'s initial usage in \<^theory>\<open>Kruskal.Kruskal\<close>...\<close>
+  abbreviation (in Kruskal_interface) "MSF == minBasis"
+  abbreviation (in Kruskal_interface) "SpanningForest == basis"
+  lemmas (in Kruskal_interface) SpanningForest_def = basis_def
+  lemmas (in Kruskal_interface) MSF_def = minBasis_def
   
   lemmas kruskal3_ref_spec_ = kruskal3_refine[FCOMP kruskal2_refine, FCOMP kruskal1_refine,
       FCOMP kruskal0_refine,
