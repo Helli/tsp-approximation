@@ -339,7 +339,10 @@ lemma (in finite_weighted_graph) minimum_spanning_tree_symhull_edge_weight:
   assumes \<open>\<And>v w.(v,w,v) \<notin> E\<close>
   assumes "minimum_spanning_tree T \<lparr>nodes=V, edges=E\<rparr>" "minimum_spanning_tree T' \<lparr>nodes=V, edges = symhull E\<rparr>"
   shows "edge_weight T = edge_weight T'"
-  using assms oops
+  using assms minimum_spanning_forest_symhull_edge_weight[unfolded minimum_spanning_forest_def]
+  unfolding minimum_spanning_tree_def spanning_tree_def spanning_forest_def tree_def forest_def
+  optimal_tree_def apply auto
+  by (meson connected_graph.maximally_connected_impl_connected forest.axioms(2) optimal_forest_def spanning_forest_def vE valid_graph.connected_impl_maximally_connected valid_graph.subgraph_impl_connected valid_graph.valid_subgraph valid_graph_symhull)
 
 context Kruskal_Impl
 begin
