@@ -2,7 +2,7 @@ section \<open>Undirected Kruskal on Directed Graphs\<close>
 
 theory Graph_Definition_Impl
 imports
- Kruskal.Kruskal_Impl Kruskal.Graph_Definition_Aux
+ Kruskal_Impl Kruskal.Graph_Definition_Aux
 begin
 
 context weight begin subclass ordered_comm_monoid_add.. end
