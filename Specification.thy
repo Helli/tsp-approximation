@@ -347,14 +347,14 @@ lemma (in finite_weighted_graph) minimum_spanning_tree_symhull_edge_weight:
 lemma sum_of_parts[simp]: "\<lparr>nodes= nodes G, edges=edges G\<rparr> = G"
   by simp
 
-context Kruskal_Impl
+context Kruskal_interface
 begin
-
 lemmas k0 = kruskal0_refine minWeightBasis_refine
 lemma k0_spec: "kruskal0 \<le> SPEC MSF" using k0 unfolding nres_rel_def by auto
 end
-thm "Kruskal_Impl.k0_spec"
+thm "Kruskal_interface.k0_spec"
 thm finite_weighted_graph.spanning_forest_eq[simplified]
+thm finite_weighted_graph.MSF_eq[simplified]
 
 text \<open>Citation test: @{cite lawler}.\<close>
 
