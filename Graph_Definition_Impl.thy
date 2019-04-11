@@ -319,7 +319,7 @@ proof -
   have *: "\<And>F'. edge_weight (ind F') = sum (\<lambda>(u,w,v). w) F'"
     unfolding edge_weight_def apply auto by (metis fn_snd_conv fst_def)
   show ?thesis using *
-    by (sep_auto heap: corr simp: fromlist.edge_weight_alt minimum_spanning_forest_def optimal_forest_def)
+    by (sep_auto heap: corr simp: edge_weight_alt minimum_spanning_forest_def optimal_forest_def)
 qed
 
 
