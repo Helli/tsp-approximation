@@ -246,7 +246,7 @@ lemma (in finite_weighted_graph) spanning_forest_symhull_preimage:
 proof (induction "F - E" arbitrary: F rule: infinite_finite_induct)
   case infinite
   have "finite F"
-    by (metis a finite_graph.finite_E finite_weighted_graph.axioms graph.select_convs(2) infinite.prems(2) infinite_super spanning_forest_def subgraph_def)
+    by (metis finite_weighted_graph_symhull finite_graph.finite_E finite_weighted_graph.axioms graph.select_convs(2) infinite.prems(2) infinite_super spanning_forest_def subgraph_def)
   with infinite show ?case
     by blast
 next
