@@ -344,6 +344,9 @@ lemma (in finite_weighted_graph) minimum_spanning_tree_symhull_edge_weight:
   optimal_tree_def apply auto
   by (meson connected_graph.maximally_connected_impl_connected forest.axioms(2) optimal_forest_def spanning_forest_def vE valid_graph.connected_impl_maximally_connected valid_graph.subgraph_impl_connected valid_graph.valid_subgraph valid_graph_symhull)
 
+lemma sum_of_parts[simp]: "\<lparr>nodes= nodes G, edges=edges G\<rparr> = G"
+  by simp
+
 context Kruskal_Impl
 begin
 
@@ -351,6 +354,7 @@ lemmas k0 = kruskal0_refine minWeightBasis_refine
 lemma k0_spec: "kruskal0 \<le> SPEC MSF" using k0 unfolding nres_rel_def by auto
 end
 thm "Kruskal_Impl.k0_spec"
+thm finite_weighted_graph.spanning_forest_eq[simplified]
 
 text \<open>Citation test: @{cite lawler}.\<close>
 
