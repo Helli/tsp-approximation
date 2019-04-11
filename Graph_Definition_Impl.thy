@@ -228,6 +228,26 @@ begin
       unfolding s.SpanningForest_def using iii f sub by blast
   qed
 
+  lemma (in -) edge_weight_alt: "edge_weight G = sum (\<lambda>(u,w,v). w) (edges G)"
+  proof -
+    have f: "fst o snd  = (\<lambda>(u,w,v). w) " by auto
+    show ?thesis unfolding edge_weight_def f by auto
+  qed
+
+  lemma MSF_eq: "s.MSF E' = minimum_spanning_forest (ind E') (ind E)"
+    unfolding s.MSF_def minimum_spanning_forest_def optimal_forest_def
+    unfolding spanning_forest_eq edge_weight_alt
+  proof safe
+    fix F'
+    assume "spanning_forest (ind E') (ind E)"
+      and B: "(\<forall>B'. spanning_forest (ind B') (ind E)
+             \<longrightarrow> (\<Sum>(u, w, v)\<in>E'. w) \<le> (\<Sum>(u, w, v)\<in>B'. w))"
+      and sf: "spanning_forest F' (ind E)"
+    from sf have "subgraph F' (ind E)" by(auto simp: spanning_forest_def)
+    then have "F' = ind (edges F')" unfolding subgraph_def by auto
+    with B sf show "(\<Sum>(u, w, v)\<in>edges (ind E'). w) \<le> (\<Sum>(u, w, v)\<in>edges F'. w)" by auto
+  qed auto
+
 end
   
 
@@ -265,26 +285,6 @@ next
   case 5
   then show ?case apply sepref_to_hoare by sep_auto
 qed
-
-  lemma edge_weight_alt: "edge_weight G = sum (\<lambda>(u,w,v). w) (edges G)"
-  proof -
-    have f: "fst o snd  = (\<lambda>(u,w,v). w) " by auto
-    show ?thesis unfolding edge_weight_def f by (auto cong: ) 
-  qed
-  
-  lemma MSF_eq: "s.MSF E' = minimum_spanning_forest (ind E') (ind E)"
-    unfolding s.MSF_def minimum_spanning_forest_def optimal_forest_def
-    unfolding spanning_forest_eq edge_weight_alt
-  proof safe
-    fix F'
-    assume "spanning_forest (ind E') (ind E)"
-      and B: "(\<forall>B'. spanning_forest (ind B') (ind E)
-             \<longrightarrow> (\<Sum>(u, w, v)\<in>E'. w) \<le> (\<Sum>(u, w, v)\<in>B'. w))"
-      and sf: "spanning_forest F' (ind E)"
-    from sf have "subgraph F' (ind E)" by(auto simp: spanning_forest_def)
-    then have "F' = ind (edges F')" unfolding subgraph_def by auto
-    with B sf show "(\<Sum>(u, w, v)\<in>edges (ind E'). w) \<le> (\<Sum>(u, w, v)\<in>edges F'. w)" by auto 
-  qed auto
     
   lemma kruskal_correct:
     "<emp> kruskal (return L) (\<lambda>(u,w,v). return (u,v)) ()
