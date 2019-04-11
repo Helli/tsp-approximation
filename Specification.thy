@@ -65,6 +65,9 @@ lemma finite_weighted_graph_symhull_iff:
   apply (simp add: symhull_altdef)
     using subgraph_def subset_eq_symhull valid_graph.valid_subgraph apply fastforce
     using infinite_super subset_eq_symhull by blast
+lemma (in finite_weighted_graph) finite_weighted_graph_symhull:
+  "finite_weighted_graph\<lparr>nodes = V, edges = symhull E\<rparr>"
+  using finite_weighted_graph_axioms finite_weighted_graph_symhull_iff by blast
 
 lemma is_path_undir_symhull:
   "is_path_undir \<lparr>nodes=V, edges=symhull E\<rparr> v p v' \<Longrightarrow> is_path_undir \<lparr>nodes=V, edges=E\<rparr> v p v'"
@@ -99,9 +102,6 @@ begin \<comment> \<open>@{class weight} might be too special, and @{thm valid_gr
 
 interpretation m?: weighted_matroid E subforest "\<lambda>(_,w,_). w"
   by (simp add: s.weighted_matroid_axioms)
-
-lemma a: "finite_weighted_graph\<lparr>nodes = V, edges = symhull E\<rparr>"
-  using finite_weighted_graph_axioms finite_weighted_graph_symhull_iff by blast
 
 end
 
