@@ -95,16 +95,6 @@ lemma infinite_edge_weight: "infinite (edges G) \<Longrightarrow> edge_weight G 
   by (simp add: edge_weight_def)
 
 
-subsection \<open>Matroid Interpretation\<close>
-
-context finite_weighted_graph \<comment> \<open>first usage in the AFP\<close>
-begin \<comment> \<open>@{class weight} might be too special, and @{thm valid_graph_axioms} unneeded\<close>
-
-interpretation m?: weighted_matroid E subforest "\<lambda>(_,w,_). w"
-  by (simp add: s.weighted_matroid_axioms)
-
-end
-
 subsection \<open>Relation To The Digraph's Spanning Forest\<close>
 
 abbreviation "mirror_edge u w v G \<equiv> add_edge v w u (delete_edge u w v G)"
@@ -344,8 +334,19 @@ lemma (in finite_weighted_graph) minimum_spanning_tree_symhull_edge_weight:
   optimal_tree_def apply auto
   by (meson connected_graph.maximally_connected_impl_connected forest.axioms(2) optimal_forest_def spanning_forest_def vE valid_graph.connected_impl_maximally_connected valid_graph.subgraph_impl_connected valid_graph.valid_subgraph valid_graph_symhull)
 
-lemma sum_of_parts[simp]: "\<lparr>nodes= nodes G, edges=edges G\<rparr> = G"
+lemma sum_of_parts: "\<lparr>nodes= nodes G, edges=edges G\<rparr> = G"
   by simp
+
+
+subsection \<open>Matroid Interpretation\<close>
+
+context finite_weighted_graph \<comment> \<open>first usage in the AFP\<close>
+begin \<comment> \<open>@{class weight} might be too special, and @{thm valid_graph_axioms} unneeded\<close>
+
+interpretation m?: weighted_matroid E subforest "\<lambda>(_,w,_). w"
+  by (simp add: local.s.weighted_matroid_axioms)
+
+end
 
 context Kruskal_interface
 begin
