@@ -354,8 +354,8 @@ lemmas k0 = kruskal0_refine minWeightBasis_refine
 lemma k0_spec: "kruskal0 \<le> SPEC MSF" using k0 unfolding nres_rel_def by auto
 end
 thm "Kruskal_interface.k0_spec"
-thm finite_weighted_graph.spanning_forest_eq[simplified]
-thm finite_weighted_graph.MSF_eq[simplified]
+thm finite_weighted_graph.spanning_forest_eq
+thm finite_weighted_graph.MSF_eq
 
 text \<open>Citation test: @{cite lawler}.\<close>
 
