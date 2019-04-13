@@ -344,18 +344,26 @@ context finite_weighted_graph \<comment> \<open>first usage in the AFP\<close>
 begin \<comment> \<open>@{class weight} might be too special, and @{thm valid_graph_axioms} unneeded\<close>
 
 interpretation m?: weighted_matroid E subforest "\<lambda>(_,w,_). w"
-  by (simp add: local.s.weighted_matroid_axioms)
+  by (simp add: s.weighted_matroid_axioms)
 
 end
 
 context Kruskal_interface
 begin
 lemmas k0 = kruskal0_refine minWeightBasis_refine
-lemma k0_spec: "kruskal0 \<le> SPEC MSF" using k0 unfolding nres_rel_def by auto
+lemma k0_spec: "kruskal0 \<le> SPEC MSF"
+  using k0 unfolding nres_rel_def by auto
 end
-thm "Kruskal_interface.k0_spec"
-thm finite_weighted_graph.spanning_forest_eq
-thm finite_weighted_graph.MSF_eq
+thm Kruskal_interface.kruskal0_def
+context finite_weighted_graph
+begin
+
+find_theorems name: MSF_eq
+thm s.k0_spec[unfolded MSF_eq, simplified]
+thm spanning_forest_eq
+thm MSF_eq
+
+end
 
 text \<open>Citation test: @{cite lawler}.\<close>
 
@@ -366,9 +374,11 @@ subsection \<open>Manhattan Distance\<close>
 
 text \<open>1d-coordinates:\<close>
 
-lemma "nat\<bar>c-a\<bar> \<le> nat\<bar>b-a\<bar> + nat\<bar>c-b\<bar>" for a :: int
+lemma manhattan: "nat\<bar>c-a\<bar> \<le> nat\<bar>b-a\<bar> + nat\<bar>c-b\<bar>" for a b c :: int
   by (simp add: nat_le_iff)
 
+subsection \<open>Euclidean Distance, Rounded Up\<close>
+  \<comment> \<open>attempt only if too much time at the end\<close>
 
 section \<open>Junk\<close>
 
