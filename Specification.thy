@@ -322,9 +322,6 @@ lemma (in finite_weighted_graph) minimum_spanning_forest_symhull_edge_weight:
   using assms
   by (meson antisym minimum_spanning_forest_def optimal_forest_def optimal_forest_symhull optimal_forest_symhull_preimage)
 
-lemma \<open>minimum_spanning_forest F G \<Longrightarrow> nodes F = nodes G\<close> (* OK, then why have it twice? *)
-  by (simp add: minimum_spanning_forest_def spanning_forest_def subgraph_def)
-
 lemma (in finite_weighted_graph) minimum_spanning_tree_symhull_edge_weight:
   assumes \<open>\<And>v w.(v,w,v) \<notin> E\<close>
   assumes "minimum_spanning_tree T \<lparr>nodes=V, edges=E\<rparr>" "minimum_spanning_tree T' \<lparr>nodes=V, edges = symhull E\<rparr>"
@@ -363,6 +360,19 @@ thm s.k0_spec[unfolded MSF_eq]
 thm s.k0_spec[unfolded MSF_eq, simplified]
 thm spanning_forest_eq
 thm MSF_eq
+
+end
+
+locale finite_weighted_connected_graph = finite_weighted_graph + connected_graph
+begin
+
+lemma \<open>s.kruskal0 \<le> SPEC (\<lambda>E'. minimum_spanning_tree (ind E') G)\<close>
+proof -
+  have \<open>minimum_spanning_tree F G\<close> if \<open>minimum_spanning_forest F G\<close> for F
+    by (simp add: connected_graph_axioms minimum_spanning_forest_impl_tree2 that)
+  with SPEC_cons_rule[OF s.k0_spec[unfolded MSF_eq] this] show ?thesis
+    by (simp add: sum_of_parts)
+qed
 
 end
 
