@@ -336,7 +336,7 @@ lemma (in finite_weighted_graph) minimum_spanning_tree_symhull_edge_weight:
 
 lemma (in finite_weighted_graph) spanning_tree_impl_connected:
   assumes "spanning_tree F G"
-  shows connected_G: "connected_graph G"
+  shows "connected_graph G"
   using assms spanning_tree_def subgraph_impl_connected tree_def by blast
 
 lemma (in finite_weighted_graph) minimum_spanning_tree_symhull:
