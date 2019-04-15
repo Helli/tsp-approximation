@@ -334,15 +334,21 @@ lemma (in finite_weighted_graph) minimum_spanning_tree_symhull_edge_weight:
   optimal_tree_def apply auto
   by (meson connected_graph.maximally_connected_impl_connected forest.axioms(2) optimal_forest_def spanning_forest_def vE valid_graph.connected_impl_maximally_connected valid_graph.subgraph_impl_connected valid_graph.valid_subgraph valid_graph_symhull)
 
+lemma (in finite_weighted_graph) spanning_tree_impl_connected:
+  assumes "spanning_tree F G"
+  shows connected_G: "connected_graph G"
+  using assms spanning_tree_def subgraph_impl_connected tree_def by blast
+
 lemma (in finite_weighted_graph) minimum_spanning_tree_symhull:
   assumes "\<And>v w.(v,w,v) \<notin> E"
   assumes "minimum_spanning_tree F \<lparr>nodes=V, edges=E\<rparr>"
   shows "minimum_spanning_tree F \<lparr>nodes=V, edges = symhull E\<rparr>"
   using assms unfolding minimum_spanning_tree_def minimum_spanning_forest_def
-  apply auto
-   apply (meson spanning_tree_def subgraph_trans supergraph_symhull)
-  unfolding spanning_tree_def optimal_tree_def apply auto
-  by (smt connected_graph.maximally_connected_impl_connected graph.select_convs(1) spanning_forest_def spanning_forest_symhull_preimage subgraph_def sum_of_parts tree.axioms(1) tree.axioms(2) tree.intro vE valid_graph.connected_impl_maximally_connected valid_graph.subgraph_impl_connected valid_graph_symhull)
+  by (metis connected_graph.maximally_connected_impl_connected spanning_tree_impl_connected
+      minimum_spanning_forest_def minimum_spanning_forest_impl_tree minimum_spanning_forest_symhull
+      minimum_spanning_tree_def optimal_forest_def optimal_tree_def spanning_forest_def
+      spanning_tree_def sum_of_parts tree_def connected_impl_maximally_connected
+      valid_graph_symhull)
 
 
 subsection \<open>Matroid Interpretation\<close>
