@@ -359,6 +359,7 @@ context finite_weighted_graph
 begin
 
 find_theorems name: MSF_eq
+thm s.k0_spec[unfolded MSF_eq]
 thm s.k0_spec[unfolded MSF_eq, simplified]
 thm spanning_forest_eq
 thm MSF_eq
