@@ -381,12 +381,27 @@ end
 locale finite_weighted_connected_graph = finite_weighted_graph + connected_graph
 begin
 
-lemma \<open>s.kruskal0 \<le> SPEC (\<lambda>E'. minimum_spanning_tree (ind E') G)\<close>
+lemma kurskal0_MST: \<open>s.kruskal0 \<le> SPEC (\<lambda>E'. minimum_spanning_tree (ind E') G)\<close>
 proof -
   have \<open>minimum_spanning_tree F G\<close> if \<open>minimum_spanning_forest F G\<close> for F
     by (simp add: connected_graph_axioms minimum_spanning_forest_impl_tree2 that)
   with SPEC_cons_rule[OF s.k0_spec[unfolded MSF_eq] this] show ?thesis
     by (simp add: sum_of_parts)
+qed
+
+end
+
+locale finite_weighted_connected_loopfree_graph = finite_weighted_connected_graph +
+  assumes no_loops: \<open>\<And>v w.(v,w,v) \<notin> E\<close>
+begin
+
+lemma \<open>s.kruskal0 \<le> SPEC (\<lambda>E'. minimum_spanning_tree (ind E') \<lparr>nodes=V, edges = symhull E\<rparr>)\<close>
+  using kurskal0_MST
+proof -
+  have "SPEC (\<lambda>E'. minimum_spanning_tree (ind E') G) \<le> SPEC (\<lambda>E'. minimum_spanning_tree (ind E') \<lparr>nodes=V, edges = symhull E\<rparr>)"
+    using minimum_spanning_tree_symhull using no_loops by force
+  with SPEC_trans kurskal0_MST show ?thesis
+    by blast
 qed
 
 end
