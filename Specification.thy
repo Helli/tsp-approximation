@@ -341,14 +341,13 @@ lemma (in finite_weighted_graph) spanning_tree_impl_connected:
 
 lemma (in finite_weighted_graph) minimum_spanning_tree_symhull:
   assumes "\<And>v w.(v,w,v) \<notin> E"
-  assumes "minimum_spanning_tree F \<lparr>nodes=V, edges=E\<rparr>"
+  assumes "minimum_spanning_tree F G"
   shows "minimum_spanning_tree F \<lparr>nodes=V, edges = symhull E\<rparr>"
   using assms unfolding minimum_spanning_tree_def minimum_spanning_forest_def
-  by (metis connected_graph.maximally_connected_impl_connected spanning_tree_impl_connected
-      minimum_spanning_forest_def minimum_spanning_forest_impl_tree minimum_spanning_forest_symhull
-      minimum_spanning_tree_def optimal_forest_def optimal_tree_def spanning_forest_def
-      spanning_tree_def sum_of_parts tree_def connected_impl_maximally_connected
-      valid_graph_symhull)
+  by (metis connected_graph.maximally_connected_impl_connected minimum_spanning_forest_def
+      minimum_spanning_forest_symhull optimal_forest_def optimal_tree_def spanning_forest_def
+      spanning_tree_def sum_of_parts tree_def valid_graph.connected_impl_maximally_connected
+      subgraph_impl_connected valid_graph_axioms valid_graph_symhull)
 
 
 subsection \<open>Matroid Interpretation\<close>
