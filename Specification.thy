@@ -404,6 +404,9 @@ proof -
     by blast
 qed
 
+sublocale symhull: valid_unMultigraph \<open>ind (symhull E)\<close>
+  by (simp add: no_loops valid_unMultigraph_symhull)
+
 end
 
 text \<open>Citation test: @{cite lawler}.\<close>
