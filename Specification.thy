@@ -381,7 +381,7 @@ end
 locale finite_weighted_connected_graph = finite_weighted_graph + connected_graph
 begin
 
-lemma kurskal0_MST: \<open>s.kruskal0 \<le> SPEC (\<lambda>E'. minimum_spanning_tree (ind E') G)\<close>
+lemma kruskal0_MST: \<open>s.kruskal0 \<le> SPEC (\<lambda>E'. minimum_spanning_tree (ind E') G)\<close>
 proof -
   have \<open>minimum_spanning_tree F G\<close> if \<open>minimum_spanning_forest F G\<close> for F
     by (simp add: connected_graph_axioms minimum_spanning_forest_impl_tree2 that)
@@ -395,17 +395,21 @@ locale finite_weighted_connected_loopfree_graph = finite_weighted_connected_grap
   assumes no_loops: \<open>\<And>v w.(v,w,v) \<notin> E\<close>
 begin
 
-lemma \<open>s.kruskal0 \<le> SPEC (\<lambda>E'. minimum_spanning_tree (ind E') \<lparr>nodes=V, edges = symhull E\<rparr>)\<close>
-  using kurskal0_MST
+lemma kruskal0_MST': \<open>s.kruskal0 \<le> SPEC (\<lambda>E'. minimum_spanning_tree (ind E') \<lparr>nodes=V, edges = symhull E\<rparr>)\<close>
+  using kruskal0_MST
 proof -
   have "SPEC (\<lambda>E'. minimum_spanning_tree (ind E') G) \<le> SPEC (\<lambda>E'. minimum_spanning_tree (ind E') \<lparr>nodes=V, edges = symhull E\<rparr>)"
     using minimum_spanning_tree_symhull using no_loops by force
-  with SPEC_trans kurskal0_MST show ?thesis
+  with SPEC_trans kruskal0_MST show ?thesis
     by blast
 qed
 
 sublocale symhull: valid_unMultigraph \<open>ind (symhull E)\<close>
   by (simp add: no_loops valid_unMultigraph_symhull)
+
+term \<open>symhull.is_Eulerian_trail\<close>
+definition "phase2 = undefined"
+
 
 end
 
