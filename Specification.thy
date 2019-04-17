@@ -422,6 +422,7 @@ find_theorems "int_vertices"
 definition (in valid_graph) is_hamiltonian where \<comment> \<open>to-do: unconventional intermediate definition, only for experimentation\<close>
   \<open>is_hamiltonian ps \<longleftrightarrow> int_vertices ps = V\<close>
 
+find_theorems valid_unMultigraph.connected
 
 text \<open>Citation test: @{cite lawler}.\<close>
 
