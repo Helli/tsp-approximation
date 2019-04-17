@@ -416,8 +416,8 @@ subsection \<open>Hamiltonian Circuits\<close>
 
 term \<open>valid_unMultigraph.is_Eulerian_trail\<close>
 
-definition is_simple_path :: \<open>(_,_) path \<Rightarrow> bool\<close> where
-  \<open>is_simple_path ps \<longleftrightarrow> distinct (map fst ps)\<close>
+definition (in valid_graph) is_simple_path :: \<open>(_,_) path \<Rightarrow> bool\<close> where
+  \<open>is_simple_path ps \<longleftrightarrow> is_path ps \<and> distinct (map fst ps)\<close>
 find_theorems "int_vertices"
 definition (in valid_graph) is_hamiltonian where \<comment> \<open>to-do: unconventional intermediate definition, only for experimentation\<close>
   \<open>is_hamiltonian ps \<longleftrightarrow> int_vertices ps = V\<close>
@@ -425,6 +425,7 @@ definition (in valid_graph) is_hamiltonian_path where
   \<open>is_hamiltonian_path ps \<longleftrightarrow> is_hamiltonian ps \<and> is_simple_path ps\<close>
 
 term "valid_graph.is_path"
+find_theorems \<open>valid_graph.is_path\<close>
 find_theorems valid_unMultigraph.connected
 
 text \<open>Citation test: @{cite lawler}.\<close>
