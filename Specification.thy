@@ -421,7 +421,10 @@ definition is_simple_path :: \<open>(_,_) path \<Rightarrow> bool\<close> where
 find_theorems "int_vertices"
 definition (in valid_graph) is_hamiltonian where \<comment> \<open>to-do: unconventional intermediate definition, only for experimentation\<close>
   \<open>is_hamiltonian ps \<longleftrightarrow> int_vertices ps = V\<close>
+definition (in valid_graph) is_hamiltonian_path where
+  \<open>is_hamiltonian_path ps \<longleftrightarrow> is_hamiltonian ps \<and> is_simple_path ps\<close>
 
+term "valid_graph.is_path"
 find_theorems valid_unMultigraph.connected
 
 text \<open>Citation test: @{cite lawler}.\<close>
