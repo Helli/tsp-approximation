@@ -399,7 +399,7 @@ lemma kruskal0_MST': \<open>s.kruskal0 \<le> SPEC (\<lambda>E'. minimum_spanning
   using kruskal0_MST
 proof -
   have "SPEC (\<lambda>E'. minimum_spanning_tree (ind E') G) \<le> SPEC (\<lambda>E'. minimum_spanning_tree (ind E') \<lparr>nodes=V, edges = symhull E\<rparr>)"
-    using minimum_spanning_tree_symhull using no_loops by force
+    using minimum_spanning_tree_symhull no_loops by force
   with SPEC_trans kruskal0_MST show ?thesis
     by blast
 qed
