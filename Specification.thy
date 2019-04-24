@@ -4,7 +4,7 @@ theory Specification
     Koenigsberg_Friendship.KoenigsbergBridge
     Graph_Definition_Impl
     "HOL-ex.Sketch_and_Explore"
-begin hide_const a b c d
+begin
 
 lemma sum_of_parts(*rm*): "\<lparr>nodes= nodes G, edges=edges G\<rparr> = G"
   by simp
