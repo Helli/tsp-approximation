@@ -108,20 +108,13 @@ lemma mirror_single_edge_weight:
   using assms unfolding edge_weight_def apply simp
   by (smt Diff_idemp Diff_insert0 Diff_insert2 finite_insert fst_conv insertCI insert_Diff snd_conv sum.infinite sum.insert_remove)
 
-lemma forest_no_dups: "forest F \<Longrightarrow> (u,w,v) \<in> edges F \<Longrightarrow> (v,w,u) \<notin> edges F"
-  unfolding forest_def forest_axioms_def
-proof auto
-  assume a1: "\<forall>x\<in>edges F. case x of (a, w, b) \<Rightarrow> \<forall>p. \<not> is_path_undir (delete_edge a w b F) a p b"
-  assume a2: "(v, w, u) \<in> edges F"
-  assume a3: "valid_graph F"
-  assume a4: "(u, w, v) \<in> edges F"
-  have "\<forall>ps. \<not> is_path_undir (delete_edge v w u F) v ps u"
-    using a2 a1 by fastforce
-  then show False
-    using a4 a3 a2 by (metis (no_types) delete_edge_valid edges_delete_edge insert_Diff insert_iff nodes_delete_edge prod.simps(1) valid_graph.E_validD(2) valid_graph.add_delete_edge valid_graph.add_edge_is_connected(2) valid_graph.is_path_undir_simps(1))
-qed
-corollary forest_no_loops: "forest F \<Longrightarrow> (u,w,u) \<notin> edges F"
-  by (meson forest_no_dups)
+lemma (in valid_graph) valid_graph_delete_edge: \<open>valid_graph (delete_edge v e v' G)\<close>
+  by (simp add: valid_graph_axioms) \<comment> \<open>uses the oddly formed @{thm delete_edge_valid}\<close>
+
+lemma (in forest) no_dups: "(u,w,v) \<in> E \<Longrightarrow> (v,w,u) \<notin> E"
+  by (smt E_validD(2) Pair_inject add_delete_edge case_prodE delete_edge_valid forest.cycle_free forest_axioms nodes_delete_edge swap_delete_add_edge valid_graph.add_edge_is_connected(2) valid_graph.is_path_undir_simps(1) valid_graph_axioms)
+corollary (in forest) no_loops: "(u,w,u) \<notin> E"
+  using no_dups by blast
 
 lemma (in valid_graph) delete_mirrored[simp]:
   "u\<in>V \<Longrightarrow> v\<in>V \<Longrightarrow> delete_edge v w u (mirror_edge u w v G) = delete_edge v w u (delete_edge u w v G)"
@@ -135,13 +128,13 @@ lemma (in valid_graph) is_path_undir_mirror_single_iff:
 
 lemma (in valid_graph) nodes_connected_mirror_singe_iff[simp]:
   assumes \<open>(u,w,v)\<in>E\<close>
-  shows "nodes_connected (mirror_edge u w v G) a b \<longleftrightarrow> nodes_connected G a b"
+  shows "nodes_connected (mirror_edge u w v G) n n' \<longleftrightarrow> nodes_connected G n n'"
 proof -
   {
     assume e: "(u, w, v) \<in> E"
-    have a: "nodes_connected G a b" if "is_path_undir (mirror_edge u w v G) a p b" for p
+    have *: "nodes_connected G n n'" if "is_path_undir (mirror_edge u w v G) n p n'" for p
       using that
-    proof (induction \<open>mirror_edge u w v G\<close> a p b rule: is_path_undir.induct)
+    proof (induction \<open>mirror_edge u w v G\<close> n p n' rule: is_path_undir.induct)
       case (1 v v')
       then show ?case
         by (metis e insert_absorb is_path_undir.simps(1) nodes_add_edge nodes_delete_edge valid_graph.E_validD valid_graph_axioms)
@@ -151,9 +144,9 @@ proof -
         apply simp
         by (meson e is_path_undir_simps(2) valid_graph.is_path_undir_append valid_graph_axioms)
     qed
-    have "nodes_connected (mirror_edge u w v G) a b" if "is_path_undir G a p b" for p
+    have "nodes_connected (mirror_edge u w v G) n n'" if "is_path_undir G n p n'" for p
       using that
-    proof (induction \<open>mirror_edge u w v G\<close> a p b rule: is_path_undir.induct)
+    proof (induction \<open>mirror_edge u w v G\<close> n p n' rule: is_path_undir.induct)
       case (1 v v')
       then show ?case
         by (metis insert_iff is_path_undir.simps(1) nodes_add_edge nodes_delete_edge)
@@ -163,7 +156,7 @@ proof -
         apply simp
         by (meson e is_path_undir.simps(2) valid_graph.is_path_undir_mirror_single_iff valid_graph_axioms)
     qed
-    note a this
+    note * this
   }
   then show ?thesis
     using assms
@@ -191,7 +184,7 @@ proof unfold_locales
       then have E: \<open>(v2,w',v1) \<in> E\<close>
         using assms by blast
       then have *: "delete_edge v1 w' v2 (mirror_edge u w v G) = delete_edge v2 w' v1 G"
-        using True V forest_axioms forest_no_dups by fastforce
+        using True V no_dups by fastforce
       from cycle_free E True have "\<not>nodes_connected \<dots> v2 v1"
         by fast
       then show ?thesis
@@ -231,7 +224,7 @@ lemma (in valid_unMultigraph) spanning_forest_mirror_single:
       and "maximally_connected \<lparr>nodes = V, edges = F\<rparr> G"
       and "subgraph \<lparr>nodes = V, edges = F\<rparr> G"
     using that
-    by (smt forest add_edge_maximally_connected add_edge_preserve_subgraph corres edges_add_edge forest.forest_add_edge forest_no_dups graph.select_convs(2) insert_iff insert_subset nodes_delete_edge subgraph_def swap_delete_add_edge valid_graph.E_validD(1) valid_graph.add_delete_edge valid_graph.delete_edge_maximally_connected valid_graph.valid_subgraph valid_graph_axioms)
+    by (smt forest add_edge_maximally_connected add_edge_preserve_subgraph corres edges_add_edge forest.forest_add_edge forest.no_dups graph.select_convs(2) insert_iff insert_subset nodes_delete_edge subgraph_def swap_delete_add_edge valid_graph.E_validD(1) valid_graph.add_delete_edge valid_graph.delete_edge_maximally_connected valid_graph.valid_subgraph valid_graph_axioms)
   show "subgraph (mirror_edge u w v \<lparr>nodes = V, edges = F\<rparr>) G"
     if "(u, w, v) \<in> F"
       and "forest \<lparr>nodes = V, edges = F\<rparr>"
@@ -277,7 +270,7 @@ next
     apply (simp add: f1 x)
     using insert.hyps(4) by auto
   with \<open>x \<in> F\<close> have "(v,w,u) \<notin> F"
-    using forest_no_dups insert.prems spanning_forest_def x by fastforce
+    using forest.no_dups insert.prems spanning_forest_def x by fastforce
   then have I: "I = edges (mirror_edge u w v \<lparr>nodes=V, edges=F\<rparr>) - E"
     by (metis (no_types, lifting) Diff_insert Diff_insert2 Diff_insert_absorb * edges_add_edge edges_delete_edge graph.select_convs(2) insert.hyps(2) insert.hyps(4) insert_Diff1 x)
   have "forest \<lparr>nodes=V, edges=F\<rparr>"
