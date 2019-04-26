@@ -421,7 +421,6 @@ term "valid_graph.is_path"
 find_theorems \<open>valid_graph.is_path\<close>
 find_theorems valid_unMultigraph.connected
 
-text \<open>Citation test: @{cite lawler}.\<close>
 
 
 section \<open>Generating Example Input\<close>
@@ -492,5 +491,7 @@ lemma "indep_system E (\<lambda>E'. E'\<subseteq>E \<and> (\<forall>v\<in>V. dg 
 
 end
 end
+
+text \<open>dummy citation: @{cite lawler}.\<close>
 
 end
