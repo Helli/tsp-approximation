@@ -417,7 +417,7 @@ fun (in valid_graph) is_trace :: \<open>('v,'w) path \<Rightarrow> bool\<close>w
   \<open>is_trace [] \<longleftrightarrow> V={} \<or> card V = 1\<close> |
   \<open>is_trace ps \<longleftrightarrow> insert (snd(snd(last ps))) (int_vertices ps) = V\<close>
 
-lemma (in valid_graph) is_trace_snoc[simp]:
+lemma (in valid_graph) is_trace_snoc:
   "is_trace (ps @ [p]) \<longleftrightarrow> insert (snd(snd p)) (int_vertices (ps@[p])) = V"
   by (metis (no_types, lifting) append_is_Nil_conv is_trace.elims(2) is_trace.elims(3) last_snoc not_Cons_self2)
 
@@ -427,14 +427,36 @@ definition (in valid_graph) is_hamiltonian_path where \<comment> \<open>or "simp
 fun (in valid_graph) is_hamiltonian :: \<open>('v,'w) path \<Rightarrow> bool\<close> where \<comment> \<open>to-do: unconventional intermediate definition, only for experimentation\<close>
   \<open>is_hamiltonian [] \<longleftrightarrow> V={} \<or> card V = 1\<close> |
   \<open>is_hamiltonian ps \<longleftrightarrow> int_vertices ps = V\<close>
+
 definition (in valid_graph) is_hamiltonian_circuit where
   \<open>is_hamiltonian_circuit v ps \<longleftrightarrow> is_hamiltonian ps \<and> is_simple_path v ps v\<close>
 
-lemma (in valid_graph) "is_hamiltonian_path v ps v \<longleftrightarrow> is_hamiltonian_circuit v ps"
-  apply (cases ps)
+lemma (in valid_graph) is_hamiltonian_iff: "is_hamiltonian_path v ps v \<longleftrightarrow> is_hamiltonian_circuit v ps"
+  apply (cases ps rule: rev_cases)
    apply (simp_all add: is_hamiltonian_path_def is_hamiltonian_circuit_def)
-  apply (simp add: is_simple_path_def)
-  oops
+proof auto
+  fix ys :: "('v \<times> 'w \<times> 'v) list" and a :: 'v and aa :: 'w and b :: 'v
+  assume a1: "is_simple_path v (ys @ [(a, aa, b)]) v"
+  assume a2: "ps = ys @ [(a, aa, b)]"
+  assume a3: "is_trace (ys @ [(a, aa, b)])"
+  have f4: "is_path b ps b"
+    using a2 a1 by (metis (no_types) is_path.simps(1) is_path_split' is_simple_path_def)
+  have "is_trace ps"
+    using a3 a2 by meson
+  then have f5: "insert (snd (snd (last ps))) (int_vertices ps) = V \<or> ps = []"
+    using f4 is_path.elims(2) is_trace.simps(2) by blast
+  have f6: "\<forall>v ps va. ((ps = [] \<or> is_hamiltonian ps) \<or> int_vertices ps \<noteq> V) \<or> \<not> is_path va ps v"
+    using is_hamiltonian.simps(2) is_path.elims(2) by blast
+  have "ps = [] \<longrightarrow> is_hamiltonian ps"
+    using a2 by force
+  then have "is_hamiltonian ps"
+    using f6 f5 f4 by (metis fst_conv insertCI insert_absorb int_vertices_simps(2) is_path.elims(2) valid_graph.path_end valid_graph_axioms)
+  then show "is_hamiltonian (ys @ [(a, aa, b)])"
+    using a2 by meson
+qed (metis (no_types, lifting) E_validD(2) Nil_is_append_conv insert_absorb is_hamiltonian.elims(2)
+      is_path_split' is_simple_path_def last_snoc not_Cons_self2 snd_conv
+      valid_graph.is_trace.elims(3) valid_graph_axioms)
+
 
 term "valid_graph.is_path"
 find_theorems \<open>valid_graph.is_path\<close>
