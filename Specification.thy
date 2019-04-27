@@ -420,6 +420,11 @@ definition (in valid_graph) is_hamiltonian_path where
 
 definition (in valid_graph) is_hamiltonian where \<comment> \<open>to-do: unconventional intermediate definition, only for experimentation\<close>
   \<open>is_hamiltonian ps \<longleftrightarrow> int_vertices ps = V\<close>
+definition (in valid_graph) is_hamiltonian_circuit where
+  \<open>is_hamiltonian_circuit v ps \<longleftrightarrow> is_hamiltonian ps \<and> is_simple_path v ps v\<close>
+
+lemma (in valid_graph) "is_hamiltonian_path v ps v \<longleftrightarrow> is_hamiltonian_circuit v ps"
+  try oops
 
 term "valid_graph.is_path"
 find_theorems \<open>valid_graph.is_path\<close>
