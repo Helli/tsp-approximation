@@ -421,7 +421,8 @@ term "valid_graph.is_path"
 find_theorems \<open>valid_graph.is_path\<close>
 find_theorems valid_unMultigraph.connected
 
-
+text \<open>Reuse @{const kon_graph}, but interpreted, differently: Between to-do and to-do, there are
+  four edges, two of which have the same label.\<close>
 
 section \<open>Generating Example Input\<close>
 
