@@ -424,10 +424,13 @@ find_theorems valid_unMultigraph.connected
 text \<open>Reuse @{const kon_graph}, but interpreted, differently: Between to-do and to-do, there are
   four edges, two of which have the same label.\<close>
 
-definition \<open>kon_path \<equiv> [(a,ab1,b)]\<close> \<comment> \<open>to-do: expand\<close>
+definition \<open>kon_path \<equiv> [(a,ab1,b),(b,bd1,d),(d,cd1,c)]\<close> \<comment> \<open>to-do: expand\<close>
 
-lemma is_simple_path_kon_path: \<open>kon_graph.is_simple_path a kon_path b\<close>
+lemma is_simple_path_kon_path: \<open>kon_graph.is_simple_path a kon_path c\<close>
   unfolding kon_graph.is_simple_path_def by (simp add: kon_path_def) (simp add: kon_graph_def)
+
+lemma \<open>kon_graph.is_hamiltonian_path a kon_path b\<close>
+  oops
 
 section \<open>Generating Example Input\<close>
 
