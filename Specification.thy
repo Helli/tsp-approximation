@@ -413,18 +413,28 @@ definition (in valid_graph) is_simple_path :: \<open>_ \<Rightarrow> (_,_) path 
   \<open>is_simple_path v ps v' \<longleftrightarrow> is_path v ps v' \<and> distinct (map fst ps)\<close>
 find_theorems "int_vertices"
 
-definition (in valid_graph) is_trace where \<comment> \<open>non-standard definition. Also not thoroughly thought through.\<close>
+fun (in valid_graph) is_trace :: \<open>('v,'w) path \<Rightarrow> bool\<close>where \<comment> \<open>non-standard definition. Also not thoroughly thought through.\<close>
+  \<open>is_trace [] \<longleftrightarrow> V={} \<or> card V = 1\<close> |
   \<open>is_trace ps \<longleftrightarrow> insert (snd(snd(last ps))) (int_vertices ps) = V\<close>
-definition (in valid_graph) is_hamiltonian_path where
+
+lemma (in valid_graph) is_trace_snoc[simp]:
+  "is_trace (ps @ [p]) \<longleftrightarrow> insert (snd(snd p)) (int_vertices (ps@[p])) = V"
+  by (metis (no_types, lifting) append_is_Nil_conv is_trace.elims(2) is_trace.elims(3) last_snoc not_Cons_self2)
+
+definition (in valid_graph) is_hamiltonian_path where \<comment> \<open>or "simple trace"\<close>
   \<open>is_hamiltonian_path v ps v' \<longleftrightarrow> is_trace ps \<and> is_simple_path v ps v'\<close>
 
-definition (in valid_graph) is_hamiltonian where \<comment> \<open>to-do: unconventional intermediate definition, only for experimentation\<close>
+fun (in valid_graph) is_hamiltonian :: \<open>('v,'w) path \<Rightarrow> bool\<close> where \<comment> \<open>to-do: unconventional intermediate definition, only for experimentation\<close>
+  \<open>is_hamiltonian [] \<longleftrightarrow> V={} \<or> card V = 1\<close> |
   \<open>is_hamiltonian ps \<longleftrightarrow> int_vertices ps = V\<close>
 definition (in valid_graph) is_hamiltonian_circuit where
   \<open>is_hamiltonian_circuit v ps \<longleftrightarrow> is_hamiltonian ps \<and> is_simple_path v ps v\<close>
 
 lemma (in valid_graph) "is_hamiltonian_path v ps v \<longleftrightarrow> is_hamiltonian_circuit v ps"
-  try oops
+  apply (cases ps)
+   apply (simp_all add: is_hamiltonian_path_def is_hamiltonian_circuit_def)
+  apply (simp add: is_simple_path_def)
+  oops
 
 term "valid_graph.is_path"
 find_theorems \<open>valid_graph.is_path\<close>
@@ -439,7 +449,8 @@ lemma is_simple_path_kon_path: \<open>kon_graph.is_simple_path a kon_path c\<clo
   unfolding kon_graph.is_simple_path_def by (simp add: kon_path_def) (simp add: kon_graph_def)
 
 lemma is_hamiltonian_path_kon_path: \<open>kon_graph.is_hamiltonian_path a kon_path c\<close>
-  apply (simp add: kon_graph.is_hamiltonian_path_def kon_graph.is_trace_def is_simple_path_kon_path)
+  apply (simp add: kon_graph.is_hamiltonian_path_def is_simple_path_kon_path)
+  apply (simp add: kon_path_def)
   apply eval
   done
 
