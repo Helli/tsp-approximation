@@ -462,7 +462,7 @@ term "valid_graph.is_path"
 find_theorems \<open>valid_graph.is_path\<close>
 find_theorems valid_unMultigraph.connected
 
-text \<open>Reuse @{const kon_graph}, but interpreted, differently: Between to-do and to-do, there are
+text \<open>Reuse @{const kon_graph}, but interpreted differently: Between to-do and to-do, there are
   four edges, two of which have the same label.\<close>
 
 definition \<open>kon_path = [(a,ab1,b),(b,bd1,d),(d,cd1,c)]\<close>
@@ -487,6 +487,10 @@ lemma is_hamiltonian_circuit_kon_circuit: \<open>kon_graph.is_hamiltonian_circui
    apply (simp add: kon_circuit_def kon_path_def)
    apply (simp add: kon_graph_def) apply fast
   by (fact is_simple_path_kon_circuit)
+
+subsection \<open>Tours\<close>
+
+
 
 section \<open>Generating Example Input\<close>
 
