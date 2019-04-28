@@ -481,6 +481,13 @@ definition \<open>kon_circuit = kon_path @ [(c,ac2,a)]\<close>
 lemma is_simple_path_kon_circuit: \<open>kon_graph.is_simple_path a kon_circuit a\<close>
   unfolding kon_graph.is_simple_path_def by (simp add: kon_circuit_def kon_path_def) (simp add: kon_graph_def)
 
+lemma is_hamiltonian_circuit_kon_circuit: \<open>kon_graph.is_hamiltonian_circuit a kon_circuit\<close>
+  unfolding kon_graph.is_hamiltonian_circuit_def
+  apply auto
+   apply (simp add: kon_circuit_def kon_path_def)
+   apply (simp add: kon_graph_def) apply fast
+  by (fact is_simple_path_kon_circuit)
+
 section \<open>Generating Example Input\<close>
 
 subsection \<open>Manhattan Distance\<close>
