@@ -462,6 +462,8 @@ lemma is_hamiltonian_circuit_kon_circuit: \<open>kon_graph.is_hamiltonian_circui
   apply (auto simp: is_simple_path_kon_circuit)
    by (auto simp: kon_circuit_def kon_path_def kon_graph_def)
 
+text \<open>to-do: change to @{const is_path_undir}. Complete notes on the DFS phase without the notion "eulerian".\<close>
+
 subsection \<open>Tours\<close>
 
 abbreviation (in finite_weighted_graph)
