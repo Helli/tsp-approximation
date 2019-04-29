@@ -432,7 +432,7 @@ definition (in valid_graph) is_hamiltonian_circuit where
 lemma (in valid_graph) is_hamiltonian_iff: "is_hamiltonian_path v ps v \<longleftrightarrow> is_hamiltonian_circuit v ps"
   apply (cases ps rule: rev_cases)
    apply (simp_all add: is_hamiltonian_path_def is_hamiltonian_circuit_def is_trace_def is_hamiltonian_def is_simple_path_def)
-  by auto (metis fst_conv insert_iff int_vertices_simps(2) is_path.elims(1))
+  by auto (smt fst_conv insert_iff int_vertices_simps(2) is_path.elims(1) list.inject not_Cons_self2)
 
 term "valid_graph.is_path"
 find_theorems \<open>valid_graph.is_path\<close>
