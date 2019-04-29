@@ -493,6 +493,8 @@ subsection \<open>Tours\<close>
 abbreviation (in finite_weighted_graph)
   \<open>tour ps w \<equiv> is_hamiltonian_circuit (fst (hd ps)) ps \<and> edge_weight \<lparr>nodes=V, edges= set ps\<rparr> = w\<close>
 
+subsection \<open>Symmetric TSP\<close>
+
 section \<open>Generating Example Input\<close>
 
 subsection \<open>Manhattan Distance\<close>
