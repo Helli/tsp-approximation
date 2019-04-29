@@ -490,7 +490,8 @@ lemma is_hamiltonian_circuit_kon_circuit: \<open>kon_graph.is_hamiltonian_circui
 
 subsection \<open>Tours\<close>
 
-
+abbreviation (in finite_weighted_graph)
+  \<open>tour ps w \<equiv> is_hamiltonian_circuit (fst (hd ps)) ps \<and> edge_weight \<lparr>nodes=V, edges= set ps\<rparr> = w\<close>
 
 section \<open>Generating Example Input\<close>
 
