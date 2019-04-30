@@ -409,8 +409,8 @@ subsection \<open>Hamiltonian Circuits\<close>
 
 term \<open>valid_unMultigraph.is_Eulerian_trail\<close>
 
-definition (in valid_graph) is_simple_path :: \<open>_ \<Rightarrow> (_,_) path \<Rightarrow> _ \<Rightarrow> bool\<close> where
-  \<open>is_simple_path v ps v' \<longleftrightarrow> is_path_undir G v ps v' \<and> distinct (map fst ps)\<close>
+definition (in valid_graph) is_simple_undir :: \<open>_ \<Rightarrow> (_,_) path \<Rightarrow> _ \<Rightarrow> bool\<close> where
+  \<open>is_simple_undir v ps v' \<longleftrightarrow> is_path_undir G v ps v' \<and> distinct (map fst ps)\<close>
 find_theorems "int_vertices"
 
 definition (in valid_graph) is_trace :: \<open>('v,'w) path \<Rightarrow> bool\<close> where \<comment> \<open>non-standard definition. Also not thoroughly thought through.\<close>
@@ -421,17 +421,17 @@ lemma (in valid_graph) is_trace_snoc:
   by (simp add: is_trace_def)
 
 definition (in valid_graph) is_hamiltonian_path where \<comment> \<open>or "simple trace"\<close>
-  \<open>is_hamiltonian_path v ps v' \<longleftrightarrow> is_trace ps \<and> is_simple_path v ps v'\<close>
+  \<open>is_hamiltonian_path v ps v' \<longleftrightarrow> is_trace ps \<and> is_simple_undir v ps v'\<close>
 
 definition (in valid_graph) is_hamiltonian :: \<open>('v,'w) path \<Rightarrow> bool\<close> where \<comment> \<open>to-do: unconventional intermediate definition, only for experimentation\<close>
   \<open>is_hamiltonian ps \<longleftrightarrow> (if ps=[] then V={} \<or> card V = 1 else int_vertices ps = V)\<close>
 
 definition (in valid_graph) is_hamiltonian_circuit where
-  \<open>is_hamiltonian_circuit v ps \<longleftrightarrow> is_hamiltonian ps \<and> is_simple_path v ps v\<close>
+  \<open>is_hamiltonian_circuit v ps \<longleftrightarrow> is_hamiltonian ps \<and> is_simple_undir v ps v\<close>
 
 lemma (in valid_graph) is_hamiltonian_iff: "is_hamiltonian_path v ps v \<longleftrightarrow> is_hamiltonian_circuit v ps"
   apply (cases ps rule: rev_cases)
-   apply (simp_all add: is_hamiltonian_path_def is_hamiltonian_circuit_def is_trace_def is_hamiltonian_def is_simple_path_def)
+   apply (simp_all add: is_hamiltonian_path_def is_hamiltonian_circuit_def is_trace_def is_hamiltonian_def is_simple_undir_def)
   by auto (smt fst_conv insert_iff int_vertices_simps(2) is_path_undir.elims(1))+
 
 term "valid_graph.is_path"
@@ -443,8 +443,8 @@ text \<open>Reuse @{const kon_graph}, but interpreted differently: Between to-do
 
 definition \<open>kon_path = [(a,ab1,b),(b,bd1,d),(d,cd1,c)]\<close>
 
-lemma is_simple_path_kon_path: \<open>kon_graph.is_simple_path a kon_path c\<close>
-  unfolding kon_graph.is_simple_path_def by (simp add: kon_path_def) (simp add: kon_graph_def)
+lemma is_simple_path_kon_path: \<open>kon_graph.is_simple_undir a kon_path c\<close>
+  unfolding kon_graph.is_simple_undir_def by (simp add: kon_path_def) (simp add: kon_graph_def)
 
 lemma is_hamiltonian_path_kon_path: \<open>kon_graph.is_hamiltonian_path a kon_path c\<close>
   apply (simp add: kon_graph.is_hamiltonian_path_def is_simple_path_kon_path)
@@ -454,8 +454,8 @@ lemma is_hamiltonian_path_kon_path: \<open>kon_graph.is_hamiltonian_path a kon_p
 
 definition \<open>kon_circuit = kon_path @ [(c,ac2,a)]\<close>
 
-lemma is_simple_path_kon_circuit: \<open>kon_graph.is_simple_path a kon_circuit a\<close>
-  unfolding kon_graph.is_simple_path_def by (simp add: kon_circuit_def kon_path_def) (simp add: kon_graph_def)
+lemma is_simple_path_kon_circuit: \<open>kon_graph.is_simple_undir a kon_circuit a\<close>
+  unfolding kon_graph.is_simple_undir_def by (simp add: kon_circuit_def kon_path_def) (simp add: kon_graph_def)
 
 lemma is_hamiltonian_circuit_kon_circuit: \<open>kon_graph.is_hamiltonian_circuit a kon_circuit\<close>
   unfolding kon_graph.is_hamiltonian_circuit_def kon_graph.is_hamiltonian_def
