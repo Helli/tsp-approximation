@@ -410,7 +410,7 @@ subsection \<open>Hamiltonian Circuits\<close>
 term \<open>valid_unMultigraph.is_Eulerian_trail\<close>
 
 definition (in valid_graph) is_simple_path :: \<open>_ \<Rightarrow> (_,_) path \<Rightarrow> _ \<Rightarrow> bool\<close> where
-  \<open>is_simple_path v ps v' \<longleftrightarrow> is_path v ps v' \<and> distinct (map fst ps)\<close>
+  \<open>is_simple_path v ps v' \<longleftrightarrow> is_path_undir G v ps v' \<and> distinct (map fst ps)\<close>
 find_theorems "int_vertices"
 
 definition (in valid_graph) is_trace :: \<open>('v,'w) path \<Rightarrow> bool\<close> where \<comment> \<open>non-standard definition. Also not thoroughly thought through.\<close>
@@ -432,7 +432,7 @@ definition (in valid_graph) is_hamiltonian_circuit where
 lemma (in valid_graph) is_hamiltonian_iff: "is_hamiltonian_path v ps v \<longleftrightarrow> is_hamiltonian_circuit v ps"
   apply (cases ps rule: rev_cases)
    apply (simp_all add: is_hamiltonian_path_def is_hamiltonian_circuit_def is_trace_def is_hamiltonian_def is_simple_path_def)
-  by auto (smt fst_conv insert_iff int_vertices_simps(2) is_path.elims(1) list.inject not_Cons_self2)
+  by auto (smt fst_conv insert_iff int_vertices_simps(2) is_path_undir.elims(1))+
 
 term "valid_graph.is_path"
 find_theorems \<open>valid_graph.is_path\<close>
@@ -462,7 +462,7 @@ lemma is_hamiltonian_circuit_kon_circuit: \<open>kon_graph.is_hamiltonian_circui
   apply (auto simp: is_simple_path_kon_circuit)
    by (auto simp: kon_circuit_def kon_path_def kon_graph_def)
 
-text \<open>to-do: change to @{const is_path_undir}. Complete notes on the DFS phase without the notion "eulerian".\<close>
+text \<open>to-do: Complete notes on the DFS phase without the notion "Eulerian".\<close>
 
 subsection \<open>Tours\<close>
 
