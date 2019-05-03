@@ -473,7 +473,7 @@ context finite_weighted_graph
 begin
 
 lemma "distinct ps \<Longrightarrow> edge_weight \<lparr>nodes=ARBITRARY, edges= set (ps::(_\<times>_\<times>_) list)\<rparr> = sum_list ((map (fst o snd)) ps)"
-  sledgehammer
+  unfolding edge_weight_def by (auto simp: sum_list_distinct_conv_sum_set)
 
 find_theorems name: weight
 definition OPT_alt where
