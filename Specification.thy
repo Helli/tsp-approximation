@@ -469,6 +469,27 @@ subsection \<open>Tours\<close>
 abbreviation (in finite_weighted_graph)
   \<open>tour ps w \<equiv> is_hamiltonian_circuit (fst (hd ps)) ps \<and> edge_weight \<lparr>nodes=V, edges= set ps\<rparr> = w\<close>
 
+context finite_weighted_graph
+begin
+
+lemma "distinct ps \<Longrightarrow> edge_weight \<lparr>nodes=ARBITRARY, edges= set (ps::(_\<times>_\<times>_) list)\<rparr> = sum_list ((map (fst o snd)) ps)"
+  sledgehammer
+
+find_theorems name: weight
+definition OPT_alt where
+  "OPT_alt = (ARG_MIN (\<lambda>ps. edge_weight \<lparr>nodes=V, edges= set ps\<rparr>) ps . is_hamiltonian_circuit (fst (hd ps)) ps)"
+
+definition OPT where
+  "OPT = (ARG_MIN todo ps . is_hamiltonian_circuit (fst (hd ps)) ps)"
+
+definition OPTWEIGHT where
+  "OPTWEIGHT = (Min {w. (\<exists>ps. tour ps w)})"
+
+lemma "edge_weight \<lparr>nodes=V, edges= set OPT\<rparr> = OPTWEIGHT"
+  unfolding OPT_def OPTWEIGHT_def
+
+end
+
 subsection \<open>Symmetric TSP\<close>
 
 section \<open>Generating Example Input\<close>
