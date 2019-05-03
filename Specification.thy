@@ -472,16 +472,26 @@ abbreviation (in finite_weighted_graph)
 context finite_weighted_graph
 begin
 
-lemma "distinct ps \<Longrightarrow> edge_weight \<lparr>nodes=ARBITRARY, edges= set (ps::(_\<times>_\<times>_) list)\<rparr> = sum_list ((map (fst o snd)) ps)"
+lemma edge_weight_sum_list: "distinct ps \<Longrightarrow> edge_weight \<lparr>nodes=ARBITRARY, edges= set ps\<rparr> = sum_list ((map (fst o snd)) ps)"
   unfolding edge_weight_def by (auto simp: sum_list_distinct_conv_sum_set)
+
+lemma is_simple_undir_distinct: \<open>is_simple_undir v ps v' \<Longrightarrow> distinct ps\<close>
+  by (induction ps arbitrary: v) (auto simp: is_simple_undir_def)
+
+lemma is_hamiltonian_circuit_distinct:
+  \<open>is_hamiltonian_circuit v ps \<Longrightarrow> distinct ps\<close>
+  by (auto simp: is_hamiltonian_circuit_def is_simple_undir_distinct)
 
 find_theorems name: weight
 definition OPT_alt where
   "OPT_alt = (ARG_MIN (\<lambda>ps. edge_weight \<lparr>nodes=V, edges= set ps\<rparr>) ps . is_hamiltonian_circuit (fst (hd ps)) ps)"
 
 definition OPT where
-  "OPT = (ARG_MIN todo ps . is_hamiltonian_circuit (fst (hd ps)) ps)"
+  "OPT = (ARG_MIN (sum_list o (map (fst o snd))) ps . is_hamiltonian_circuit (fst (hd ps)) ps)"
 
+lemma "OPT = OPT_alt"
+  unfolding OPT_def OPT_alt_def
+  thm OPT_alt_def[simplified]
 definition OPTWEIGHT where
   "OPTWEIGHT = (Min {w. (\<exists>ps. tour ps w)})"
 
