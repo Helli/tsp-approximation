@@ -483,7 +483,7 @@ abbreviation (in finite_weighted_graph)
 context finite_weighted_graph
 begin
 
-lemma edge_weight_sum_list: "distinct ps \<Longrightarrow> edge_weight \<lparr>nodes=ARBITRARY, edges= set ps\<rparr> = sum_list ((map (fst o snd)) ps)"
+lemma edge_weight_sum_list: "distinct ps \<Longrightarrow> edge_weight \<lparr>nodes=ARBITRARY, edges= set ps\<rparr> = sum_list (map (fst o snd) ps)"
   unfolding edge_weight_def by (auto simp: sum_list_distinct_conv_sum_set)
 
 lemma is_simple_undir_distinct: \<open>is_simple_undir v ps v' \<Longrightarrow> distinct ps\<close>
@@ -505,8 +505,13 @@ lemma sanity: "OPT = OPT_alt" unfolding OPT_def OPT_alt_def
 definition OPTWEIGHT where
   "OPTWEIGHT = (Min {w. (\<exists>ps. tour ps w)})"
 
-lemma "edge_weight \<lparr>nodes=V, edges= set OPT\<rparr> = OPTWEIGHT"
-  unfolding OPT_def OPTWEIGHT_def
+lemma
+  assumes \<open>is_hamiltonian_circuit v ps\<close>
+  shows "sum_list (map (fst \<circ> snd) OPT) = OPTWEIGHT"
+proof -
+  from assms have True
+    unfolding OPT_def OPTWEIGHT_def
+    oops
 
 end
 
