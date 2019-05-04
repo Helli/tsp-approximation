@@ -499,8 +499,8 @@ definition OPT_alt where
 definition OPT where
   "OPT = (ARG_MIN (sum_list \<circ> (map (fst \<circ> snd))) ps . is_hamiltonian_circuit (fst (hd ps)) ps)"
 
-lemma sanity: "OPT = OPT_alt"
-  unfolding OPT_def OPT_alt_def using is_hamiltonian_circuit_distinct[THEN edge_weight_sum_list] by force
+lemma sanity: "OPT = OPT_alt" unfolding OPT_def OPT_alt_def
+  using is_hamiltonian_circuit_distinct[THEN edge_weight_sum_list] by fastforce
 
 definition OPTWEIGHT where
   "OPTWEIGHT = (Min {w. (\<exists>ps. tour ps w)})"
