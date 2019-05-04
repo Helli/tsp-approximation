@@ -9,6 +9,17 @@ begin
 lemma sum_of_parts(*rm*): "\<lparr>nodes= nodes G, edges=edges G\<rparr> = G"
   by simp
 
+lemma [intro]:
+  assumes "\<And>x. P x \<Longrightarrow> f x = g x"
+  shows is_arg_min_eqI: "is_arg_min f P = is_arg_min g P"
+    and arg_min_eqI: "arg_min f P = arg_min g P"
+proof
+  from assms show \<open>is_arg_min f P x = is_arg_min g P x\<close> for x
+    unfolding is_arg_min_def by metis
+  then show \<open>arg_min f P = arg_min g P\<close>
+    unfolding arg_min_def by presburger
+qed
+
 subsection \<open>Spanning Forests for Graphs of Type @{locale valid_unMultigraph}\<close>
 
 subsubsection \<open>Undirected Hull\<close> \<comment> \<open>or rather: symmetric hull\<close>
@@ -488,34 +499,8 @@ definition OPT_alt where
 definition OPT where
   "OPT = (ARG_MIN (sum_list \<circ> (map (fst \<circ> snd))) ps . is_hamiltonian_circuit (fst (hd ps)) ps)"
 
-lemma sanity:
-  shows "OPT = OPT_alt"
-proof -
-  {
-    fix ps
-    assume \<open>is_hamiltonian_circuit (fst (hd ps)) ps\<close>
-    then have \<open>distinct ps\<close>
-      using is_hamiltonian_circuit_distinct by blast
-    then have \<open>(sum_list \<circ>\<circ> map) (fst \<circ> snd) ps = (edge_weight o ind o set) ps\<close>
-      by (simp add: edge_weight_sum_list)
-  }
-  then have "is_arg_min ((sum_list \<circ>\<circ> map) (fst \<circ> snd)) (\<lambda>ps. is_hamiltonian_circuit (fst (hd ps)) ps) =
-             is_arg_min (edge_weight o ind o set) (\<lambda>ps. is_hamiltonian_circuit (fst (hd ps)) ps)"
-    unfolding is_arg_min_def by fastforce
-  then show ?thesis
-    unfolding OPT_def OPT_alt_def arg_min_def by presburger
-qed
-
-lemma [intro]:
-  assumes "\<And>x. P x \<Longrightarrow> f x = g x"
-  shows is_arg_min_eqI: "is_arg_min f P = is_arg_min g P"
-    and arg_min_eqI: "arg_min f P = arg_min g P"
-proof
-  from assms show \<open>is_arg_min f P x = is_arg_min g P x\<close> for x
-    unfolding is_arg_min_def by metis
-  then show \<open>arg_min f P = arg_min g P\<close>
-    unfolding arg_min_def by presburger
-qed
+lemma sanity: "OPT = OPT_alt"
+  unfolding OPT_def OPT_alt_def using is_hamiltonian_circuit_distinct[THEN edge_weight_sum_list] by force
 
 definition OPTWEIGHT where
   "OPTWEIGHT = (Min {w. (\<exists>ps. tour ps w)})"
