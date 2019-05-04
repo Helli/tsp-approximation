@@ -505,10 +505,17 @@ proof -
   then show ?thesis
     unfolding OPT_def OPT_alt_def arg_min_def by presburger
 qed
-lemma useful[intro]: \<comment> \<open>maybe make points-free?\<close>
-  assumes "\<And>x. P x \<Longrightarrow> f x = f' x"
-  shows "is_arg_min f P = is_arg_min f' P" "arg_min f P = arg_min f' P"
-  using assms unfolding arg_min_def is_arg_min_def by metis+
+
+lemma [intro]:
+  assumes "\<And>x. P x \<Longrightarrow> f x = g x"
+  shows is_arg_min_eqI: "is_arg_min f P = is_arg_min g P"
+    and arg_min_eqI: "arg_min f P = arg_min g P"
+proof
+  from assms show \<open>is_arg_min f P x = is_arg_min g P x\<close> for x
+    unfolding is_arg_min_def by metis
+  then show \<open>arg_min f P = arg_min g P\<close>
+    unfolding arg_min_def by presburger
+qed
 
 definition OPTWEIGHT where
   "OPTWEIGHT = (Min {w. (\<exists>ps. tour ps w)})"
