@@ -477,11 +477,11 @@ text \<open>to-do: Complete notes on the DFS phase without the notion "Eulerian"
 
 subsection \<open>Tours\<close>
 
-abbreviation (in finite_weighted_graph)
-  \<open>tour ps w \<equiv> is_hamiltonian_circuit (fst (hd ps)) ps \<and> edge_weight \<lparr>nodes=V, edges= set ps\<rparr> = w\<close>
-
 context finite_weighted_graph
 begin
+
+abbreviation
+  \<open>tour ps w \<equiv> is_hamiltonian_circuit (fst (hd ps)) ps \<and> sum_list (map (fst o snd) ps) = w\<close>
 
 lemma edge_weight_sum_list: "distinct ps \<Longrightarrow> edge_weight \<lparr>nodes=ARBITRARY, edges= set ps\<rparr> = sum_list (map (fst o snd) ps)"
   unfolding edge_weight_def by (auto simp: sum_list_distinct_conv_sum_set)
@@ -492,6 +492,10 @@ lemma is_simple_undir_distinct: \<open>is_simple_undir v ps v' \<Longrightarrow>
 lemma is_hamiltonian_circuit_distinct:
   \<open>is_hamiltonian_circuit v ps \<Longrightarrow> distinct ps\<close>
   by (auto simp: is_hamiltonian_circuit_def is_simple_undir_distinct)
+
+lemma tour_edge_weight:
+  \<open>tour ps w \<longleftrightarrow> is_hamiltonian_circuit (fst (hd ps)) ps \<and> edge_weight \<lparr>nodes=V, edges= set ps\<rparr> = w\<close>
+  by (auto simp: edge_weight_sum_list is_hamiltonian_circuit_distinct)
 
 definition OPT_alt where
   "OPT_alt = (ARG_MIN (edge_weight \<circ> ind \<circ> set) ps . is_hamiltonian_circuit (fst (hd ps)) ps)"
