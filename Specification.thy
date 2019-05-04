@@ -469,7 +469,7 @@ subsection \<open>Tours\<close>
 abbreviation (in finite_weighted_graph)
   \<open>tour ps w \<equiv> is_hamiltonian_circuit (fst (hd ps)) ps \<and> edge_weight \<lparr>nodes=V, edges= set ps\<rparr> = w\<close>
 
-context finite_weighted_graph
+locale finite_weighted_graph' = finite_weighted_graph G for G :: "('v,nat) graph" \<comment> \<open>only for the sanity checks below, might be removable\<close>
 begin
 
 lemma edge_weight_sum_list: "distinct ps \<Longrightarrow> edge_weight \<lparr>nodes=ARBITRARY, edges= set ps\<rparr> = sum_list ((map (fst o snd)) ps)"
@@ -482,20 +482,15 @@ lemma is_hamiltonian_circuit_distinct:
   \<open>is_hamiltonian_circuit v ps \<Longrightarrow> distinct ps\<close>
   by (auto simp: is_hamiltonian_circuit_def is_simple_undir_distinct)
 
-find_theorems name: weight
 definition OPT_alt where
   "OPT_alt = (ARG_MIN (edge_weight \<circ> ind \<circ> set) ps . is_hamiltonian_circuit (fst (hd ps)) ps)"
 
 definition OPT where
   "OPT = (ARG_MIN (sum_list \<circ> (map (fst \<circ> snd))) ps . is_hamiltonian_circuit (fst (hd ps)) ps)"
 
-lemma
-  assumes "is_hamiltonian_circuit (fst (hd ps)) ps"
+lemma sanity:
   shows "OPT = OPT_alt"
 proof -
-  from assms have \<open>is_hamiltonian_circuit (fst (hd OPT)) OPT\<close> \<open>is_hamiltonian_circuit (fst (hd OPT_alt)) OPT_alt\<close>
-    unfolding OPT_def OPT_alt_def using arg_min_natI sorry
-  moreover
   {
     fix ps
     assume \<open>is_hamiltonian_circuit (fst (hd ps)) ps\<close>
@@ -504,8 +499,11 @@ proof -
     then have \<open>(sum_list \<circ>\<circ> map) (fst \<circ> snd) ps = (edge_weight o ind o set) ps\<close>
       by (simp add: edge_weight_sum_list)
   }
-  ultimately show ?thesis
-    unfolding OPT_def OPT_alt_def sorry
+  then have \<open>is_hamiltonian_circuit (fst (hd x)) x \<and> (\<nexists>y. is_hamiltonian_circuit (fst (hd y)) y \<and> (sum_list \<circ>\<circ> map) (fst \<circ> snd) y < (sum_list \<circ>\<circ> map) (fst \<circ> snd) x) \<longleftrightarrow>
+        is_hamiltonian_circuit (fst (hd x)) x \<and> (\<nexists>y. is_hamiltonian_circuit (fst (hd y)) y \<and> (edge_weight \<circ> ind \<circ> set) y < (edge_weight \<circ> ind \<circ> set) x)\<close> for x
+      \<comment> \<open>todo: fold.\<close> by fastforce
+  then show ?thesis
+    unfolding OPT_def OPT_alt_def arg_min_def is_arg_min_def by presburger
 qed
 
 definition OPTWEIGHT where
