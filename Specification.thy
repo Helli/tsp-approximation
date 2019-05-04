@@ -484,14 +484,30 @@ lemma is_hamiltonian_circuit_distinct:
 
 find_theorems name: weight
 definition OPT_alt where
-  "OPT_alt = (ARG_MIN (\<lambda>ps. edge_weight \<lparr>nodes=V, edges= set ps\<rparr>) ps . is_hamiltonian_circuit (fst (hd ps)) ps)"
+  "OPT_alt = (ARG_MIN (edge_weight \<circ> ind \<circ> set) ps . is_hamiltonian_circuit (fst (hd ps)) ps)"
 
 definition OPT where
-  "OPT = (ARG_MIN (sum_list o (map (fst o snd))) ps . is_hamiltonian_circuit (fst (hd ps)) ps)"
+  "OPT = (ARG_MIN (sum_list \<circ> (map (fst \<circ> snd))) ps . is_hamiltonian_circuit (fst (hd ps)) ps)"
 
-lemma "OPT = OPT_alt"
-  unfolding OPT_def OPT_alt_def
-  thm OPT_alt_def[simplified]
+lemma
+  assumes "is_hamiltonian_circuit (fst (hd ps)) ps"
+  shows "OPT = OPT_alt"
+proof -
+  from assms have \<open>is_hamiltonian_circuit (fst (hd OPT)) OPT\<close> \<open>is_hamiltonian_circuit (fst (hd OPT_alt)) OPT_alt\<close>
+    unfolding OPT_def OPT_alt_def using arg_min_natI sorry
+  moreover
+  {
+    fix ps
+    assume \<open>is_hamiltonian_circuit (fst (hd ps)) ps\<close>
+    then have \<open>distinct ps\<close>
+      using is_hamiltonian_circuit_distinct by blast
+    then have \<open>(sum_list \<circ>\<circ> map) (fst \<circ> snd) ps = (edge_weight o ind o set) ps\<close>
+      by (simp add: edge_weight_sum_list)
+  }
+  ultimately show ?thesis
+    unfolding OPT_def OPT_alt_def sorry
+qed
+
 definition OPTWEIGHT where
   "OPTWEIGHT = (Min {w. (\<exists>ps. tour ps w)})"
 
