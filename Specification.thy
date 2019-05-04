@@ -469,7 +469,7 @@ subsection \<open>Tours\<close>
 abbreviation (in finite_weighted_graph)
   \<open>tour ps w \<equiv> is_hamiltonian_circuit (fst (hd ps)) ps \<and> edge_weight \<lparr>nodes=V, edges= set ps\<rparr> = w\<close>
 
-locale finite_weighted_graph' = finite_weighted_graph G for G :: "('v,nat) graph" \<comment> \<open>only for the sanity checks below, might be removable\<close>
+context finite_weighted_graph
 begin
 
 lemma edge_weight_sum_list: "distinct ps \<Longrightarrow> edge_weight \<lparr>nodes=ARBITRARY, edges= set ps\<rparr> = sum_list ((map (fst o snd)) ps)"
@@ -499,12 +499,16 @@ proof -
     then have \<open>(sum_list \<circ>\<circ> map) (fst \<circ> snd) ps = (edge_weight o ind o set) ps\<close>
       by (simp add: edge_weight_sum_list)
   }
-  then have \<open>is_hamiltonian_circuit (fst (hd x)) x \<and> (\<nexists>y. is_hamiltonian_circuit (fst (hd y)) y \<and> (sum_list \<circ>\<circ> map) (fst \<circ> snd) y < (sum_list \<circ>\<circ> map) (fst \<circ> snd) x) \<longleftrightarrow>
-        is_hamiltonian_circuit (fst (hd x)) x \<and> (\<nexists>y. is_hamiltonian_circuit (fst (hd y)) y \<and> (edge_weight \<circ> ind \<circ> set) y < (edge_weight \<circ> ind \<circ> set) x)\<close> for x
-      \<comment> \<open>todo: fold.\<close> by fastforce
+  then have "is_arg_min ((sum_list \<circ>\<circ> map) (fst \<circ> snd)) (\<lambda>ps. is_hamiltonian_circuit (fst (hd ps)) ps) =
+             is_arg_min (edge_weight o ind o set) (\<lambda>ps. is_hamiltonian_circuit (fst (hd ps)) ps)"
+    unfolding is_arg_min_def by fastforce
   then show ?thesis
-    unfolding OPT_def OPT_alt_def arg_min_def is_arg_min_def by presburger
+    unfolding OPT_def OPT_alt_def arg_min_def by presburger
 qed
+lemma useful[intro]: \<comment> \<open>maybe make points-free?\<close>
+  assumes "\<And>x. P x \<Longrightarrow> f x = f' x"
+  shows "is_arg_min f P = is_arg_min f' P" "arg_min f P = arg_min f' P"
+  using assms unfolding arg_min_def is_arg_min_def by metis+
 
 definition OPTWEIGHT where
   "OPTWEIGHT = (Min {w. (\<exists>ps. tour ps w)})"
