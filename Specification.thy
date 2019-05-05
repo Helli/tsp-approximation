@@ -507,7 +507,7 @@ lemma sanity: \<open>OPT = OPT_alt\<close> unfolding OPT_def OPT_alt_def
   using is_hamiltonian_circuit_distinct[THEN edge_weight_sum_list] by fastforce
 
 definition OPTWEIGHT where
-  \<open>OPTWEIGHT = (Min {w. (\<exists>ps. tour ps w)})\<close>
+  \<open>OPTWEIGHT = Min {w. (\<exists>ps. tour ps w)}\<close>
 
 lemma
   assumes \<open>is_hamiltonian_circuit v ps\<close>
