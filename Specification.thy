@@ -411,14 +411,9 @@ qed
 sublocale symhull: valid_unMultigraph \<open>ind (symhull E)\<close>
   by (simp add: no_loops valid_unMultigraph_symhull)
 
-term \<open>symhull.is_Eulerian_trail\<close>
-definition \<open>phase2 = undefined\<close>
-
 end
 
 subsection \<open>Hamiltonian Circuits\<close>
-
-term \<open>valid_unMultigraph.is_Eulerian_trail\<close>
 
 definition (in valid_graph) is_simple_undir :: \<open>_ \<Rightarrow> (_,_) path \<Rightarrow> _ \<Rightarrow> bool\<close> where
   \<open>is_simple_undir v ps v' \<longleftrightarrow> is_path_undir G v ps v' \<and> distinct (map fst ps)\<close>
@@ -447,7 +442,6 @@ lemma (in valid_graph) is_hamiltonian_iff: \<open>is_hamiltonian_path v ps v \<l
 
 term \<open>valid_graph.is_path\<close>
 find_theorems \<open>valid_graph.is_path\<close>
-find_theorems valid_unMultigraph.connected
 
 text \<open>Reuse @{const kon_graph}, but interpreted differently: Between to-do and to-do, there are
   four edges, two of which have the same label.\<close>
