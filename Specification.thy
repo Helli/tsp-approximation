@@ -514,11 +514,27 @@ proof -
 end
 
 locale complete_finite_weighted_graph = finite_weighted_graph +
-  assumes \<open>v1\<in>V \<Longrightarrow> v2\<in>V \<Longrightarrow> \<exists>w. (v1,w,v2) \<in> E \<or> (v2,w,v1) \<in> E\<close>
+  assumes complete: \<open>v1\<in>V \<Longrightarrow> v2\<in>V \<Longrightarrow> \<exists>w. (v1,w,v2) \<in> E \<or> (v2,w,v1) \<in> E\<close>
 
-lemma (in finite_weighted_graph) sanity_check:
+lemma (in finite_weighted_graph) complete_finite_weighted_graph_sanity_check:
   \<open>complete_finite_weighted_graph G \<longleftrightarrow> (\<forall>v1\<in>V. \<forall>v2\<in>V. (\<exists>w. (v1,w,v2) \<in> E) \<or> (\<exists>w. (v2,w,v1) \<in> E))\<close>
   by (meson complete_finite_weighted_graph_axioms_def complete_finite_weighted_graph_def finite_weighted_graph_axioms)
+
+lemma (in finite_weighted_graph) complete_finite_weighted_graph_intro:
+  assumes \<open>\<And>v1 v2. v1\<in>V \<Longrightarrow> v2\<in>V \<Longrightarrow> (\<exists>w. (v1,w,v2) \<in> E) \<or> (\<exists>w. (v2,w,v1) \<in> E)\<close>
+  shows \<open>complete_finite_weighted_graph G\<close>
+  using assms complete_finite_weighted_graph_sanity_check by blast
+
+thm finite_weighted_graph.complete_finite_weighted_graph_intro
+  complete_finite_weighted_graph.intro[unfolded complete_finite_weighted_graph_axioms_def]
+
+context complete_finite_weighted_graph
+begin
+
+lemma complete': \<open>v1\<in>V \<Longrightarrow> v2\<in>V \<Longrightarrow> (\<exists>w. (v1,w,v2) \<in> E) \<or> (\<exists>w. (v2,w,v1) \<in> E)\<close>
+  using complete by blast
+
+end
 
 subsection \<open>Symmetric TSP\<close>
 
