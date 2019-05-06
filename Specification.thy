@@ -534,6 +534,16 @@ begin
 lemma complete': \<open>v1\<in>V \<Longrightarrow> v2\<in>V \<Longrightarrow> (\<exists>w. (v1,w,v2) \<in> E) \<or> (\<exists>w. (v2,w,v1) \<in> E)\<close>
   using complete by blast
 
+lemma ex_hamiltonian_circuit:
+  assumes \<open>v\<in>V\<close>
+  shows \<open>\<exists>ps. is_hamiltonian_circuit v ps\<close>
+proof -
+  from assms s.finiteV have \<open>card V > 0\<close>
+    using card_0_eq by blast
+  then show ?thesis
+    apply (induction \<open>card V\<close> rule: nat_induct_non_zero)
+  oops
+
 end
 
 subsection \<open>Symmetric TSP\<close>
