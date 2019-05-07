@@ -567,7 +567,7 @@ proof -
       using Suc.hyps(1) by fastforce
     from "Suc.hyps"(2)[OF n v G'.complete_finite_weighted_graph_axioms]
     obtain ps' where ps': \<open>G'.is_hamiltonian_circuit v' ps'\<close> by blast
-    obtain w1 where "(v,w1,v') \<in> E"
+    obtain w1 where \<open>(v,w1,v') \<in> E\<close>
     let ?ps = \<open>\<close>
     then show ?case sorry
   qed
