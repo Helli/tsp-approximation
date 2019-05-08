@@ -415,16 +415,28 @@ end
 
 subsection \<open>Hamiltonian Circuits\<close>
 
+definition adj_vertices where
+  \<open>adj_vertices ps = insert (snd(snd(last ps))) (set (map fst ps))\<close>
+
+lemma adj_vertices_int_vertices:
+  \<open>adj_vertices ps = insert (snd(snd(last ps))) (int_vertices ps)\<close>
+  by (simp add: adj_vertices_def int_vertices_def)
+
+lemma adj_vertices_simps[simp]:
+    \<open>ps \<noteq> [] \<Longrightarrow> adj_vertices (e#ps) = insert (fst e) (adj_vertices ps)\<close>
+    \<open>snd(snd(last ps)) = fst e \<Longrightarrow> adj_vertices (ps@[e]) = insert (snd(snd e)) (adj_vertices ps)\<close>
+  by (auto simp: adj_vertices_def)
+
 definition (in valid_graph) is_simple_undir :: \<open>_ \<Rightarrow> (_,_) path \<Rightarrow> _ \<Rightarrow> bool\<close> where
   \<open>is_simple_undir v ps v' \<longleftrightarrow> is_path_undir G v ps v' \<and> distinct (map fst ps)\<close>
 find_theorems \<open>int_vertices\<close>
 
 definition (in valid_graph) is_trace :: \<open>('v,'w) path \<Rightarrow> bool\<close> where \<comment> \<open>non-standard definition. Also not thoroughly thought through.\<close>
-  \<open>is_trace ps \<longleftrightarrow> (if ps=[] then V={} \<or> card V = 1 else insert (snd(snd(last ps))) (int_vertices ps) = V)\<close>
+  \<open>is_trace ps \<longleftrightarrow> (if ps=[] then V={} \<or> card V = 1 else adj_vertices ps = V)\<close>
 
 lemma (in valid_graph) is_trace_snoc:
   \<open>is_trace (ps @ [p]) \<longleftrightarrow> insert (snd(snd p)) (int_vertices (ps@[p])) = V\<close>
-  by (simp add: is_trace_def)
+  by (simp add: adj_vertices_int_vertices is_trace_def)
 
 definition (in valid_graph) is_hamiltonian_path where \<comment> \<open>or \<open>simple trace\<close>\<close>
   \<open>is_hamiltonian_path v ps v' \<longleftrightarrow> is_trace ps \<and> is_simple_undir v ps v'\<close>
@@ -437,7 +449,7 @@ definition (in valid_graph) is_hamiltonian_circuit where
 
 lemma (in valid_graph) is_hamiltonian_iff: \<open>is_hamiltonian_path v ps v \<longleftrightarrow> is_hamiltonian_circuit v ps\<close>
   apply (cases ps rule: rev_cases)
-   apply (simp_all add: is_hamiltonian_path_def is_hamiltonian_circuit_def is_trace_def is_hamiltonian_def is_simple_undir_def)
+   apply (simp_all add: is_hamiltonian_path_def is_hamiltonian_circuit_def is_trace_def is_hamiltonian_def adj_vertices_int_vertices is_simple_undir_def)
   by auto (smt fst_conv insert_iff int_vertices_simps(2) is_path_undir.elims(1))+
 
 term \<open>valid_graph.is_path\<close>
@@ -530,6 +542,10 @@ lemma complete_finite_weighted_graph_intro:
 
 end
 
+lemma (in valid_graph)
+  assumes \<open>v \<notin> \<close>
+  assumes \<open>valid_graph.is_simple_undir (delete_node v G)\<close>
+
 context complete_finite_weighted_graph
 begin
 
@@ -566,7 +582,8 @@ proof -
       using Suc.hyps(1) by fastforce
     from Suc.hyps(2)[OF n v G'.complete_finite_weighted_graph_axioms]
     obtain ps' where ps': \<open>G'.is_hamiltonian_circuit v' ps'\<close> by blast
-    obtain w1 where \<open>(v,w1,v') \<in> E\<close>
+    note this[unfolded G'.is_hamiltonian_circuit_def]
+    obtain w1 where \<open>(v,w1,v') \<in> E \<or> (v,w1,v') \<in> E\<close>
     let ?ps = \<open>\<close>
     then show ?case sorry
   qed
