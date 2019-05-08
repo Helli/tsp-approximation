@@ -576,14 +576,21 @@ proof -
     let ?G = \<open>delete_node v G\<close>
     interpret G': complete_finite_weighted_graph ?G
       sorry
-    from Suc have n: \<open>n = card (nodes ?G)\<close>
+    have nG': \<open>G'.V = G.V - {v}\<close>
+      unfolding delete_node_def by force
+    from Suc have n: \<open>n = card G'.V\<close>
       unfolding delete_node_def by fastforce
-    then obtain v' where v: \<open>v'\<in>nodes ?G\<close>
+    then obtain v' where v: \<open>v'\<in>G'.V\<close>
       using Suc.hyps(1) by fastforce
     from Suc.hyps(2)[OF n v G'.complete_finite_weighted_graph_axioms]
     obtain ps' where ps': \<open>G'.is_hamiltonian_circuit v' ps'\<close> by blast
     note this[unfolded G'.is_hamiltonian_circuit_def]
-    obtain w1 where \<open>(v,w1,v') \<in> E \<or> (v,w1,v') \<in> E\<close>
+    then have *: \<open>card G'.V = 1 \<or> int_vertices ps' = G'.V\<close> \<open>G.is_simple_undir v' ps' v'\<close>
+      unfolding G'.is_hamiltonian_def apply auto
+      apply (metis all_not_in_conv int_vertices_empty)
+       apply (metis One_nat_def empty_iff)
+      using G.delete_node_was_simple_undir by blast
+    obtain w1 where \<open>(v',w1,v) \<in> G.E \<or> (v',w1,v) \<in> G.E\<close>
     let ?ps = \<open>\<close>
     then show ?case sorry
   qed
