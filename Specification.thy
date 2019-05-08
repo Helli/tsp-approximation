@@ -546,17 +546,16 @@ proof -
     using assms complete_finite_weighted_graph_axioms
   proof (induction \<open>card V\<close> arbitrary: v G rule: nat_induct_non_zero)
     case 1
-    interpret G: complete_finite_weighted_graph G
-      by (simp add: "1.prems")
+    then interpret G: complete_finite_weighted_graph G
+      by simp
     show ?case
       apply (rule exI[of _ \<open>[]\<close>])
       unfolding G.is_hamiltonian_circuit_def apply auto
-      using "1.hyps" G.is_hamiltonian_def apply auto[1]
-      unfolding G.is_simple_undir_def by (simp add: "1.prems"(1))
+      using 1 G.is_hamiltonian_def by (auto simp: G.is_simple_undir_def)
   next
     case (Suc n)
     thm Suc interpret G: complete_finite_weighted_graph G
-      by (simp add: "Suc.prems")
+      by (simp add: Suc.prems)
     thm Suc
     let ?G = \<open>delete_node v G\<close>
     interpret G': complete_finite_weighted_graph ?G
@@ -565,7 +564,7 @@ proof -
       unfolding delete_node_def by fastforce
     then obtain v' where v: \<open>v'\<in>nodes ?G\<close>
       using Suc.hyps(1) by fastforce
-    from "Suc.hyps"(2)[OF n v G'.complete_finite_weighted_graph_axioms]
+    from Suc.hyps(2)[OF n v G'.complete_finite_weighted_graph_axioms]
     obtain ps' where ps': \<open>G'.is_hamiltonian_circuit v' ps'\<close> by blast
     obtain w1 where \<open>(v,w1,v') \<in> E\<close>
     let ?ps = \<open>\<close>
