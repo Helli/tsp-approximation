@@ -582,15 +582,24 @@ proof -
       unfolding delete_node_def by fastforce
     then obtain v' where v: \<open>v'\<in>G'.V\<close>
       using Suc.hyps(1) by fastforce
+    with \<open>v \<in> G.V\<close> obtain w where w: \<open>(v,w,v') \<in> G.E \<or> (v',w,v) \<in> G.E\<close>
+      unfolding nG' using G.complete by fast
     from Suc.hyps(2)[OF n v G'.complete_finite_weighted_graph_axioms]
     obtain ps' where ps': \<open>G'.is_hamiltonian_circuit v' ps'\<close> by blast
     show ?case
     proof (cases \<open>card G'.V \<le> 1\<close>)
+      let ?circuit = \<open>[(v,w,v'),(v',w,v)]\<close>
       case True
-      with v have \<open>G'.V = {v'}\<close>
+      with v have G'V: \<open>G'.V = {v'}\<close>
         using G'.finite_V
         by (metis One_nat_def Suc.hyps(1) card_1_singletonI le0 le_antisym n neq0_conv not_less_eq_eq)
-      then show ?thesis sorry
+      show ?thesis
+        apply (rule exI[of _ ?circuit])
+        unfolding G.is_hamiltonian_circuit_def G.is_hamiltonian_def apply auto
+        using Suc.prems(1) apply blast
+        using G.E_validD w apply blast
+        using G'V nG' apply blast
+        unfolding G.is_simple_undir_def apply simp using Suc.prems(1) nG' v w by blast
     next
       case False
       note ps'[unfolded G'.is_hamiltonian_circuit_def]
