@@ -560,7 +560,7 @@ proof -
     using card_0_eq by blast
   then show ?thesis
     using assms complete_finite_weighted_graph_axioms
-  proof (induction \<open>card V\<close> arbitrary: v G rule: nat_induct_non_zero)
+  proof (induction \<open>card V\<close> arbitrary: v G rule: nat_induct_non_zero) \<comment> \<open>Maybe instead prove a \<open>set_induct_non_empty\<close>?\<close>
     case 1
     then interpret G: complete_finite_weighted_graph G
       by simp
@@ -584,15 +584,26 @@ proof -
       using Suc.hyps(1) by fastforce
     from Suc.hyps(2)[OF n v G'.complete_finite_weighted_graph_axioms]
     obtain ps' where ps': \<open>G'.is_hamiltonian_circuit v' ps'\<close> by blast
-    note this[unfolded G'.is_hamiltonian_circuit_def]
-    then have *: \<open>card G'.V = 1 \<or> int_vertices ps' = G'.V\<close> \<open>G.is_simple_undir v' ps' v'\<close>
-      unfolding G'.is_hamiltonian_def apply auto
-      apply (metis all_not_in_conv int_vertices_empty)
-       apply (metis One_nat_def empty_iff)
-      using G.delete_node_was_simple_undir by blast
-    obtain w1 where \<open>(v',w1,v) \<in> G.E \<or> (v',w1,v) \<in> G.E\<close>
-    let ?ps = \<open>\<close>
-    then show ?case sorry
+    show ?case
+    proof (cases \<open>card G'.V \<le> 1\<close>)
+      case True
+      with v have \<open>G'.V = {v'}\<close>
+        using G'.finite_V
+        by (metis One_nat_def Suc.hyps(1) card_1_singletonI le0 le_antisym n neq0_conv not_less_eq_eq)
+      then show ?thesis sorry
+    next
+      case False
+      note ps'[unfolded G'.is_hamiltonian_circuit_def]
+      then have *: \<open>card G'.V = 1 \<or> int_vertices ps' = G'.V\<close> \<open>G.is_simple_undir v' ps' v'\<close>
+        unfolding G'.is_hamiltonian_def apply auto
+        apply (metis all_not_in_conv int_vertices_empty)
+         apply (metis One_nat_def empty_iff)
+        using G.delete_node_was_simple_undir by blast
+      obtain w1 where \<open>(v',w1,v) \<in> G.E \<or> (v',w1,v) \<in> G.E\<close>
+        using G.complete
+      let ?ps = \<open>\<close>
+      then show ?thesis sorry
+    qed
   qed
   oops
 
