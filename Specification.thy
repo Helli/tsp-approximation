@@ -603,13 +603,14 @@ proof -
     next
       case False
       note ps'[unfolded G'.is_hamiltonian_circuit_def]
-      then have *: \<open>card G'.V = 1 \<or> int_vertices ps' = G'.V\<close> \<open>G.is_simple_undir v' ps' v'\<close>
+      then have *: \<open>int_vertices ps' = G'.V\<close> \<open>G.is_simple_undir v' ps' v'\<close>
         unfolding G'.is_hamiltonian_def apply auto
         apply (metis all_not_in_conv int_vertices_empty)
-         apply (metis One_nat_def empty_iff)
+        apply (metis False empty_iff le_refl)
         using G.delete_node_was_simple_undir by blast
-      obtain w1 where \<open>(v',w1,v) \<in> G.E \<or> (v',w1,v) \<in> G.E\<close>
-        using G.complete
+      with False obtain w_discard v1 ps'' where \<open>ps' = (v',w_discard,v1)#ps''\<close>
+        sledgehammer[no_smt_proofs]
+        by (metis DiffE G'.is_simple_undir_def \<open>G'.is_hamiltonian ps' \<and> G'.is_simple_undir v' ps' v'\<close> insertCI int_vertices_simps(1) is_path_undir.elims(2) nG')
       let ?ps = \<open>\<close>
       then show ?thesis sorry
     qed
