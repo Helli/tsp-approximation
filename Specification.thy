@@ -542,9 +542,9 @@ lemma complete_finite_weighted_graph_intro:
 
 end
 
-lemma (in valid_graph)
-  assumes \<open>v \<notin> \<close>
-  assumes \<open>valid_graph.is_simple_undir (delete_node v G)\<close>
+lemma (in valid_graph) delete_node_was_simple_undir:
+  \<open>valid_graph.is_simple_undir (delete_node v G) v1 ps v2 \<Longrightarrow> is_simple_undir v1 ps v2\<close>
+  by (meson delete_node_valid delete_node_was_path valid_graph.is_simple_undir_def valid_graph_axioms)
 
 context complete_finite_weighted_graph
 begin
