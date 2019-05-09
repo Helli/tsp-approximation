@@ -602,15 +602,24 @@ proof -
         unfolding G.is_simple_undir_def apply simp using Suc.prems(1) nG' v w by blast
     next
       case False
-      note ps'[unfolded G'.is_hamiltonian_circuit_def]
+      have G': \<open>G'.is_hamiltonian ps'\<close> \<open>G'.is_simple_undir v' ps' v'\<close>
+       by (auto simp: ps'[unfolded G'.is_hamiltonian_circuit_def])
       then have *: \<open>int_vertices ps' = G'.V\<close> \<open>G.is_simple_undir v' ps' v'\<close>
         unfolding G'.is_hamiltonian_def apply auto
         apply (metis all_not_in_conv int_vertices_empty)
         apply (metis False empty_iff le_refl)
         using G.delete_node_was_simple_undir by blast
-      with False obtain w_discard v1 ps'' where \<open>ps' = (v',w_discard,v1)#ps''\<close>
-        sledgehammer[no_smt_proofs]
-        by (metis DiffE G'.is_simple_undir_def \<open>G'.is_hamiltonian ps' \<and> G'.is_simple_undir v' ps' v'\<close> insertCI int_vertices_simps(1) is_path_undir.elims(2) nG')
+      then have \<open>v \<notin> int_vertices ps'\<close>
+        using nG' by blast
+      from *(1) False obtain w_discard v1 ps'' where ps'': \<open>ps' = (v',w_discard,v1)#ps''\<close>
+        by (metis DiffE G'.is_simple_undir_def G'(2) insertCI int_vertices_simps(1) is_path_undir.elims(2) nG')
+      then have \<open>v1 \<in> G.V\<close> \<open>v \<notin> int_vertices ps''\<close>
+        using *(2) G.valid_graph_axioms valid_graph.is_simple_undir_def apply fastforce
+        using \<open>v \<notin> int_vertices ps'\<close> ps'' by auto
+      then obtain w1 where \<open>(v,w1,v1) \<in> G.E \<or> (v1,w1,v) \<in> G.E\<close>
+        by (meson Suc.prems(1) G.complete)
+      with *(2)[unfolded ps''] have \<open>G.is_simple_undir v ((v,w1,v1)#ps'') v'\<close>
+        using \<open>v \<notin> int_vertices ps''\<close> \<open>v \<in> G.V\<close>
       let ?ps = \<open>\<close>
       then show ?thesis sorry
     qed
