@@ -562,12 +562,24 @@ lemma (in valid_graph)
   assumes \<open>v' \<in> V\<close>
   assumes \<open>is_hamiltonian_circuit v ps\<close>
   shows \<open>\<exists>ps'. is_hamiltonian_circuit v' ps'\<close>
-proof
+proof -
   from assms have \<open>card V > 0\<close>
     using card_gt_0_iff hamiltonian_impl_finiteV is_hamiltonian_iff by fastforce
-  then show 
+  then show ?thesis
+    using assms valid_graph_axioms
+  proof (induction "card V" arbitrary: G ps rule: nat_induct_non_zero)
+    case 1
+    then interpret G: valid_graph G
+      by simp
+    show ?case
+      apply (rule exI[of _ \<open>[]\<close>])
+      using 1 unfolding G.is_hamiltonian_circuit_def G.is_hamiltonian_def G.is_simple_undir_def by auto
+  next
+    case (Suc n)
+    then show ?case sorry
+  qed
   from assms have \<open>v' \<in> int_vertices ps\<close>
-    unfolding is_hamiltonian_circuit_def is_hamiltonian_def try0
+    unfolding is_hamiltonian_circuit_def is_hamiltonian_def
 
 context complete_finite_weighted_graph
 begin
