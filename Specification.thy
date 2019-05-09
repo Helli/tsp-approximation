@@ -547,7 +547,7 @@ lemma (in valid_graph) delete_node_was_simple_undir:
   by (meson delete_node_valid delete_node_was_path valid_graph.is_simple_undir_def valid_graph_axioms)
 
 lemma (in valid_graph) is_simple_undir_Cons[intro]:
-  assumes \<open>(v,w,v') \<in> E\<close>
+  assumes \<open>(v,w,v') \<in> E \<or> (v',w,v) \<in> E\<close>
   assumes \<open>v \<notin> int_vertices ps\<close>
   assumes \<open>is_simple_undir v' ps vl\<close>
   shows \<open>is_simple_undir v ((v,w,v')#ps) vl\<close>
@@ -633,6 +633,9 @@ proof -
       moreover have \<open>v' \<notin> int_vertices ((v,w1,v1)#ps'')\<close>
         by (metis DiffE G'(2) G'.is_simple_undir_def distinct.simps(2) insert_iff int_vertices_def int_vertices_simps(2) list.map(2) nG' prod.sel(1) ps'' v)
       ultimately have \<open>G.is_hamiltonian_circuit v' ?ps\<close>
+        unfolding G.is_hamiltonian_circuit_def using w apply auto
+        using G'(1) apply (simp_all add: G.is_hamiltonian_def G'.is_hamiltonian_def)
+        using ps'' nG' using Suc.prems(1) by auto
       then show ?thesis sorry
     qed
   qed
