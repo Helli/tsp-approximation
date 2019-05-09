@@ -553,6 +553,22 @@ lemma (in valid_graph) is_simple_undir_Cons[intro]:
   shows \<open>is_simple_undir v ((v,w,v')#ps) vl\<close>
   using assms unfolding is_simple_undir_def by (simp add: int_vertices_def)
 
+lemma (in valid_graph) hamiltonian_impl_finiteV:
+  \<open>is_hamiltonian_path v ps v' \<Longrightarrow> finite V\<close>
+  unfolding is_hamiltonian_path_def is_trace_def adj_vertices_def
+  by (metis List.finite_set card_1_singletonE finite.simps)
+
+lemma (in valid_graph)
+  assumes \<open>v' \<in> V\<close>
+  assumes \<open>is_hamiltonian_circuit v ps\<close>
+  shows \<open>\<exists>ps'. is_hamiltonian_circuit v' ps'\<close>
+proof
+  from assms have \<open>card V > 0\<close>
+    using card_gt_0_iff hamiltonian_impl_finiteV is_hamiltonian_iff by fastforce
+  then show 
+  from assms have \<open>v' \<in> int_vertices ps\<close>
+    unfolding is_hamiltonian_circuit_def is_hamiltonian_def try0
+
 context complete_finite_weighted_graph
 begin
 
