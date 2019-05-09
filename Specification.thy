@@ -546,6 +546,13 @@ lemma (in valid_graph) delete_node_was_simple_undir:
   \<open>valid_graph.is_simple_undir (delete_node v G) v1 ps v2 \<Longrightarrow> is_simple_undir v1 ps v2\<close>
   by (meson delete_node_valid delete_node_was_path valid_graph.is_simple_undir_def valid_graph_axioms)
 
+lemma (in valid_graph) is_simple_undir_Cons[intro]:
+  assumes \<open>(v,w,v') \<in> E\<close>
+  assumes \<open>v \<notin> int_vertices ps\<close>
+  assumes \<open>is_simple_undir v' ps vl\<close>
+  shows \<open>is_simple_undir v ((v,w,v')#ps) vl\<close>
+  using assms unfolding is_simple_undir_def by (simp add: int_vertices_def)
+
 context complete_finite_weighted_graph
 begin
 
@@ -616,11 +623,16 @@ proof -
       then have \<open>v1 \<in> G.V\<close> \<open>v \<notin> int_vertices ps''\<close>
         using *(2) G.valid_graph_axioms valid_graph.is_simple_undir_def apply fastforce
         using \<open>v \<notin> int_vertices ps'\<close> ps'' by auto
-      then obtain w1 where \<open>(v,w1,v1) \<in> G.E \<or> (v1,w1,v) \<in> G.E\<close>
+      then obtain w1 where **: \<open>(v,w1,v1) \<in> G.E \<or> (v1,w1,v) \<in> G.E\<close>
         by (meson Suc.prems(1) G.complete)
-      with *(2)[unfolded ps''] have \<open>G.is_simple_undir v ((v,w1,v1)#ps'') v'\<close>
-        using \<open>v \<notin> int_vertices ps''\<close> \<open>v \<in> G.V\<close>
-      let ?ps = \<open>\<close>
+      let ?ps = \<open>(v',w,v)#(v,w1,v1)#ps''\<close>
+      from *(2)[unfolded ps''] have \<open>G.is_simple_undir v1 ps'' v'\<close>
+        unfolding G.is_simple_undir_def by simp
+      with ** have \<open>G.is_simple_undir v ((v,w1,v1)#ps'') v'\<close>
+        using \<open>v \<notin> int_vertices ps''\<close> \<open>v \<in> G.V\<close> by (simp add: int_vertices_def G.is_simple_undir_def)
+      moreover have \<open>v' \<notin> int_vertices ((v,w1,v1)#ps'')\<close>
+        by (metis DiffE G'(2) G'.is_simple_undir_def distinct.simps(2) insert_iff int_vertices_def int_vertices_simps(2) list.map(2) nG' prod.sel(1) ps'' v)
+      ultimately have \<open>G.is_hamiltonian_circuit v' ?ps\<close>
       then show ?thesis sorry
     qed
   qed
