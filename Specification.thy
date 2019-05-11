@@ -560,10 +560,16 @@ lemma (in valid_graph) hamiltonian_impl_finiteV:
 
 find_theorems rotate1 find
 
-lemma (in valid_graph)
+lemma (in valid_graph) is_hamiltonian_circuit_rotate:
   assumes \<open>is_hamiltonian_circuit v (e#ps)\<close>
-  shows \<open>is_hamiltonian_circuit (fst e) (ps@[e])\<close>
-  using assms try
+  shows \<open>is_hamiltonian_circuit (snd (snd e)) (ps@[e])\<close>
+  using assms sorry
+
+lemma (in valid_graph) is_hamiltonian_circuit_rotate_ex:
+  assumes \<open>is_hamiltonian_circuit v ps\<close>
+  shows \<open>\<exists>v'. is_hamiltonian_circuit v' (rotate1 ps)\<close>
+  apply (cases ps)
+  using assms is_hamiltonian_circuit_rotate by fastforce+
 
 lemma (in valid_graph)
   assumes \<open>v' \<in> V\<close>
