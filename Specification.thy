@@ -9,6 +9,9 @@ begin
 lemma sum_of_parts(*rm*): \<open>\<lparr>nodes= nodes G, edges=edges G\<rparr> = G\<close>
   by simp
 
+lemma triple_of_parts: \<open>(fst e, fst (snd e), snd (snd e)) = e\<close>
+  by auto
+
 lemma [intro]:
   assumes \<open>\<And>x. P x \<Longrightarrow> f x = g x\<close>
   shows is_arg_min_eqI: \<open>is_arg_min f P = is_arg_min g P\<close>
@@ -578,6 +581,10 @@ lemma (in valid_graph) is_hamiltonian_circuit_rotate1_ex:
   apply (cases ps)
   using assms is_hamiltonian_circuit_rotate1 by fastforce+
 
+lemma (in valid_graph) is_hamiltonian_circuit_int_vertices:
+  \<open>is_hamiltonian_circuit v ps \<Longrightarrow> ps = [] \<or> int_vertices ps = V\<close>
+  by (meson is_hamiltonian_circuit_def is_hamiltonian_def valid_graph_axioms)
+
 lemma (in valid_graph)
   assumes \<open>v' \<in> V\<close>
   assumes \<open>is_hamiltonian_circuit v ps\<close>
@@ -599,7 +606,7 @@ proof -
     then show ?case sorry
   qed
   from assms have \<open>v' \<in> int_vertices ps\<close>
-    unfolding is_hamiltonian_circuit_def is_hamiltonian_def
+    unfolding is_hamiltonian_circuit_def is_hamiltonian_def is_simple_
 
 context complete_finite_weighted_graph
 begin
