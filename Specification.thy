@@ -432,7 +432,12 @@ lemma adj_vertices_simps[simp]:
 
 definition (in valid_graph) is_simple_undir :: \<open>_ \<Rightarrow> (_,_) path \<Rightarrow> _ \<Rightarrow> bool\<close> where
   \<open>is_simple_undir v ps v' \<longleftrightarrow> is_path_undir G v ps v' \<and> distinct (map fst ps)\<close>
-find_theorems \<open>int_vertices\<close>
+text \<open>This means that a simple path may have a loop at the end:\<close>
+lemma (in valid_graph)
+  assumes \<open>x\<noteq>y\<close> \<open>{x,y} \<subseteq> V\<close>
+  assumes \<open>{(x,w1,y),(y,w2,y)} \<subseteq> E\<close>
+  shows \<open>is_simple_undir x [(x,w1,y),(y,w2,y)] y\<close>
+  unfolding is_simple_undir_def using assms by auto
 
 definition (in valid_graph) is_trace :: \<open>('v,'w) path \<Rightarrow> bool\<close> where \<comment> \<open>non-standard definition. Also not thoroughly thought through.\<close>
   \<open>is_trace ps \<longleftrightarrow> (if ps=[] then V={} \<or> card V = 1 else adj_vertices ps = V)\<close>
@@ -594,9 +599,10 @@ lemma (in valid_graph) trivial_hamiltonian_circuit_Ball:
   \<open>is_hamiltonian_circuit v [] \<Longrightarrow> \<forall>v'\<in>V. is_hamiltonian_circuit v' []\<close>
   by (simp add: is_hamiltonian_circuit_def is_simple_undir_def)
 
-lemma (in valid_graph)
+lemma (in valid_graph) is_hamiltonian_circuit_length:
   \<open>card V \<noteq> 1 \<Longrightarrow> is_hamiltonian_circuit v ps \<Longrightarrow> length ps = card V\<close>
-  oops
+  unfolding is_hamiltonian_circuit_def is_hamiltonian_def is_simple_undir_def int_vertices_def
+  apply auto by (metis One_nat_def card_empty distinct_card length_0_conv length_map)
 
 lemma (in valid_graph)
   assumes \<open>v' \<in> V\<close>
