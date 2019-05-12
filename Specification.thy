@@ -713,7 +713,7 @@ proof -
         using G'(1) apply (simp_all add: G.is_hamiltonian_def G'.is_hamiltonian_def)
         using ps'' nG' using Suc.prems(1) by auto
       then show ?thesis
-        using G.is_hamiltonian_circuit_rotate1 by fastforce
+        by (simp add: G.is_hamiltonian_circuit_rotate Suc.prems(1))
     qed
   qed
 qed
