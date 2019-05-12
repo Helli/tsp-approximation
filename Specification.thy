@@ -432,7 +432,7 @@ lemma adj_vertices_simps[simp]:
 
 definition (in valid_graph) is_simple_undir :: \<open>_ \<Rightarrow> (_,_) path \<Rightarrow> _ \<Rightarrow> bool\<close> where
   \<open>is_simple_undir v ps v' \<longleftrightarrow> is_path_undir G v ps v' \<and> distinct (map fst ps)\<close>
-text \<open>This means that a simple path may have a loop at the end:\<close>
+text \<open>This means that a simple path may go back to a visited node at the end, e.g.\ via a loop:\<close>
 lemma (in valid_graph)
   assumes \<open>x\<noteq>y\<close> \<open>{x,y} \<subseteq> V\<close>
   assumes \<open>{(x,w1,y),(y,w2,y)} \<subseteq> E\<close>
@@ -616,7 +616,19 @@ next
   case False
   with assms have \<open>v' \<in> int_vertices ps\<close>
     by (simp add: is_hamiltonian_circuit_def is_hamiltonian_def)
-  then obtain i where \<open>i < \<close>
+  then obtain i where i: \<open>i < length ps\<close> \<open>fst (ps!i) = v'\<close>
+    unfolding int_vertices_def by (metis imageE in_set_conv_nth set_map)
+  then have \<open>fst (hd (rotate i ps)) = v'\<close>
+    by (simp add: False hd_rotate_conv_nth)
+  moreover obtain v'' where \<open>is_hamiltonian_circuit v'' (rotate i ps)\<close>
+    apply (induction i) using assms(2) apply auto
+    using is_hamiltonian_circuit_rotate1_ex by blast
+  moreover have \<open>v' = v''\<close>
+    using calculation
+  ultimately have \<open>is_hamiltonian_circuit v' (rotate i ps)\<close>
+  proof -
+    from calculation
+    unfolding is_hamiltonian_circuit_def is_simple_undir_def using False
   then show ?thesis sorry
 qed
 
