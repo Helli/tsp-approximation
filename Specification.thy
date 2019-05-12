@@ -585,28 +585,22 @@ lemma (in valid_graph) is_hamiltonian_circuit_int_vertices:
   \<open>is_hamiltonian_circuit v ps \<Longrightarrow> ps = [] \<or> int_vertices ps = V\<close>
   by (meson is_hamiltonian_circuit_def is_hamiltonian_def valid_graph_axioms)
 
+lemma (in valid_graph) trivial_hamiltonian_circuit_Ball:
+  \<open>is_hamiltonian_circuit v [] \<Longrightarrow> \<forall>v'\<in>V. is_hamiltonian_circuit v' []\<close>
+  by (simp add: is_hamiltonian_circuit_def is_simple_undir_def)
+
 lemma (in valid_graph)
   assumes \<open>v' \<in> V\<close>
   assumes \<open>is_hamiltonian_circuit v ps\<close>
   shows \<open>\<exists>ps'. is_hamiltonian_circuit v' ps'\<close>
-proof -
-  from assms have \<open>card V > 0\<close>
-    using card_gt_0_iff hamiltonian_impl_finiteV is_hamiltonian_iff by fastforce
-  then show ?thesis
-    using assms valid_graph_axioms
-  proof (induction "card V" arbitrary: G ps rule: nat_induct_non_zero)
-    case 1
-    then interpret G: valid_graph G
-      by simp
-    show ?case
-      apply (rule exI[of _ \<open>[]\<close>])
-      using 1 unfolding G.is_hamiltonian_circuit_def G.is_hamiltonian_def G.is_simple_undir_def by auto
-  next
-    case (Suc n)
-    then show ?case sorry
-  qed
-  from assms have \<open>v' \<in> int_vertices ps\<close>
-    unfolding is_hamiltonian_circuit_def is_hamiltonian_def is_simple_
+proof (cases \<open>ps = []\<close>)
+  case True
+  with assms show ?thesis
+    using trivial_hamiltonian_circuit_Ball by blast
+next
+  case False
+  then show ?thesis sorry
+qed
 
 context complete_finite_weighted_graph
 begin
@@ -673,8 +667,8 @@ proof -
         using G.delete_node_was_simple_undir by blast
       then have \<open>v \<notin> int_vertices ps'\<close>
         using nG' by blast
-      from *(1) False obtain w_discard v1 ps'' where ps'': \<open>ps' = (v',w_discard,v1)#ps''\<close>
-        by (metis DiffE G'.is_simple_undir_def G'(2) insertCI int_vertices_simps(1) is_path_undir.elims(2) nG')
+      from * False obtain w_discard v1 ps'' where ps'': \<open>ps' = (v',w_discard,v1)#ps''\<close>
+        by (metis empty_iff int_vertices_empty is_path_undir.elims(2) v G.is_simple_undir_def)
       then have \<open>v1 \<in> G.V\<close> \<open>v \<notin> int_vertices ps''\<close>
         using *(2) G.valid_graph_axioms valid_graph.is_simple_undir_def apply fastforce
         using \<open>v \<notin> int_vertices ps'\<close> ps'' by auto
