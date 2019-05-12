@@ -447,6 +447,11 @@ definition (in valid_graph) is_hamiltonian_path where \<comment> \<open>or \<ope
 definition (in valid_graph) is_hamiltonian :: \<open>('v,'w) path \<Rightarrow> bool\<close> where \<comment> \<open>to-do: unconventional intermediate definition, only for experimentation\<close>
   \<open>is_hamiltonian ps \<longleftrightarrow> (if ps=[] then V={} \<or> card V = 1 else int_vertices ps = V)\<close>
 
+text\<open>to-do: remove the special case for \<^term>\<open>card V = 1\<close>. For all other cases, the definition is fine, but this should hold:\<close>
+lemma (in valid_graph)
+  \<open>V = {y} \<Longrightarrow> is_hamiltonian_circuit v ps \<Longrightarrow> v=y \<and> (\<exists>w. ps=[(v,w,v)])\<close>
+  oops
+
 definition (in valid_graph) is_hamiltonian_circuit where
   \<open>is_hamiltonian_circuit v ps \<longleftrightarrow> is_hamiltonian ps \<and> is_simple_undir v ps v\<close>
 
@@ -590,6 +595,10 @@ lemma (in valid_graph) trivial_hamiltonian_circuit_Ball:
   by (simp add: is_hamiltonian_circuit_def is_simple_undir_def)
 
 lemma (in valid_graph)
+  \<open>card V \<noteq> 1 \<Longrightarrow> is_hamiltonian_circuit v ps \<Longrightarrow> length ps = card V\<close>
+  oops
+
+lemma (in valid_graph)
   assumes \<open>v' \<in> V\<close>
   assumes \<open>is_hamiltonian_circuit v ps\<close>
   shows \<open>\<exists>ps'. is_hamiltonian_circuit v' ps'\<close>
@@ -599,6 +608,9 @@ proof (cases \<open>ps = []\<close>)
     using trivial_hamiltonian_circuit_Ball by blast
 next
   case False
+  with assms have \<open>v' \<in> int_vertices ps\<close>
+    by (simp add: is_hamiltonian_circuit_def is_hamiltonian_def)
+  then obtain i where \<open>i < \<close>
   then show ?thesis sorry
 qed
 
