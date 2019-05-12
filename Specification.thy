@@ -574,14 +574,8 @@ lemma (in valid_graph) hamiltonian_impl_finiteV:
 lemma (in valid_graph) is_hamiltonian_circuit_rotate1:
   assumes \<open>is_hamiltonian_circuit v (e#ps)\<close>
   shows \<open>is_hamiltonian_circuit (snd (snd e)) (ps@[e])\<close>
-  using assms unfolding is_hamiltonian_circuit_def is_hamiltonian_def is_simple_undir_def
-proof auto
-  assume a1: "is_path_undir G v (e # ps) v"
-  have "(fst e, fst (snd e), snd (snd e)) = e"
-    by auto
-  then show "is_path_undir G (snd (snd e)) (ps @ [e]) (snd (snd e))"
-    using a1 by (metis (no_types) is_path_undir.simps(2) is_path_undir_simps(2) is_path_undir_split)
-qed
+  using assms unfolding is_hamiltonian_circuit_def is_hamiltonian_def is_simple_undir_def apply auto
+  using triple_of_parts by (metis (no_types) is_path_undir.simps(2) is_path_undir_simps(2) is_path_undir_split)
 
 lemma (in valid_graph) is_hamiltonian_circuit_rotate1_ex:
   assumes \<open>is_hamiltonian_circuit v ps\<close>
