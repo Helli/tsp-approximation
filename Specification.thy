@@ -712,10 +712,11 @@ proof -
         unfolding G.is_hamiltonian_circuit_def using w apply auto
         using G'(1) apply (simp_all add: G.is_hamiltonian_def G'.is_hamiltonian_def)
         using ps'' nG' using Suc.prems(1) by auto
-      then show ?thesis sorry
+      then show ?thesis
+        using G.is_hamiltonian_circuit_rotate1 by fastforce
     qed
   qed
-  oops
+qed
 
 end
 
