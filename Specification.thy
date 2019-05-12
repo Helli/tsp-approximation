@@ -604,7 +604,7 @@ lemma (in valid_graph) is_hamiltonian_circuit_length:
   unfolding is_hamiltonian_circuit_def is_hamiltonian_def is_simple_undir_def int_vertices_def
   apply auto by (metis One_nat_def card_empty distinct_card length_0_conv length_map)
 
-lemma (in valid_graph)
+lemma (in valid_graph) is_hamiltonian_circuit_rotate:
   assumes \<open>v' \<in> V\<close>
   assumes \<open>is_hamiltonian_circuit v ps\<close>
   shows \<open>\<exists>ps'. is_hamiltonian_circuit v' ps'\<close>
