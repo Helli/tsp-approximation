@@ -571,8 +571,6 @@ lemma (in valid_graph) hamiltonian_impl_finiteV:
   unfolding is_hamiltonian_path_def is_trace_def adj_vertices_def
   by (metis List.finite_set card_1_singletonE finite.simps)
 
-find_theorems rotate1 find
-
 lemma (in valid_graph) is_hamiltonian_circuit_rotate1:
   assumes \<open>is_hamiltonian_circuit v (e#ps)\<close>
   shows \<open>is_hamiltonian_circuit (snd (snd e)) (ps@[e])\<close>
@@ -635,6 +633,14 @@ begin
 lemma complete': \<open>v1\<in>V \<Longrightarrow> v2\<in>V \<Longrightarrow> (\<exists>w. (v1,w,v2) \<in> E) \<or> (\<exists>w. (v2,w,v1) \<in> E)\<close>
   using complete by blast
 
+lemma complete_finite_weighted_graph_delete_node:
+  \<open>complete_finite_weighted_graph (delete_node v G)\<close>
+  apply intro_locales
+    apply (simp add: valid_graph_axioms)
+   apply unfold_locales unfolding delete_node_def
+    apply auto
+  using complete by blast
+
 lemma ex_hamiltonian_circuit:
   assumes \<open>v\<in>V\<close>
   shows \<open>\<exists>ps. is_hamiltonian_circuit v ps\<close>
@@ -658,7 +664,7 @@ proof -
     thm Suc
     let ?G = \<open>delete_node v G\<close>
     interpret G': complete_finite_weighted_graph ?G
-      sorry
+      by (fact G.complete_finite_weighted_graph_delete_node)
     have nG': \<open>G'.V = G.V - {v}\<close>
       unfolding delete_node_def by force
     from Suc have n: \<open>n = card G'.V\<close>
