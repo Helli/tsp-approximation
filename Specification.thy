@@ -616,20 +616,17 @@ next
   case False
   with assms have \<open>v' \<in> int_vertices ps\<close>
     by (simp add: is_hamiltonian_circuit_def is_hamiltonian_def)
-  then obtain i where i: \<open>i < length ps\<close> \<open>fst (ps!i) = v'\<close>
-    unfolding int_vertices_def by (metis imageE in_set_conv_nth set_map)
-  then have \<open>fst (hd (rotate i ps)) = v'\<close>
-    by (simp add: False hd_rotate_conv_nth)
+  then obtain i e where i: \<open>i < length ps\<close> \<open>ps!i = (v',e)\<close>
+    unfolding int_vertices_def by (smt fst_conv in_set_conv_nth length_map nth_map old.prod.exhaust)
+  then obtain tl where \<open>rotate i ps = (v',e)#tl\<close>
+    using hd_rotate_conv_nth[OF False] by (metis False list.sel(1) mod_less neq_Nil_conv rotate_is_Nil_conv)
   moreover obtain v'' where \<open>is_hamiltonian_circuit v'' (rotate i ps)\<close>
     apply (induction i) using assms(2) apply auto
     using is_hamiltonian_circuit_rotate1_ex by blast
-  moreover have \<open>v' = v''\<close>
-    using calculation
   ultimately have \<open>is_hamiltonian_circuit v' (rotate i ps)\<close>
-  proof -
-    from calculation
-    unfolding is_hamiltonian_circuit_def is_simple_undir_def using False
-  then show ?thesis sorry
+    unfolding is_hamiltonian_circuit_def is_simple_undir_def using is_path_undir.elims(2) by fastforce
+  then show ?thesis
+    by blast
 qed
 
 context complete_finite_weighted_graph
