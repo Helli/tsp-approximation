@@ -447,7 +447,7 @@ lemma (in valid_graph) is_trace_snoc:
   by (simp add: adj_vertices_int_vertices is_trace_def)
 
 definition (in valid_graph) is_hamiltonian_path where \<comment> \<open>or \<open>simple trace\<close>\<close>
-  \<open>is_hamiltonian_path v ps v' \<longleftrightarrow> is_trace ps \<and> is_simple_undir v ps v'\<close>
+  \<open>is_hamiltonian_path v ps v' \<longleftrightarrow> is_trace ps \<and> is_simple_undir v ps v'\<close> \<comment> \<open>abolish vertex arguments?\<close>
 
 definition (in valid_graph) is_hamiltonian :: \<open>('v,'w) path \<Rightarrow> bool\<close> where \<comment> \<open>to-do: unconventional intermediate definition, only for experimentation\<close>
   \<open>is_hamiltonian ps \<longleftrightarrow> (if ps=[] then V={} \<or> card V = 1 else int_vertices ps = V)\<close>
@@ -458,7 +458,7 @@ lemma (in valid_graph)
   oops
 
 definition (in valid_graph) is_hamiltonian_circuit where
-  \<open>is_hamiltonian_circuit v ps \<longleftrightarrow> is_hamiltonian ps \<and> is_simple_undir v ps v\<close>
+  \<open>is_hamiltonian_circuit v ps \<longleftrightarrow> is_hamiltonian ps \<and> is_simple_undir v ps v\<close> \<comment> \<open>abolish vertex argument?\<close>
 
 lemma (in valid_graph) is_hamiltonian_iff: \<open>is_hamiltonian_path v ps v \<longleftrightarrow> is_hamiltonian_circuit v ps\<close>
   apply (cases ps rule: rev_cases)
@@ -527,14 +527,6 @@ lemma sanity: \<open>OPT = OPT_alt\<close> unfolding OPT_def OPT_alt_def
 
 definition OPTWEIGHT where
   \<open>OPTWEIGHT = Min {w. (\<exists>ps. tour ps w)}\<close>
-
-lemma
-  shows \<open>sum_list (map (fst \<circ> snd) OPT) = OPTWEIGHT\<close>
-proof -
-  show ?thesis
-    unfolding OPT_def OPTWEIGHT_def
-    oops
-    find_theorems Min arg_min
 
 end
 
@@ -637,7 +629,7 @@ lemma complete_finite_weighted_graph_delete_node:
 
 lemma ex_hamiltonian_circuit:
   assumes \<open>v\<in>V\<close>
-  shows \<open>\<exists>ps. is_hamiltonian_circuit v ps\<close>
+  shows \<open>\<exists>ps. is_hamiltonian_circuit v ps \<and> ps \<noteq> []\<close>
 proof -
   from assms s.finiteV have \<open>card V > 0\<close>
     using card_0_eq by blast
@@ -647,10 +639,13 @@ proof -
     case 1
     then interpret G: complete_finite_weighted_graph G
       by simp
+    from 1(2) obtain w where w: \<open>(v,w,v) \<in> G.E\<close>
+      using G.complete by blast
     show ?case
-      apply (rule exI[of _ \<open>[]\<close>])
+      apply (rule exI[of _ \<open>[(v,w,v)]\<close>])
       unfolding G.is_hamiltonian_circuit_def apply auto
-      using 1 G.is_hamiltonian_def by (auto simp: G.is_simple_undir_def)
+      using 1 G.is_hamiltonian_def apply (auto simp: G.is_simple_undir_def w)
+      by (metis "1.hyps" G.s.finiteV card_1_singletonI the_elem_eq)
   next
     case (Suc n)
     thm Suc interpret G: complete_finite_weighted_graph G
@@ -713,10 +708,41 @@ proof -
         using G'(1) apply (simp_all add: G.is_hamiltonian_def G'.is_hamiltonian_def)
         using ps'' nG' using Suc.prems(1) by auto
       then show ?thesis
-        by (simp add: G.is_hamiltonian_circuit_rotate Suc.prems(1))
+        using G.is_hamiltonian_circuit_rotate1 by fastforce
     qed
   qed
 qed
+
+lemma is_hamiltonian_circuit_fst:
+  assumes \<open>is_hamiltonian_circuit v (p#ps)\<close>
+  shows "fst p = v"
+proof -
+  from assms[unfolded is_hamiltonian_circuit_def is_hamiltonian_def is_simple_undir_def]
+  show "fst p = v"
+    by (cases p) simp
+qed
+
+lemma ex_hamiltonian_circuit':
+  assumes \<open>V \<noteq> {}\<close>
+  shows \<open>\<exists>ps. is_hamiltonian_circuit (fst (hd ps)) ps\<close>
+proof -
+  from assms obtain v where v: \<open>v \<in> V\<close>
+    by blast
+  from ex_hamiltonian_circuit[OF this] obtain ps where ps: \<open>is_hamiltonian_circuit v ps \<and> ps \<noteq> []\<close>
+    by fast
+  with assms have \<open>fst (hd ps) = v\<close>
+    by (metis hd_Cons_tl is_hamiltonian_circuit_fst)
+  with ps show ?thesis
+    by blast
+qed
+
+lemma
+  assumes \<open>v \<in> V\<close>
+  shows \<open>sum_list (map (fst \<circ> snd) OPT) = OPTWEIGHT\<close>
+proof -
+  show ?thesis
+    unfolding OPT_def OPTWEIGHT_def
+    oops
 
 end
 
