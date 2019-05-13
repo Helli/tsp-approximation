@@ -633,76 +633,60 @@ lemma ex_hamiltonian_circuit:
   shows \<open>\<exists>ps. is_hamiltonian_circuit v ps \<and> ps \<noteq> []\<close>
 proof -
   from assms complete_finite_weighted_graph_axioms show ?thesis
-  proof (induction \<open>card V\<close> arbitrary: v G rule: nat_induct_at_least[of 2]) \<comment> \<open>Maybe instead prove a \<open>set_induct_non_empty\<close>?\<close>
+  proof (induction \<open>card V\<close> arbitrary: v G rule: nat_induct_at_least[of 2])
     case base
     then interpret G: complete_finite_weighted_graph G
       by simp
-    from base(1-2) obtain v' where \<open>G.V = {v,v'}\<close> oops
-    from base(1-2) obtain v' where \<open>v' \<in> G.V\<close> \<open>v \<noteq> v'\<close> oops
-    from base(2) obtain vw wv where w: \<open>(v,w,v) \<in> G.E\<close>
+    from base(1-2) obtain v' where GV: \<open>G.V = {v,v'}\<close> \<open>v \<noteq> v'\<close>
+      by (metis card2_get2 doubleton_eq_iff insertE singletonD)
+    then have v': \<open>v' \<in> G.V\<close>
+      by blast+
+    with GV base(2) obtain w where w: \<open>(v,w,v') \<in> G.E \<or> (v',w,v) \<in> G.E\<close>
       using G.complete by blast
     show ?case
-      apply (rule exI[of _ \<open>[(v,w,v)]\<close>])
-      unfolding G.is_hamiltonian_circuit_def apply auto
-      using 1 G.is_hamiltonian_def apply (auto simp: G.is_simple_undir_def w)
-      by (metis 1(1) G.s.finiteV card_1_singletonI the_elem_eq)
+      apply (rule exI[of _ \<open>[(v,w,v'),(v',w,v)]\<close>])
+      apply (auto simp: G.is_hamiltonian_circuit_def G.is_hamiltonian_def G.is_simple_undir_def base v' GV w)
+      using w by blast
   next
     case (Suc n)
-    thm Suc interpret G: complete_finite_weighted_graph G
+    interpret G: complete_finite_weighted_graph G
       by (simp add: Suc.prems)
-    thm Suc
     let ?G = \<open>delete_node v G\<close>
     interpret G': complete_finite_weighted_graph ?G
       by (fact G.complete_finite_weighted_graph_delete_node)
-    have nG': \<open>G'.V = G.V - {v}\<close>
-      unfolding delete_node_def by force
-    from Suc have n: \<open>n = card G'.V\<close>
-      unfolding delete_node_def by fastforce
-    then obtain v' where v: \<open>v'\<in>G'.V\<close>
+    from Suc have nG': \<open>G'.V = G.V - {v}\<close> \<open>2 \<le> card G'.V\<close> and n: \<open>n = card G'.V\<close>
+      unfolding delete_node_def by force+
+    from nG'(2) obtain v' where v: \<open>v'\<in>G'.V\<close>
       using Suc.hyps(1) by fastforce
     with \<open>v \<in> G.V\<close> obtain w where w: \<open>(v,w,v') \<in> G.E \<or> (v',w,v) \<in> G.E\<close>
       unfolding nG' using G.complete by fast
     from Suc.hyps(2)[OF n v G'.complete_finite_weighted_graph_axioms]
     obtain ps' where ps': \<open>G'.is_hamiltonian_circuit v' ps'\<close> by blast
     show ?case
-    proof (cases \<open>card G'.V \<le> 1\<close>)
-      let ?circuit = \<open>[(v,w,v'),(v',w,v)]\<close>
-      case True
-      with v have G'V: \<open>G'.V = {v'}\<close>
-        using G'.finite_V
-        by (metis One_nat_def Suc.hyps(1) card_1_singletonI le0 le_antisym n neq0_conv not_less_eq_eq)
-      show ?thesis
-        apply (rule exI[of _ ?circuit])
-        unfolding G.is_hamiltonian_circuit_def G.is_hamiltonian_def apply auto
-        using Suc.prems(1) apply blast
-        using G.E_validD w apply blast
-        using G'V nG' apply blast
-        unfolding G.is_simple_undir_def apply simp using Suc.prems(1) nG' v w by blast
-    next
-      case False
+    proof-
       have G': \<open>G'.is_hamiltonian ps'\<close> \<open>G'.is_simple_undir v' ps' v'\<close>
        by (auto simp: ps'[unfolded G'.is_hamiltonian_circuit_def])
       then have *: \<open>int_vertices ps' = G'.V\<close> \<open>G.is_simple_undir v' ps' v'\<close>
         unfolding G'.is_hamiltonian_def apply auto
-        apply (metis all_not_in_conv int_vertices_empty)
-        apply (metis False empty_iff le_refl)
+          apply (metis all_not_in_conv int_vertices_empty)
+        using nG'(2) apply (metis Suc_1 Suc_n_not_le_n int_vertices_simps(1))
         using G.delete_node_was_simple_undir by blast
       then have \<open>v \<notin> int_vertices ps'\<close>
         using nG' by blast
-      from * False obtain w_discard v1 ps'' where ps'': \<open>ps' = (v',w_discard,v1)#ps''\<close>
-        by (metis empty_iff int_vertices_empty is_path_undir.elims(2) v G.is_simple_undir_def)
+      from * nG'(2) obtain w_discard v1 ps'' where ps'': \<open>ps' = (v',w_discard,v1)#ps''\<close>
+        by (metis all_not_in_conv int_vertices_empty is_path_undir.elims(2) v G.is_simple_undir_def)
       then have \<open>v1 \<in> G.V\<close> \<open>v \<notin> int_vertices ps''\<close>
         using *(2) G.valid_graph_axioms valid_graph.is_simple_undir_def apply fastforce
         using \<open>v \<notin> int_vertices ps'\<close> ps'' by auto
-      then obtain w1 where **: \<open>(v,w1,v1) \<in> G.E \<or> (v1,w1,v) \<in> G.E\<close>
-        by (meson Suc.prems(1) G.complete)
+      with *(1) obtain w1 where **: \<open>(v,w1,v1) \<in> G.E \<or> (v1,w1,v) \<in> G.E\<close>
+        by (metis G'(2) G'.is_path_undir_simps Suc.prems(1) \<open>v \<notin> int_vertices ps'\<close> G.complete is_path_undir.simps(2) ps'' G'.is_simple_undir_def)
       let ?ps = \<open>(v',w,v)#(v,w1,v1)#ps''\<close>
       from *(2)[unfolded ps''] have \<open>G.is_simple_undir v1 ps'' v'\<close>
         unfolding G.is_simple_undir_def by simp
       with ** have \<open>G.is_simple_undir v ((v,w1,v1)#ps'') v'\<close>
         using \<open>v \<notin> int_vertices ps''\<close> \<open>v \<in> G.V\<close> by (simp add: int_vertices_def G.is_simple_undir_def)
       moreover have \<open>v' \<notin> int_vertices ((v,w1,v1)#ps'')\<close>
-        by (metis DiffE G'(2) G'.is_simple_undir_def distinct.simps(2) insert_iff int_vertices_def int_vertices_simps(2) list.map(2) nG' prod.sel(1) ps'' v)
+        by (metis DiffE G'(2) G'.is_simple_undir_def distinct.simps(2) insert_iff int_vertices_def int_vertices_simps(2) list.map(2) nG'(1) prod.sel(1) ps'' v)
       ultimately have \<open>G.is_hamiltonian_circuit v' ?ps\<close>
         unfolding G.is_hamiltonian_circuit_def using w apply auto
         using G'(1) apply (simp_all add: G.is_hamiltonian_def G'.is_hamiltonian_def)
@@ -723,12 +707,12 @@ proof -
 qed
 
 lemma ex_hamiltonian_circuit':
-  assumes \<open>V \<noteq> {}\<close>
+  assumes \<open>2 \<le> card V\<close>
   shows \<open>\<exists>ps. is_hamiltonian_circuit (fst (hd ps)) ps\<close>
 proof -
   from assms obtain v where v: \<open>v \<in> V\<close>
-    by blast
-  from ex_hamiltonian_circuit[OF this] obtain ps where ps: \<open>is_hamiltonian_circuit v ps \<and> ps \<noteq> []\<close>
+    by fastforce
+  from ex_hamiltonian_circuit[OF assms this] obtain ps where ps: \<open>is_hamiltonian_circuit v ps \<and> ps \<noteq> []\<close>
     by fast
   with assms have \<open>fst (hd ps) = v\<close>
     by (metis hd_Cons_tl is_hamiltonian_circuit_fst)
