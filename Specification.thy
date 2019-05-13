@@ -451,13 +451,13 @@ definition (in valid_graph) is_hamiltonian_path where \<comment> \<open>or \<ope
 definition (in valid_graph) is_hamiltonian :: \<open>('v,'w) path \<Rightarrow> bool\<close> where \<comment> \<open>to-do: unconventional intermediate definition, only for experimentation\<close>
   \<open>is_hamiltonian ps \<longleftrightarrow> (if ps=[] then V={} \<or> card V = 1 else int_vertices ps = V)\<close>
 
+definition (in valid_graph) is_hamiltonian_circuit where
+  \<open>is_hamiltonian_circuit v ps \<longleftrightarrow> is_hamiltonian ps \<and> is_simple_undir v ps v\<close> \<comment> \<open>abolish vertex argument?\<close>
+
 text\<open>to-do: remove the special case for \<^term>\<open>card V = 1\<close>. For all other cases, the definition is fine, but this should hold:\<close>
 lemma (in valid_graph)
   \<open>V = {y} \<Longrightarrow> is_hamiltonian_circuit v ps \<Longrightarrow> v=y \<and> (\<exists>w. ps=[(v,w,v)])\<close>
   oops
-
-definition (in valid_graph) is_hamiltonian_circuit where
-  \<open>is_hamiltonian_circuit v ps \<longleftrightarrow> is_hamiltonian ps \<and> is_simple_undir v ps v\<close> \<comment> \<open>abolish vertex argument?\<close>
 
 lemma (in valid_graph) is_hamiltonian_iff: \<open>is_hamiltonian_path v ps v \<longleftrightarrow> is_hamiltonian_circuit v ps\<close>
   apply (cases ps rule: rev_cases)
