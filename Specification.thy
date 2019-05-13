@@ -529,14 +529,16 @@ definition OPTWEIGHT where
 
 end
 
+text \<open>The definition below is non-standard: It allows for additional edges, e.g. loops.\<close>
 locale complete_finite_weighted_graph = finite_weighted_graph +
-  assumes complete: \<open>v1\<in>V \<Longrightarrow> v2\<in>V \<Longrightarrow> \<exists>w. (v1,w,v2) \<in> E \<or> (v2,w,v1) \<in> E\<close>
+  assumes complete: \<open>v1\<in>V \<Longrightarrow> v2\<in>V \<Longrightarrow> v1\<noteq>v2 \<Longrightarrow> \<exists>w. (v1,w,v2)\<in>E \<or> (v2,w,v1)\<in>E\<close>
+    \<comment> \<open>maybe use \<^const>\<open>Ex1\<close>?\<close>
 
 context finite_weighted_graph
 begin
 
 lemma complete_finite_weighted_graph_sanity_check:
-  \<open>complete_finite_weighted_graph G \<longleftrightarrow> (\<forall>v1\<in>V. \<forall>v2\<in>V. (\<exists>w. (v1,w,v2) \<in> E) \<or> (\<exists>w. (v2,w,v1) \<in> E))\<close>
+  \<open>complete_finite_weighted_graph G \<longleftrightarrow> (\<forall>v1\<in>V. \<forall>v2\<in>V. v1\<noteq>v2 \<longrightarrow> (\<exists>w. (v1,w,v2) \<in> E) \<or> (\<exists>w. (v2,w,v1) \<in> E))\<close>
   by (meson complete_finite_weighted_graph_axioms_def complete_finite_weighted_graph_def finite_weighted_graph_axioms)
 
 lemma complete_finite_weighted_graph_intro:
@@ -615,7 +617,7 @@ qed
 context complete_finite_weighted_graph
 begin
 
-lemma complete': \<open>v1\<in>V \<Longrightarrow> v2\<in>V \<Longrightarrow> (\<exists>w. (v1,w,v2) \<in> E) \<or> (\<exists>w. (v2,w,v1) \<in> E)\<close>
+lemma complete': \<open>v1\<in>V \<Longrightarrow> v2\<in>V \<Longrightarrow> v1\<noteq>v2 \<Longrightarrow> (\<exists>w. (v1,w,v2)\<in>E) \<or> (\<exists>w. (v2,w,v1)\<in>E)\<close>
   using complete by blast
 
 lemma complete_finite_weighted_graph_delete_node:
@@ -627,18 +629,17 @@ lemma complete_finite_weighted_graph_delete_node:
   using complete by blast
 
 lemma ex_hamiltonian_circuit:
-  assumes \<open>v\<in>V\<close>
+  assumes \<open>2 \<le> card V\<close> \<open>v\<in>V\<close>
   shows \<open>\<exists>ps. is_hamiltonian_circuit v ps \<and> ps \<noteq> []\<close>
 proof -
-  from assms s.finiteV have \<open>card V > 0\<close>
-    using card_0_eq by blast
-  then show ?thesis
-    using assms complete_finite_weighted_graph_axioms
-  proof (induction \<open>card V\<close> arbitrary: v G rule: nat_induct_non_zero) \<comment> \<open>Maybe instead prove a \<open>set_induct_non_empty\<close>?\<close>
-    case 1
+  from assms complete_finite_weighted_graph_axioms show ?thesis
+  proof (induction \<open>card V\<close> arbitrary: v G rule: nat_induct_at_least[of 2]) \<comment> \<open>Maybe instead prove a \<open>set_induct_non_empty\<close>?\<close>
+    case base
     then interpret G: complete_finite_weighted_graph G
       by simp
-    from 1(2) obtain w where w: \<open>(v,w,v) \<in> G.E\<close>
+    from base(1-2) obtain v' where \<open>G.V = {v,v'}\<close> oops
+    from base(1-2) obtain v' where \<open>v' \<in> G.V\<close> \<open>v \<noteq> v'\<close> oops
+    from base(2) obtain vw wv where w: \<open>(v,w,v) \<in> G.E\<close>
       using G.complete by blast
     show ?case
       apply (rule exI[of _ \<open>[(v,w,v)]\<close>])
