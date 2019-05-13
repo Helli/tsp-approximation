@@ -520,7 +520,7 @@ definition OPT_alt where
   \<open>OPT_alt = (ARG_MIN (edge_weight \<circ> ind \<circ> set) ps . is_hamiltonian_circuit (fst (hd ps)) ps)\<close>
 
 definition OPT where
-  \<open>OPT = (ARG_MIN (sum_list \<circ> (map (fst \<circ> snd))) ps . is_hamiltonian_circuit (fst (hd ps)) ps)\<close>
+  \<open>OPT = (ARG_MIN (sum_list \<circ> (map (fst\<circ>snd))) ps . is_hamiltonian_circuit (fst (hd ps)) ps)\<close>
 
 lemma sanity: \<open>OPT = OPT_alt\<close> unfolding OPT_def OPT_alt_def
   using is_hamiltonian_circuit_distinct[THEN edge_weight_sum_list] by fastforce
@@ -529,12 +529,12 @@ definition OPTWEIGHT where
   \<open>OPTWEIGHT = Min {w. (\<exists>ps. tour ps w)}\<close>
 
 lemma
-  assumes \<open>is_hamiltonian_circuit v ps\<close>
   shows \<open>sum_list (map (fst \<circ> snd) OPT) = OPTWEIGHT\<close>
 proof -
-  from assms have True
+  show ?thesis
     unfolding OPT_def OPTWEIGHT_def
     oops
+    find_theorems Min arg_min
 
 end
 
