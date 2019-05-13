@@ -3,7 +3,6 @@ theory Specification
   imports
     Koenigsberg_Friendship.KoenigsbergBridge
     Graph_Definition_Impl
-    "HOL-ex.Sketch_and_Explore"
 begin
 
 lemma sum_of_parts(*rm*): \<open>\<lparr>nodes= nodes G, edges=edges G\<rparr> = G\<close>
@@ -645,7 +644,7 @@ proof -
       apply (rule exI[of _ \<open>[(v,w,v)]\<close>])
       unfolding G.is_hamiltonian_circuit_def apply auto
       using 1 G.is_hamiltonian_def apply (auto simp: G.is_simple_undir_def w)
-      by (metis "1.hyps" G.s.finiteV card_1_singletonI the_elem_eq)
+      by (metis 1(1) G.s.finiteV card_1_singletonI the_elem_eq)
   next
     case (Suc n)
     thm Suc interpret G: complete_finite_weighted_graph G
@@ -715,10 +714,10 @@ qed
 
 lemma is_hamiltonian_circuit_fst:
   assumes \<open>is_hamiltonian_circuit v (p#ps)\<close>
-  shows "fst p = v"
+  shows \<open>fst p = v\<close>
 proof -
   from assms[unfolded is_hamiltonian_circuit_def is_hamiltonian_def is_simple_undir_def]
-  show "fst p = v"
+  show \<open>fst p = v\<close>
     by (cases p) simp
 qed
 
