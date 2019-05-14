@@ -719,6 +719,35 @@ proof -
     by blast
 qed
 
+end
+
+text \<open>move these bits up\<close>
+context valid_graph
+begin
+lemma \<open>is_hamiltonian_circuit v ps \<Longrightarrow> length ps \<le> card V\<close>
+  find_theorems \<open>is_hamiltonian_circuit\<close> length
+  oops
+end
+
+context finite_graph
+begin
+
+lemma finitely_many_hamiltonian_circuits:
+  oops
+
+
+(*
+find_theorems finite is_arg_min
+find_theorems \<open>Collect\<close> \<open>is_arg_min\<close>
+*)
+lemma
+  assumes \<open>2 \<le> card V\<close>
+  shows \<open>is_arg_min (sum_list \<circ> (map (fst \<circ> snd))) (\<lambda>ps. is_hamiltonian_circuit (fst (hd ps)) ps) OPT\<close>
+  unfolding OPT_def using ex_hamiltonian_circuit'[OF assms]
+  unfolding arg_min_def is_arg_min_def apply auto
+  find_theorems arg_min is_arg_min
+  oops
+
 lemma
   assumes \<open>v \<in> V\<close>
   shows \<open>sum_list (map (fst \<circ> snd) OPT) = OPTWEIGHT\<close>
