@@ -593,7 +593,7 @@ lemma (in valid_graph) is_hamiltonian_circuit_length:
   unfolding is_hamiltonian_circuit_def is_hamiltonian_def is_simple_undir_def int_vertices_def
   by (metis Suc_1 Suc_n_not_le_n card_empty distinct_card length_map list.size(3))
 
-corollary (in valid_graph) is_hamiltonian_circuit_length':
+corollary (in valid_graph) is_hamiltonian_circuit_length_le:
   assumes \<open>is_hamiltonian_circuit v ps\<close>
   shows \<open>length ps \<le> card V\<close>
 proof -
