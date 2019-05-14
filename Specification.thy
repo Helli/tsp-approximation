@@ -584,6 +584,10 @@ lemma (in valid_graph) trivial_hamiltonian_circuit_Ball:
   \<open>is_hamiltonian_circuit v [] \<Longrightarrow> \<forall>v'\<in>V. is_hamiltonian_circuit v' []\<close>
   by (simp add: is_hamiltonian_circuit_def is_simple_undir_def)
 
+lemma (in valid_graph) is_hamiltonian_circuit_inV:
+  \<open>is_hamiltonian_circuit v ps \<Longrightarrow> v \<in> V\<close>
+  by (meson is_hamiltonian_circuit_def is_path_undir_memb is_simple_undir_def)
+
 lemma (in valid_graph) is_hamiltonian_circuit_length:
   \<open>card V \<noteq> 1 \<Longrightarrow> is_hamiltonian_circuit v ps \<Longrightarrow> length ps = card V\<close>
   unfolding is_hamiltonian_circuit_def is_hamiltonian_def is_simple_undir_def int_vertices_def
