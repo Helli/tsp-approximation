@@ -593,6 +593,27 @@ lemma (in valid_graph) is_hamiltonian_circuit_length:
   unfolding is_hamiltonian_circuit_def is_hamiltonian_def is_simple_undir_def int_vertices_def
   by (metis Suc_1 Suc_n_not_le_n card_empty distinct_card length_map list.size(3))
 
+corollary (in valid_graph) is_hamiltonian_circuit_length':
+  assumes \<open>is_hamiltonian_circuit v ps\<close>
+  shows \<open>length ps \<le> card V\<close>
+proof -
+  have \<open>length ps \<le> card V\<close> if \<open>card V = 1\<close> using assms that
+    unfolding is_hamiltonian_circuit_def is_hamiltonian_def is_simple_undir_def int_vertices_def
+    by (metis One_nat_def Suc_n_not_le_n distinct_card length_map linear list.size(3))
+  moreover have False if \<open>card V = 0\<close>
+  proof cases
+    assume \<open>finite V\<close>
+    then show False
+      using assms is_hamiltonian_circuit_inV that by auto
+  next
+    assume \<open>infinite V\<close>
+    with assms show False
+      by (meson hamiltonian_impl_finiteV is_hamiltonian_iff)
+  qed
+  ultimately show ?thesis
+    using assms is_hamiltonian_circuit_length by fastforce
+qed
+
 lemma (in valid_graph) is_hamiltonian_circuit_rotate:
   assumes \<open>v' \<in> V\<close>
   assumes \<open>is_hamiltonian_circuit v ps\<close>
