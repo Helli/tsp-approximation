@@ -630,7 +630,7 @@ lemma complete_finite_weighted_graph_delete_node:
 
 lemma ex_hamiltonian_circuit:
   assumes \<open>2 \<le> card V\<close> \<open>v\<in>V\<close>
-  shows \<open>\<exists>ps. is_hamiltonian_circuit v ps \<and> ps \<noteq> []\<close>
+  shows \<open>\<exists>ps. is_hamiltonian_circuit v ps\<close>
   using assms complete_finite_weighted_graph_axioms
 proof (induction \<open>card V\<close> arbitrary: v G rule: nat_induct_at_least[of 2])
   case base
@@ -707,10 +707,10 @@ lemma ex_hamiltonian_circuit':
 proof -
   from assms obtain v where v: \<open>v \<in> V\<close>
     by fastforce
-  from ex_hamiltonian_circuit[OF assms this] obtain ps where ps: \<open>is_hamiltonian_circuit v ps \<and> ps \<noteq> []\<close>
+  from ex_hamiltonian_circuit[OF assms this] obtain ps where ps: \<open>is_hamiltonian_circuit v ps\<close>
     by fast
-  with assms have \<open>fst (hd ps) = v\<close>
-    by (metis hd_Cons_tl is_hamiltonian_circuit_fst)
+  with assms v have \<open>fst (hd ps) = v\<close>
+    by (metis Suc_1 Suc_n_not_le_n empty_iff is_hamiltonian_circuit_def is_hamiltonian_circuit_fst is_hamiltonian_def list.sel(1) neq_Nil_conv)
   with ps show ?thesis
     by blast
 qed
