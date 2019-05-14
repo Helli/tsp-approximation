@@ -589,9 +589,9 @@ lemma (in valid_graph) is_hamiltonian_circuit_inV:
   by (meson is_hamiltonian_circuit_def is_path_undir_memb is_simple_undir_def)
 
 lemma (in valid_graph) is_hamiltonian_circuit_length:
-  \<open>card V \<noteq> 1 \<Longrightarrow> is_hamiltonian_circuit v ps \<Longrightarrow> length ps = card V\<close>
+  \<open>2 \<le> card V \<Longrightarrow> is_hamiltonian_circuit v ps \<Longrightarrow> length ps = card V\<close>
   unfolding is_hamiltonian_circuit_def is_hamiltonian_def is_simple_undir_def int_vertices_def
-  apply auto by (metis One_nat_def card_empty distinct_card length_0_conv length_map)
+  by (metis Suc_1 Suc_n_not_le_n card_empty distinct_card length_map list.size(3))
 
 lemma (in valid_graph) is_hamiltonian_circuit_rotate:
   assumes \<open>v' \<in> V\<close>
