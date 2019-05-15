@@ -755,20 +755,24 @@ proof -
     by blast
 qed
 
-(*
-find_theorems finite is_arg_min
+
 find_theorems \<open>Collect\<close> \<open>is_arg_min\<close>
-*)
-lemma
+
+lemma is_arg_min_OPT:
   assumes \<open>2 \<le> card V\<close>
   shows \<open>is_arg_min (sum_list \<circ> (map (fst \<circ> snd))) (\<lambda>ps. is_hamiltonian_circuit (fst (hd ps)) ps) OPT\<close>
-  unfolding OPT_def using ex_hamiltonian_circuit'[OF assms]
-  unfolding arg_min_def is_arg_min_def apply auto
-  find_theorems arg_min is_arg_min
-  oops
+proof -
+  have \<open>finite {ps. is_hamiltonian_circuit (fst (hd ps)) ps}\<close>
+    using finitely_many_hamiltonian_circuits
+    by (metis (mono_tags, lifting) finite_subset mem_Collect_eq subsetI)
+  note ex_is_arg_min_if_finite[OF this, of \<open>sum_list \<circ> (map (fst \<circ> snd))\<close>]
+  with ex_hamiltonian_circuit'[OF assms]
+  show ?thesis
+    unfolding OPT_def unfolding arg_min_def apply simp
+    by (meson exE_some)
+qed
 
 lemma
-  assumes \<open>v \<in> V\<close>
   shows \<open>sum_list (map (fst \<circ> snd) OPT) = OPTWEIGHT\<close>
 proof -
   show ?thesis
