@@ -742,20 +742,24 @@ qed
 
 end
 
-text \<open>move these bits up\<close>
-context valid_graph
-begin
-lemma \<open>is_hamiltonian_circuit v ps \<Longrightarrow> length ps \<le> card V\<close>
-  find_theorems \<open>is_hamiltonian_circuit\<close> length
-  oops
-end
-
+text \<open>move this up\<close>
 context finite_graph
 begin
 
 lemma finitely_many_hamiltonian_circuits:
-  oops
-
+  \<open>finite {ps. \<exists>v. is_hamiltonian_circuit v ps}\<close>
+proof -
+  have \<open>set ps \<subseteq> E \<union> (\<lambda>(v1,w,v2). (v2,w,v1)) ` E\<close> if \<open>\<exists>v. is_hamiltonian_circuit v ps\<close> for ps
+    using that unfolding is_hamiltonian_circuit_def is_simple_undir_def apply auto
+    by (metis (mono_tags, lifting) is_path_undir_memb_edges prod.simps(2) rev_image_eqI)
+  moreover have \<open>finite \<dots>\<close>
+    by (simp add: finite_E)
+  moreover have \<open>length ps \<le> card V\<close> if \<open>\<exists>v. is_hamiltonian_circuit v ps\<close> for ps
+    using is_hamiltonian_circuit_length_le that by blast
+  ultimately show ?thesis
+    using finite_lists_length_le[of \<open>E \<union> (\<lambda>(v1,w,v2). (v2,w,v1)) ` E\<close> \<open>card V\<close>]
+    by (smt Collect_cong finite_Collect_conjI)
+qed
 
 (*
 find_theorems finite is_arg_min
