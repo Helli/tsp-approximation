@@ -798,6 +798,9 @@ proof -
 
 end
 
+lemma \<open>f (ARG_MIN f x. P x) = (LEAST y. \<exists>x. P x \<and> f x = y)\<close>
+  try oops
+
 subsection \<open>Symmetric TSP\<close>
 
 section \<open>Generating Example Input\<close>
