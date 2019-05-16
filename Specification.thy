@@ -791,7 +791,7 @@ proof -
     unfolding OPT_def apply simp
     unfolding Least_def arg_min_def is_arg_min_def apply auto
     apply (simp add: **)
-
+\<comment> \<open>next step: theorem about Least and arg min for finite sets...\<close>
     find_theorems is_arg_min Least
 
     oops
