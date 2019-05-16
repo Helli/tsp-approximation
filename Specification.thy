@@ -798,8 +798,20 @@ proof -
 
 end
 
-lemma \<open>f (ARG_MIN f x. P x) = (LEAST y. \<exists>x. P x \<and> f x = y)\<close>
-  try oops
+lemma
+  assumes \<open>finite {x. P x}\<close>
+  assumes \<open>\<exists>x. P x\<close>
+  fixes f :: \<open>_ \<Rightarrow> _ ::linorder\<close>
+  shows \<open>f (ARG_MIN f x. P x) = (LEAST y. \<exists>x. P x \<and> f x = y)\<close> (is \<open>?l = ?r\<close>)
+proof -
+  from assms have *: \<open>\<exists>x. P x \<and> (\<forall>y. P y \<longrightarrow> f x \<le> f y)\<close>
+    sorry
+  find_theorems is_arg_min arg_min=
+  have \<open>?l \<le> ?r\<close>
+    unfolding arg_min_def using is_arg_min_linorder sorry
+  moreover have \<open>?r \<le> ?l\<close>
+    unfolding Least_def sorry \<comment> \<open>sledgehammer finds a proof.\<close>
+qed
 
 subsection \<open>Symmetric TSP\<close>
 
