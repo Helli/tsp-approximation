@@ -804,13 +804,32 @@ lemma
   fixes f :: \<open>_ \<Rightarrow> _ ::linorder\<close>
   shows \<open>f (ARG_MIN f x. P x) = (LEAST y. \<exists>x. P x \<and> f x = y)\<close> (is \<open>?l = ?r\<close>)
 proof -
-  from assms have *: \<open>\<exists>x. P x \<and> (\<forall>y. P y \<longrightarrow> f x \<le> f y)\<close>
+  from assms have *: \<open>\<exists>!x. P x \<and> (\<forall>y. P y \<longrightarrow> f x \<le> f y)\<close>
+  proof (induction \<open>{x. P x}\<close> arbitrary: P rule: finite_induct)
+    case empty
+    then show ?case
+      by simp
+  next
+    case (insert x F)
+    then show ?case sorry
+  qed
+    apply simp_all
+    apply blast
     sorry
-  find_theorems is_arg_min arg_min=
+  have \<open>\<exists>x. P x \<and> f x = (LEAST y. \<exists>x. P x \<and> f x = y)\<close>
+    by (smt "*" Least_equality)
+
+  find_theorems is_arg_min arg_min
   have \<open>?l \<le> ?r\<close>
+  proof (rule ccontr)
+    assume \<open>\<not> f (arg_min f P) \<le> (LEAST y. \<exists>x. P x \<and> f x = y)\<close>
+    then have \<open>(LEAST y. \<exists>x. P x \<and> f x = y) < f (arg_min f P)\<close>
+      by simp
     unfolding arg_min_def using is_arg_min_linorder sorry
   moreover have \<open>?r \<le> ?l\<close>
     unfolding Least_def sorry \<comment> \<open>sledgehammer finds a proof.\<close>
+  ultimately show ?thesis
+    by simp
 qed
 
 subsection \<open>Symmetric TSP\<close>
