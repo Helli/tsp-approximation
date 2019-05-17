@@ -811,10 +811,17 @@ proof -
       by simp
   next
     case (insert x F)
-    then show ?case sorry
+    then show ?case
+    proof (cases \<open>\<forall>y. P y \<longrightarrow> f x \<le> f y\<close>)
+      case True
+      then show ?thesis sorry
+    next
+      case False
+      then show ?thesis sorry
+    qed
   qed
     apply simp_all
-    apply blast
+    apply blas
     sorry
   have \<open>\<exists>x. P x \<and> f x = (LEAST y. \<exists>x. P x \<and> f x = y)\<close>
     by (smt "*" Least_equality)
