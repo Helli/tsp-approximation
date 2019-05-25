@@ -858,63 +858,6 @@ lemma manhattan: \<open>nat\<bar>c-a\<bar> \<le> nat\<bar>b-a\<bar> + nat\<bar>c
 subsection \<open>Euclidean Distance, Rounded Up\<close>
   \<comment> \<open>attempt only if too much time at the end\<close>
 
-section \<open>Junk\<close>
-
-context valid_graph begin
-context assumes
-  finE: \<open>finite E\<close>
-begin
-
-definition dg where \<open>dg v R = card {(w,v'). (v,w,v')\<in>R} + card {(v',w).(v',w,v)\<in>R}\<close>
-
-lemma assumes \<open>finite R'\<close> \<open>R \<subseteq> R'\<close> shows dg_mono: \<open>dg v R \<le> dg v R'\<close>
-proof -
-  from assms(1) have \<open>finite {(w,v').(v,w,v')\<in>R'}\<close> (is \<open>finite ?A\<close>)
-  proof -
-    from \<open>finite R'\<close> have \<open>finite ((fst o snd) ` R')\<close> \<open>finite ((snd o snd) ` R')\<close>
-      by blast+
-    then have f: \<open>finite {(w,v'). w \<in> (fst o snd) ` R' \<and> v' \<in> ((snd o snd) ` R')}\<close>
-      by simp
-    have \<open>?A = {(w,v'). (v,w,v')\<in>R' \<and> w \<in> (fst o snd) ` R' \<and> v' \<in> ((snd o snd) ` R')}\<close>
-      by (auto simp: rev_image_eqI)
-    also have \<open>\<dots> \<subseteq> {(w,v'). w \<in> (fst o snd) ` R' \<and> v' \<in> ((snd o snd) ` R')}\<close>
-      by blast
-    finally show ?thesis
-      using f finite_subset by blast
-  qed
-  with assms(2) have l: \<open>card {(w,v').(v,w,v')\<in>R} \<le> card {(w,v').(v,w,v')\<in>R'}\<close>
-    by (smt Collect_mono_iff card_mono case_prodE case_prodI2 subsetD)
-  from assms(1) have \<open>finite {(v',w).(v',w,v)\<in>R'}\<close> (is \<open>finite ?B\<close>)
-  proof -
-    from \<open>finite R'\<close> have \<open>finite (fst ` R')\<close> \<open>finite ((fst o snd) ` R')\<close>
-      by blast+
-    then have f: \<open>finite {(w,v'). w \<in> fst ` R' \<and> v' \<in> ((fst o snd) ` R')}\<close>
-      by simp
-    have \<open>?B = {(v',w). (v',w,v)\<in>R' \<and> v' \<in> fst ` R' \<and> w \<in> ((fst o snd) ` R')}\<close>
-      by (auto simp: rev_image_eqI)
-    also have \<open>\<dots> \<subseteq> {(v',w). v' \<in> fst ` R' \<and> w \<in> ((fst o snd) ` R')}\<close>
-      by blast
-    finally show ?thesis
-      using f finite_subset by blast
-  qed
-  with assms(2) have r: \<open>card {(v',w).(v',w,v)\<in>R} \<le> card {(v',w).(v',w,v)\<in>R'}\<close>
-    by (smt Collect_mono_iff card_mono case_prodD case_prodI2 subsetD)
-  from l r show ?thesis
-    by (simp add: dg_def)
-qed
-
-lemma \<open>indep_system E (\<lambda>E'. E'\<subseteq>E \<and> (\<forall>v\<in>V. dg v E' \<le> 1))\<close>
-  apply standard
-     apply (simp add: finE)
-    apply blast
-   apply (rule exI[of _ \<open>{}\<close>])
-   apply (simp add: dg_def)
-  apply auto
-  by (meson dg_mono finE finite_subset le_trans)
-
-end
-end
-
 text \<open>dummy citation: @{cite lawler}.\<close>
 
 end
