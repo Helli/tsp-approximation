@@ -826,23 +826,29 @@ proof (induction rule: finite_psubset_induct)
     using assms(2) by blast
 qed
 
-lemma
-  assumes \<open>finite (Collect P :: 'y set)\<close>
-  assumes \<open>\<exists>x. P x\<close>
+lemma finite_linorder_arg_min_is_least:
+  assumes \<open>finite {x. Q x}\<close>
+  assumes \<open>\<exists>x. Q x\<close>
   fixes f :: \<open>_ \<Rightarrow> _ ::linorder\<close>
-  shows \<open>f (ARG_MIN f x. P x) = (LEAST y. \<exists>x. P x \<and> f x = y)\<close>
+  shows \<open>f (ARG_MIN f x. Q x) = (LEAST y. \<exists>x. Q x \<and> f x = y)\<close>
 proof -
-  let ?C = \<open>Collect P\<close>
+  let ?C = \<open>{x. Q x}\<close>
   from assms(2) have *: \<open>?C \<noteq> {}\<close>
     by blast
-  have \<open>f (ARG_MIN f x. x \<in> ?C) = (LEAST y. \<exists>x. x \<in> ?C \<and> f x = y)\<close>
-    using assms(1)
-    apply (induction \<open>Collect P\<close> arbitrary: rule: finite_ranking_induct')
-    using "*" apply blast
-    sorry
+  have \<open>f (ARG_MIN f x. x \<in> ?C) = (LEAST y. \<exists>x. x \<in> ?C \<and> f x = y)\<close> if \<open>C = ?C\<close> for C
+    using assms(1) that
+  proof (induction ?C arbitrary: Q rule: finite_ranking_induct'[where f = f])
+    case empty
+    then show ?case
+      using "*" that by blast
+  next
+    case (insert x S)
+    then show ?case
+      by (smt Least_equality arg_min_equality insert_iff order_mono_setup.refl)
+  qed
   then show ?thesis
   unfolding arg_min_def is_arg_min_def Least_def
-    by forc
+    by force
 qed
 
 subsection \<open>Symmetric TSP\<close>
