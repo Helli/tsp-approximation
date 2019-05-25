@@ -835,16 +835,16 @@ proof -
   let ?C = \<open>{x. Q x}\<close>
   from assms(2) have *: \<open>?C \<noteq> {}\<close>
     by blast
-  have \<open>f (ARG_MIN f x. x \<in> ?C) = (LEAST y. \<exists>x. x \<in> ?C \<and> f x = y)\<close> if \<open>C = ?C\<close> for C
-    using assms(1) that
-  proof (induction ?C arbitrary: Q rule: finite_ranking_induct'[where f = f])
+  have \<open>f (ARG_MIN f x. x \<in> ?C) = (LEAST y. \<exists>x. x \<in> ?C \<and> f x = y)\<close>
+    using assms(1)
+  proof (induction ?C rule: finite_ranking_induct'[where f = f])
     case empty
     then show ?case
-      using * that by blast
+      using * by blast
   next
     case (insert x S)
-    then show ?case
-      by (smt Least_equality arg_min_equality insert_iff order_mono_setup.refl)
+    from insert(2,4) \<comment> \<open>no IH!\<close> show ?case
+      by (smt Least_equality arg_min_equality insert_iff order_refl)
   qed
   then show ?thesis
   unfolding arg_min_def is_arg_min_def Least_def
