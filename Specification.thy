@@ -798,45 +798,51 @@ proof -
 
 end
 
+lemma (in linorder) finite_ranking_induct'[consumes 1, case_names empty insert]: \<comment> \<open>copied from \<^theory>\<open>HOL.Lattices_Big\<close> and adapted\<close>
+  fixes f :: "'b \<Rightarrow> 'a"
+  assumes "finite S"
+  assumes "P {}"
+  assumes "\<And>x S. finite S \<Longrightarrow> (\<And>y. y \<in> S \<Longrightarrow> f x \<le> f y) \<Longrightarrow> P S \<Longrightarrow> P (insert x S)"
+  shows "P S"
+  using `finite S`
+proof (induction rule: finite_psubset_induct)
+  case (psubset A)
+  {
+    assume "A \<noteq> {}"
+    hence "f ` A \<noteq> {}" and "finite (f ` A)"
+      using psubset finite_image_iff by simp+
+    then obtain a where "f a = Min (f ` A)" and "a \<in> A"
+      by (metis Min_in[of "f ` A"] imageE)
+    then have "P (A - {a})"
+      using psubset member_remove by blast
+    moreover
+    have "\<And>y. y \<in> A \<Longrightarrow> f a \<le> f y"
+      using \<open>f a = Min (f ` A)\<close> \<open>finite (f ` A)\<close> by simp
+    ultimately
+    have ?case
+      by (metis \<open>a \<in> A\<close> DiffD1 insert_Diff assms(3) finite_Diff psubset.hyps)
+  }
+  thus ?case
+    using assms(2) by blast
+qed
+
 lemma
-  assumes \<open>finite {x. P x}\<close>
+  assumes \<open>finite (Collect P :: 'y set)\<close>
   assumes \<open>\<exists>x. P x\<close>
   fixes f :: \<open>_ \<Rightarrow> _ ::linorder\<close>
-  shows \<open>f (ARG_MIN f x. P x) = (LEAST y. \<exists>x. P x \<and> f x = y)\<close> (is \<open>?l = ?r\<close>)
+  shows \<open>f (ARG_MIN f x. P x) = (LEAST y. \<exists>x. P x \<and> f x = y)\<close>
 proof -
-  from assms have *: \<open>\<exists>!x. P x \<and> (\<forall>y. P y \<longrightarrow> f x \<le> f y)\<close>
-  proof (induction \<open>{x. P x}\<close> arbitrary: P rule: finite_induct)
-    case empty
-    then show ?case
-      by simp
-  next
-    case (insert x F)
-    then show ?case
-    proof (cases \<open>\<forall>y. P y \<longrightarrow> f x \<le> f y\<close>)
-      case True
-      then show ?thesis sorry
-    next
-      case False
-      then show ?thesis sorry
-    qed
-  qed
-    apply simp_all
-    apply blas
+  let ?C = \<open>Collect P\<close>
+  from assms(2) have *: \<open>?C \<noteq> {}\<close>
+    by blast
+  have \<open>f (ARG_MIN f x. x \<in> ?C) = (LEAST y. \<exists>x. x \<in> ?C \<and> f x = y)\<close>
+    using assms(1)
+    apply (induction \<open>Collect P\<close> arbitrary: rule: finite_ranking_induct')
+    using "*" apply blast
     sorry
-  have \<open>\<exists>x. P x \<and> f x = (LEAST y. \<exists>x. P x \<and> f x = y)\<close>
-    by (smt "*" Least_equality)
-
-  find_theorems is_arg_min arg_min
-  have \<open>?l \<le> ?r\<close>
-  proof (rule ccontr)
-    assume \<open>\<not> f (arg_min f P) \<le> (LEAST y. \<exists>x. P x \<and> f x = y)\<close>
-    then have \<open>(LEAST y. \<exists>x. P x \<and> f x = y) < f (arg_min f P)\<close>
-      by simp
-    unfolding arg_min_def using is_arg_min_linorder sorry
-  moreover have \<open>?r \<le> ?l\<close>
-    unfolding Least_def sorry \<comment> \<open>sledgehammer finds a proof.\<close>
-  ultimately show ?thesis
-    by simp
+  then show ?thesis
+  unfolding arg_min_def is_arg_min_def Least_def
+    by forc
 qed
 
 subsection \<open>Symmetric TSP\<close>
