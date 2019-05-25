@@ -11,6 +11,60 @@ lemma sum_of_parts(*rm*): \<open>\<lparr>nodes= nodes G, edges=edges G\<rparr> =
 lemma triple_of_parts: \<open>(fst e, fst (snd e), snd (snd e)) = e\<close>
   by auto
 
+lemma (in linorder) finite_ranking_induct'[consumes 1, case_names empty insert]:
+  \<comment> \<open>copied from \<^theory>\<open>HOL.Lattices_Big\<close> and mirrored\<close>
+  fixes f :: \<open>'b \<Rightarrow> 'a\<close>
+  assumes \<open>finite S\<close>
+  assumes \<open>P {}\<close>
+  assumes \<open>\<And>x S. finite S \<Longrightarrow> (\<And>y. y \<in> S \<Longrightarrow> f x \<le> f y) \<Longrightarrow> P S \<Longrightarrow> P (insert x S)\<close>
+  shows \<open>P S\<close>
+  using \<open>finite S\<close>
+proof (induction rule: finite_psubset_induct)
+  case (psubset A)
+  {
+    assume \<open>A \<noteq> {}\<close>
+    hence \<open>f ` A \<noteq> {}\<close> and \<open>finite (f ` A)\<close>
+      using psubset finite_image_iff by simp+
+    then obtain a where \<open>f a = Min (f ` A)\<close> and \<open>a \<in> A\<close>
+      by (metis Min_in[of \<open>f ` A\<close>] imageE)
+    then have \<open>P (A - {a})\<close>
+      using psubset member_remove by blast
+    moreover
+    have \<open>\<And>y. y \<in> A \<Longrightarrow> f a \<le> f y\<close>
+      using \<open>f a = Min (f ` A)\<close> \<open>finite (f ` A)\<close> by simp
+    ultimately
+    have ?case
+      by (metis \<open>a \<in> A\<close> DiffD1 insert_Diff assms(3) finite_Diff psubset.hyps)
+  }
+  thus ?case
+    using assms(2) by blast
+qed
+
+lemma finite_linorder_arg_min_is_least:
+  assumes \<open>finite {x. Q x}\<close>
+  assumes \<open>\<exists>x. Q x\<close>
+  fixes f :: \<open>_ \<Rightarrow> _ ::linorder\<close>
+  shows \<open>f (ARG_MIN f x. Q x) = (LEAST y. \<exists>x. Q x \<and> f x = y)\<close>
+proof -
+  let ?C = \<open>{x. Q x}\<close>
+  from assms(2) have *: \<open>?C \<noteq> {}\<close>
+    by blast
+  have \<open>f (ARG_MIN f x. x \<in> ?C) = (LEAST y. \<exists>x. x \<in> ?C \<and> f x = y)\<close>
+    using assms(1)
+  proof (induction ?C rule: finite_ranking_induct'[where f = f])
+    case empty
+    then show ?case
+      using * by blast
+  next
+    case (insert x S)
+    from insert(2,4) \<comment> \<open>no IH!\<close> show ?case
+      by (smt Least_equality arg_min_equality insert_iff order_refl)
+  qed
+  then show ?thesis
+  unfolding arg_min_def is_arg_min_def Least_def
+    by force
+qed
+
 lemma [intro]:
   assumes \<open>\<And>x. P x \<Longrightarrow> f x = g x\<close>
   shows is_arg_min_eqI: \<open>is_arg_min f P = is_arg_min g P\<close>
@@ -797,59 +851,6 @@ proof -
     oops
 
 end
-
-lemma (in linorder) finite_ranking_induct'[consumes 1, case_names empty insert]: \<comment> \<open>copied from \<^theory>\<open>HOL.Lattices_Big\<close> and adapted\<close>
-  fixes f :: \<open>'b \<Rightarrow> 'a\<close>
-  assumes \<open>finite S\<close>
-  assumes \<open>P {}\<close>
-  assumes \<open>\<And>x S. finite S \<Longrightarrow> (\<And>y. y \<in> S \<Longrightarrow> f x \<le> f y) \<Longrightarrow> P S \<Longrightarrow> P (insert x S)\<close>
-  shows \<open>P S\<close>
-  using \<open>finite S\<close>
-proof (induction rule: finite_psubset_induct)
-  case (psubset A)
-  {
-    assume \<open>A \<noteq> {}\<close>
-    hence \<open>f ` A \<noteq> {}\<close> and \<open>finite (f ` A)\<close>
-      using psubset finite_image_iff by simp+
-    then obtain a where \<open>f a = Min (f ` A)\<close> and \<open>a \<in> A\<close>
-      by (metis Min_in[of \<open>f ` A\<close>] imageE)
-    then have \<open>P (A - {a})\<close>
-      using psubset member_remove by blast
-    moreover
-    have \<open>\<And>y. y \<in> A \<Longrightarrow> f a \<le> f y\<close>
-      using \<open>f a = Min (f ` A)\<close> \<open>finite (f ` A)\<close> by simp
-    ultimately
-    have ?case
-      by (metis \<open>a \<in> A\<close> DiffD1 insert_Diff assms(3) finite_Diff psubset.hyps)
-  }
-  thus ?case
-    using assms(2) by blast
-qed
-
-lemma finite_linorder_arg_min_is_least:
-  assumes \<open>finite {x. Q x}\<close>
-  assumes \<open>\<exists>x. Q x\<close>
-  fixes f :: \<open>_ \<Rightarrow> _ ::linorder\<close>
-  shows \<open>f (ARG_MIN f x. Q x) = (LEAST y. \<exists>x. Q x \<and> f x = y)\<close>
-proof -
-  let ?C = \<open>{x. Q x}\<close>
-  from assms(2) have *: \<open>?C \<noteq> {}\<close>
-    by blast
-  have \<open>f (ARG_MIN f x. x \<in> ?C) = (LEAST y. \<exists>x. x \<in> ?C \<and> f x = y)\<close>
-    using assms(1)
-  proof (induction ?C rule: finite_ranking_induct'[where f = f])
-    case empty
-    then show ?case
-      using * by blast
-  next
-    case (insert x S)
-    from insert(2,4) \<comment> \<open>no IH!\<close> show ?case
-      by (smt Least_equality arg_min_equality insert_iff order_refl)
-  qed
-  then show ?thesis
-  unfolding arg_min_def is_arg_min_def Least_def
-    by force
-qed
 
 subsection \<open>Symmetric TSP\<close>
 
