@@ -799,24 +799,24 @@ proof -
 end
 
 lemma (in linorder) finite_ranking_induct'[consumes 1, case_names empty insert]: \<comment> \<open>copied from \<^theory>\<open>HOL.Lattices_Big\<close> and adapted\<close>
-  fixes f :: "'b \<Rightarrow> 'a"
-  assumes "finite S"
-  assumes "P {}"
-  assumes "\<And>x S. finite S \<Longrightarrow> (\<And>y. y \<in> S \<Longrightarrow> f x \<le> f y) \<Longrightarrow> P S \<Longrightarrow> P (insert x S)"
-  shows "P S"
-  using `finite S`
+  fixes f :: \<open>'b \<Rightarrow> 'a\<close>
+  assumes \<open>finite S\<close>
+  assumes \<open>P {}\<close>
+  assumes \<open>\<And>x S. finite S \<Longrightarrow> (\<And>y. y \<in> S \<Longrightarrow> f x \<le> f y) \<Longrightarrow> P S \<Longrightarrow> P (insert x S)\<close>
+  shows \<open>P S\<close>
+  using \<open>finite S\<close>
 proof (induction rule: finite_psubset_induct)
   case (psubset A)
   {
-    assume "A \<noteq> {}"
-    hence "f ` A \<noteq> {}" and "finite (f ` A)"
+    assume \<open>A \<noteq> {}\<close>
+    hence \<open>f ` A \<noteq> {}\<close> and \<open>finite (f ` A)\<close>
       using psubset finite_image_iff by simp+
-    then obtain a where "f a = Min (f ` A)" and "a \<in> A"
-      by (metis Min_in[of "f ` A"] imageE)
-    then have "P (A - {a})"
+    then obtain a where \<open>f a = Min (f ` A)\<close> and \<open>a \<in> A\<close>
+      by (metis Min_in[of \<open>f ` A\<close>] imageE)
+    then have \<open>P (A - {a})\<close>
       using psubset member_remove by blast
     moreover
-    have "\<And>y. y \<in> A \<Longrightarrow> f a \<le> f y"
+    have \<open>\<And>y. y \<in> A \<Longrightarrow> f a \<le> f y\<close>
       using \<open>f a = Min (f ` A)\<close> \<open>finite (f ` A)\<close> by simp
     ultimately
     have ?case
@@ -840,7 +840,7 @@ proof -
   proof (induction ?C arbitrary: Q rule: finite_ranking_induct'[where f = f])
     case empty
     then show ?case
-      using "*" that by blast
+      using * that by blast
   next
     case (insert x S)
     then show ?case
