@@ -826,29 +826,21 @@ proof -
     by (meson exE_some)
 qed
 
-lemma
+lemma OPT_sanity:
   assumes \<open>2 \<le> card V\<close>
   shows \<open>sum_list (map (fst \<circ> snd) OPT) = OPTWEIGHT\<close>
 proof -
   have tmp: \<comment> \<open>duplicate\<close> \<open>finite {ps. is_hamiltonian_circuit (fst (hd ps)) ps}\<close>
     using finitely_many_hamiltonian_circuits
     by (metis (mono_tags, lifting) finite_subset mem_Collect_eq subsetI)
-  have *: \<open>{w. \<exists>ps. tour ps w} = (sum_list \<circ> (map (fst \<circ> snd))) ` {ps. is_hamiltonian_circuit (fst (hd ps)) ps}\<close>
-    by auto
-  then have **: \<open>(\<exists>ps. tour ps w) \<longleftrightarrow> w \<in> (sum_list \<circ> (map (fst \<circ> snd))) ` {ps. is_hamiltonian_circuit (fst (hd ps)) ps}\<close> for w
-    by auto
-  have \<open>OPTWEIGHT = (LEAST w. \<exists>ps. tour ps w)\<close>
+  have ***: \<open>OPTWEIGHT = (LEAST w. \<exists>ps. tour ps w)\<close>
     unfolding OPTWEIGHT_def apply (rule Least_Min[symmetric])
      apply auto using tmp apply force
     by (simp add: assms ex_hamiltonian_circuit')
-  then show ?thesis
-    unfolding OPT_def apply simp
-    unfolding Least_def arg_min_def is_arg_min_def apply auto
-    apply (simp add: **)
-\<comment> \<open>next step: theorem about Least and arg min for finite sets...\<close>
-    find_theorems is_arg_min Least
-
-    oops
+  show ?thesis unfolding OPT_def
+    using finite_linorder_arg_min_is_least[of \<open>\<lambda>ps. is_hamiltonian_circuit (fst (hd ps)) ps\<close> \<open>(sum_list \<circ>\<circ> map) (fst \<circ> snd)\<close>]
+ assms ex_hamiltonian_circuit' tmp by (auto simp add: ***)
+qed
 
 end
 
