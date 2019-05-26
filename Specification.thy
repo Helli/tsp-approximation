@@ -834,9 +834,9 @@ proof -
     unfolding OPTWEIGHT_def apply (rule Least_Min[symmetric])
      apply auto using tmp apply force
     by (simp add: assms ex_hamiltonian_circuit')
-  show ?thesis unfolding OPT_def
+  show ?thesis unfolding OPT_def ***
     using finite_linorder_arg_min_is_least[of \<open>\<lambda>ps. is_hamiltonian_circuit (fst (hd ps)) ps\<close> \<open>(sum_list \<circ>\<circ> map) (fst \<circ> snd)\<close>]
- assms ex_hamiltonian_circuit' tmp by (auto simp: ***)
+ assms ex_hamiltonian_circuit' tmp by fastforce
 qed
 
 end
