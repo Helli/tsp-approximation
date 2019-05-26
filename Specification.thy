@@ -809,9 +809,6 @@ proof -
     by blast
 qed
 
-
-find_theorems \<open>Collect\<close> \<open>is_arg_min\<close>
-
 lemma is_arg_min_OPT:
   assumes \<open>2 \<le> card V\<close>
   shows \<open>is_arg_min (sum_list \<circ> (map (fst \<circ> snd))) (\<lambda>ps. is_hamiltonian_circuit (fst (hd ps)) ps) OPT\<close>
