@@ -713,8 +713,8 @@ qed
 context complete_finite_weighted_graph
 begin
 
-sublocale connected_graph \<comment> \<open>rm?\<close>
-  by standard (metis complete is_path_undir.simps(1) is_path_undir_simps(2))
+sublocale finite_weighted_connected_graph \<comment> \<open>rm?\<close>
+  by unfold_locales (metis complete is_path_undir.simps(1) is_path_undir_simps(2))
 
 lemma complete': \<open>v1\<in>V \<Longrightarrow> v2\<in>V \<Longrightarrow> v1\<noteq>v2 \<Longrightarrow> (\<exists>w. (v1,w,v2)\<in>E) \<or> (\<exists>w. (v2,w,v1)\<in>E)\<close>
   using complete by blast
@@ -843,6 +843,8 @@ proof -
     using finite_linorder_arg_min_is_least[of \<open>\<lambda>ps. is_hamiltonian_circuit (fst (hd ps)) ps\<close> \<open>(sum_list \<circ>\<circ> map) (fst \<circ> snd)\<close>]
  assms ex_hamiltonian_circuit' tmp by fastforce
 qed
+
+thm s.k0
 
 end
 
