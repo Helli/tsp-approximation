@@ -844,7 +844,10 @@ proof -
  assms ex_hamiltonian_circuit' tmp by fastforce
 qed
 
-thm s.k0
+subsection \<open>SPEC\<close>
+
+abbreviation twoApprox where
+  \<open>twoApprox \<equiv> SPEC (\<lambda>T. \<exists>c. tour T c \<and> c \<le> OPTWEIGHT + OPTWEIGHT)\<close>
 
 end
 
