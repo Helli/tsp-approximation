@@ -839,6 +839,9 @@ proof -
  assms ex_hamiltonian_circuit' tmp by fastforce
 qed
 
+sublocale connected_graph \<comment> \<open>rm?\<close>
+  by standard (metis complete is_path_undir.simps(1) is_path_undir_simps(2))
+
 end
 
 subsection \<open>Symmetric TSP\<close>
