@@ -583,6 +583,8 @@ definition OPTWEIGHT where
 
 end
 
+subsection \<open>Complete Graphs\<close>
+
 text \<open>The definition below is non-standard: It allows for additional edges, e.g. loops.\<close>
 locale complete_finite_weighted_graph = finite_weighted_graph +
   assumes complete: \<open>v1\<in>V \<Longrightarrow> v2\<in>V \<Longrightarrow> v1\<noteq>v2 \<Longrightarrow> \<exists>w. (v1,w,v2)\<in>E \<or> (v2,w,v1)\<in>E\<close>
@@ -711,6 +713,9 @@ qed
 context complete_finite_weighted_graph
 begin
 
+sublocale connected_graph \<comment> \<open>rm?\<close>
+  by standard (metis complete is_path_undir.simps(1) is_path_undir_simps(2))
+
 lemma complete': \<open>v1\<in>V \<Longrightarrow> v2\<in>V \<Longrightarrow> v1\<noteq>v2 \<Longrightarrow> (\<exists>w. (v1,w,v2)\<in>E) \<or> (\<exists>w. (v2,w,v1)\<in>E)\<close>
   using complete by blast
 
@@ -838,9 +843,6 @@ proof -
     using finite_linorder_arg_min_is_least[of \<open>\<lambda>ps. is_hamiltonian_circuit (fst (hd ps)) ps\<close> \<open>(sum_list \<circ>\<circ> map) (fst \<circ> snd)\<close>]
  assms ex_hamiltonian_circuit' tmp by fastforce
 qed
-
-sublocale connected_graph \<comment> \<open>rm?\<close>
-  by standard (metis complete is_path_undir.simps(1) is_path_undir_simps(2))
 
 end
 
