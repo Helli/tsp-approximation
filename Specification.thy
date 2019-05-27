@@ -553,9 +553,9 @@ context finite_weighted_graph
 begin
 
 abbreviation \<comment> \<open>to-do: abolish\<close>
-  \<open>tour ps w \<equiv> is_hamiltonian_circuit (fst (hd ps)) ps \<and> sum_list (map (fst o snd) ps) = w\<close>
+  \<open>tour ps w \<equiv> is_hamiltonian_circuit (fst (hd ps)) ps \<and> sum_list (map (fst \<circ> snd) ps) = w\<close>
 
-lemma edge_weight_sum_list: \<open>distinct ps \<Longrightarrow> edge_weight \<lparr>nodes=ARBITRARY, edges= set ps\<rparr> = sum_list (map (fst o snd) ps)\<close>
+lemma edge_weight_sum_list: \<open>distinct ps \<Longrightarrow> edge_weight \<lparr>nodes=ARBITRARY, edges= set ps\<rparr> = sum_list (map (fst \<circ> snd) ps)\<close>
   unfolding edge_weight_def by (auto simp: sum_list_distinct_conv_sum_set)
 
 lemma is_simple_undir_distinct: \<open>is_simple_undir v ps v' \<Longrightarrow> distinct ps\<close>
@@ -840,7 +840,7 @@ proof -
      apply auto using tmp apply force
     by (simp add: assms ex_hamiltonian_circuit')
   show ?thesis unfolding OPT_def ***
-    using finite_linorder_arg_min_is_least[of \<open>\<lambda>ps. is_hamiltonian_circuit (fst (hd ps)) ps\<close> \<open>(sum_list \<circ>\<circ> map) (fst \<circ> snd)\<close>]
+    using finite_linorder_arg_min_is_least[of \<open>\<lambda>ps. is_hamiltonian_circuit (fst (hd ps)) ps\<close> \<open>sum_list \<circ> (map (fst \<circ> snd))\<close>]
  assms ex_hamiltonian_circuit' tmp by fastforce
 qed
 
