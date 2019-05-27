@@ -863,6 +863,10 @@ do {
   RETURN Tour
 }\<close>
 
+proposition \<open>algo \<le> twoApprox\<close>
+  unfolding algo_def apply refine_vcg
+  oops
+
 end
 
 subsection \<open>Symmetric TSP\<close>
