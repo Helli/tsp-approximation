@@ -853,17 +853,31 @@ subsection \<open>SPEC\<close>
 abbreviation twoApprox where
   \<open>twoApprox \<equiv> SPEC (\<lambda>T. is_hamiltonian_circuit (fst (hd T)) T \<and> cost T \<le> OPTWEIGHT + OPTWEIGHT)\<close>
 
-definition algo where \<open>algo =
+definition algo_sketch where \<open>algo_sketch =
 do {
   MST \<leftarrow> SPEC (s.minBasis);
   pretour \<leftarrow> SPEC (\<lambda>pT. is_hamiltonian pT \<and> cost pT \<le> set_cost MST + set_cost MST);
-  Tour \<leftarrow> SPEC (\<lambda>T. is_hamiltonian_circuit (fst (hd T)) T \<and> cost T \<le> cost pretour + cost pretour);
+  Tour \<leftarrow> SPEC (\<lambda>T. is_hamiltonian_circuit (fst (hd T)) T \<and> cost T \<le> cost pretour);
   RETURN Tour
 }\<close>
 
-proposition \<open>algo \<le> twoApprox\<close>
-  unfolding algo_def apply refine_vcg
-  oops
+lemma MSF_le_OPTWEIGHT:
+  assumes \<open>s.MSF F\<close>
+  shows \<open>set_cost F \<le> OPTWEIGHT\<close>
+  sorry
+
+proposition \<open>algo_sketch \<le> twoApprox\<close>
+  unfolding algo_sketch_def apply refine_vcg
+   apply blast using MSF_le_OPTWEIGHT apply auto
+proof goal_cases
+  case (1 MST pretour Tour)
+  note 1(6)
+  also have \<open>sum_list (map (fst \<circ> snd) pretour) \<le> set_cost MST + set_cost MST\<close>
+    by (fact 1(4))
+  also have \<open>\<dots> \<le> OPTWEIGHT + OPTWEIGHT\<close>
+    using "1"(1) MSF_le_OPTWEIGHT add_mono by blast
+  finally show ?case .
+qed
 
 end
 
