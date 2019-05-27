@@ -552,7 +552,7 @@ subsection \<open>Tours\<close>
 context finite_weighted_graph
 begin
 
-abbreviation
+abbreviation \<comment> \<open>to-do: abolish\<close>
   \<open>tour ps w \<equiv> is_hamiltonian_circuit (fst (hd ps)) ps \<and> sum_list (map (fst o snd) ps) = w\<close>
 
 lemma edge_weight_sum_list: \<open>distinct ps \<Longrightarrow> edge_weight \<lparr>nodes=ARBITRARY, edges= set ps\<rparr> = sum_list (map (fst o snd) ps)\<close>
@@ -846,8 +846,22 @@ qed
 
 subsection \<open>SPEC\<close>
 
+abbreviation cost where
+  \<open>cost \<equiv> sum_list \<circ> (map (fst \<circ> snd))\<close>
+
+abbreviation set_cost where
+  \<open>set_cost E' \<equiv> edge_weight (ind E')\<close>
+
 abbreviation twoApprox where
   \<open>twoApprox \<equiv> SPEC (\<lambda>T. \<exists>c. tour T c \<and> c \<le> OPTWEIGHT + OPTWEIGHT)\<close>
+
+definition algo where \<open>algo =
+do {
+  MST \<leftarrow> SPEC (s.minBasis);
+  pretour \<leftarrow> SPEC (\<lambda>pT. is_hamiltonian pT \<and> cost pT \<le> set_cost MST + set_cost MST);
+  Tour \<leftarrow> SPEC (\<lambda>T. \<exists>c. tour T c \<and> cost T \<le> cost pretour + cost pretour);
+  RETURN Tour
+}\<close>
 
 end
 
