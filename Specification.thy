@@ -547,13 +547,16 @@ lemma is_hamiltonian_circuit_kon_circuit: \<open>kon_graph.is_hamiltonian_circui
 
 text \<open>to-do: Complete notes on the DFS phase without the notion \<open>Eulerian\<close>.\<close>
 
-subsection \<open>Tours\<close>
+subsection \<open>Tours and Costs\<close>
 
 context finite_weighted_graph
 begin
 
-abbreviation \<comment> \<open>to-do: abolish\<close>
-  \<open>tour ps w \<equiv> is_hamiltonian_circuit (fst (hd ps)) ps \<and> sum_list (map (fst \<circ> snd) ps) = w\<close>
+abbreviation cost where
+  \<open>cost \<equiv> sum_list \<circ> (map (fst \<circ> snd))\<close>
+
+abbreviation set_cost where
+  \<open>set_cost E' \<equiv> edge_weight (ind E')\<close>
 
 lemma edge_weight_sum_list: \<open>distinct ps \<Longrightarrow> edge_weight \<lparr>nodes=ARBITRARY, edges= set ps\<rparr> = sum_list (map (fst \<circ> snd) ps)\<close>
   unfolding edge_weight_def by (auto simp: sum_list_distinct_conv_sum_set)
@@ -566,7 +569,8 @@ lemma is_hamiltonian_circuit_distinct:
   by (auto simp: is_hamiltonian_circuit_def is_simple_undir_distinct)
 
 lemma tour_edge_weight:
-  \<open>tour ps w \<longleftrightarrow> is_hamiltonian_circuit (fst (hd ps)) ps \<and> edge_weight \<lparr>nodes=V, edges= set ps\<rparr> = w\<close>
+  \<open>is_hamiltonian_circuit (fst (hd ps)) ps \<and> cost ps = w \<longleftrightarrow>
+   is_hamiltonian_circuit (fst (hd ps)) ps \<and> edge_weight \<lparr>nodes=V, edges= set ps\<rparr> = w\<close>
   by (auto simp: edge_weight_sum_list is_hamiltonian_circuit_distinct)
 
 definition OPT_alt where
@@ -579,7 +583,7 @@ lemma sanity: \<open>OPT = OPT_alt\<close> unfolding OPT_def OPT_alt_def
   using is_hamiltonian_circuit_distinct[THEN edge_weight_sum_list] by fastforce
 
 definition OPTWEIGHT where
-  \<open>OPTWEIGHT = Min {w. (\<exists>ps. tour ps w)}\<close>
+  \<open>OPTWEIGHT = Min {w. (\<exists>ps. is_hamiltonian_circuit (fst (hd ps)) ps \<and> cost ps = w)}\<close>
 
 end
 
@@ -835,7 +839,7 @@ proof -
   have tmp: \<comment> \<open>duplicate\<close> \<open>finite {ps. is_hamiltonian_circuit (fst (hd ps)) ps}\<close>
     using finitely_many_hamiltonian_circuits
     by (metis (mono_tags, lifting) finite_subset mem_Collect_eq subsetI)
-  have ***: \<open>OPTWEIGHT = (LEAST w. \<exists>ps. tour ps w)\<close>
+  have ***: \<open>OPTWEIGHT = (LEAST w. \<exists>ps. is_hamiltonian_circuit (fst (hd ps)) ps \<and> cost ps = w)\<close>
     unfolding OPTWEIGHT_def apply (rule Least_Min[symmetric])
      apply auto using tmp apply force
     by (simp add: assms ex_hamiltonian_circuit')
@@ -846,20 +850,14 @@ qed
 
 subsection \<open>SPEC\<close>
 
-abbreviation cost where
-  \<open>cost \<equiv> sum_list \<circ> (map (fst \<circ> snd))\<close>
-
-abbreviation set_cost where
-  \<open>set_cost E' \<equiv> edge_weight (ind E')\<close>
-
 abbreviation twoApprox where
-  \<open>twoApprox \<equiv> SPEC (\<lambda>T. \<exists>c. tour T c \<and> c \<le> OPTWEIGHT + OPTWEIGHT)\<close>
+  \<open>twoApprox \<equiv> SPEC (\<lambda>T. is_hamiltonian_circuit (fst (hd T)) T \<and> cost T \<le> OPTWEIGHT + OPTWEIGHT)\<close>
 
 definition algo where \<open>algo =
 do {
   MST \<leftarrow> SPEC (s.minBasis);
   pretour \<leftarrow> SPEC (\<lambda>pT. is_hamiltonian pT \<and> cost pT \<le> set_cost MST + set_cost MST);
-  Tour \<leftarrow> SPEC (\<lambda>T. \<exists>c. tour T c \<and> cost T \<le> cost pretour + cost pretour);
+  Tour \<leftarrow> SPEC (\<lambda>T. is_hamiltonian_circuit (fst (hd T)) T \<and> cost T \<le> cost pretour + cost pretour);
   RETURN Tour
 }\<close>
 
