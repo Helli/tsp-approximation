@@ -577,9 +577,9 @@ definition OPT_alt where
   \<open>OPT_alt = (ARG_MIN (edge_weight \<circ> ind \<circ> set) ps . is_hamiltonian_circuit (fst (hd ps)) ps)\<close>
 
 definition OPT where
-  \<open>OPT = (ARG_MIN (sum_list \<circ> (map (fst\<circ>snd))) ps . is_hamiltonian_circuit (fst (hd ps)) ps)\<close>
+  \<open>OPT = (ARG_MIN (sum_list \<circ> (map (fst \<circ> snd))) ps . is_hamiltonian_circuit (fst (hd ps)) ps)\<close>
 
-lemma sanity: \<open>OPT = OPT_alt\<close> unfolding OPT_def OPT_alt_def
+lemma OPT_sanity: \<open>OPT = OPT_alt\<close> unfolding OPT_def OPT_alt_def
   using is_hamiltonian_circuit_distinct[THEN edge_weight_sum_list] by fastforce
 
 definition OPTWEIGHT where
@@ -867,15 +867,14 @@ lemma MSF_le_OPTWEIGHT:
   sorry
 
 proposition \<open>algo_sketch \<le> twoApprox\<close>
-  unfolding algo_sketch_def apply refine_vcg
-   apply blast using MSF_le_OPTWEIGHT apply auto
+  unfolding algo_sketch_def apply refine_vcg apply auto
 proof goal_cases
   case (1 MST pretour Tour)
-  note 1(6)
+  note 1(5)
   also have \<open>sum_list (map (fst \<circ> snd) pretour) \<le> set_cost MST + set_cost MST\<close>
-    by (fact 1(4))
+    by (fact 1(3))
   also have \<open>\<dots> \<le> OPTWEIGHT + OPTWEIGHT\<close>
-    using "1"(1) MSF_le_OPTWEIGHT add_mono by blast
+    by (simp add: 1(1) MSF_le_OPTWEIGHT add_mono)
   finally show ?case .
 qed
 
