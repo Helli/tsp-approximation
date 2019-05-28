@@ -619,6 +619,11 @@ lemma (in valid_graph) is_simple_undir_Cons[intro]:
   shows \<open>is_simple_undir v ((v,w,v')#ps) vl\<close>
   using assms unfolding is_simple_undir_def by (simp add: int_vertices_def)
 
+lemma (in valid_graph) is_simple_undir_step:
+\<open>is_simple_undir v ((x,w,y) # ps) v' \<longleftrightarrow>
+  v=x \<and> ((x,w,y) \<in> E \<or> (y,w,x) \<in> E) \<and> x \<notin> int_vertices ps \<and> is_simple_undir y ps v'\<close>
+  unfolding is_simple_undir_def by (auto simp: int_vertices_def)
+
 lemma (in valid_graph) hamiltonian_impl_finiteV:
   \<open>is_hamiltonian_path v ps v' \<Longrightarrow> finite V\<close>
   unfolding is_hamiltonian_path_def is_trace_def adj_vertices_def
@@ -872,9 +877,13 @@ proof (induction ps arbitrary: v)
   then show ?case
     by auto
 next
-  case (Cons a ps)
-  then show ?case try sorry
-  find_theorems subforest insert
+  case (Cons e ps)
+  let ?x = \<open>fst e\<close> and ?y = \<open>snd (snd e)\<close>
+  have \<open>subforest (insert e (set ps)) \<longleftrightarrow> (\<forall>p. \<not>is_path_undir (ind (set ps)) ?x p ?y)\<close>
+    apply (rule s.augment_forest[simplified])
+    using Cons.IH[of ?y] Cons.prems try0
+  then show ?case
+    sorry
 qed
 
 lemma MSF_le_OPTWEIGHT:
