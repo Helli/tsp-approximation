@@ -834,7 +834,7 @@ qed
 
 lemma OPT_sanity:
   assumes \<open>2 \<le> card V\<close>
-  shows \<open>sum_list (map (fst \<circ> snd) OPT) = OPTWEIGHT\<close>
+  shows \<open>cost OPT = OPTWEIGHT\<close>
 proof -
   have tmp: \<comment> \<open>duplicate\<close> \<open>finite {ps. is_hamiltonian_circuit (fst (hd ps)) ps}\<close>
     using finitely_many_hamiltonian_circuits
@@ -844,7 +844,7 @@ proof -
      apply auto using tmp apply force
     by (simp add: assms ex_hamiltonian_circuit')
   show ?thesis unfolding OPT_def ***
-    using finite_linorder_arg_min_is_least[of \<open>\<lambda>ps. is_hamiltonian_circuit (fst (hd ps)) ps\<close> \<open>sum_list \<circ> (map (fst \<circ> snd))\<close>]
+    using finite_linorder_arg_min_is_least[of \<open>\<lambda>ps. is_hamiltonian_circuit (fst (hd ps)) ps\<close> cost]
  assms ex_hamiltonian_circuit' tmp by fastforce
 qed
 
@@ -855,7 +855,7 @@ abbreviation twoApprox where
 
 definition algo_sketch where \<open>algo_sketch =
 do {
-  MST \<leftarrow> SPEC (s.minBasis);
+  MST \<leftarrow> SPEC s.minBasis;
   pretour \<leftarrow> SPEC (\<lambda>pT. is_hamiltonian pT \<and> cost pT \<le> set_cost MST + set_cost MST);
   Tour \<leftarrow> SPEC (\<lambda>T. is_hamiltonian_circuit (fst (hd T)) T \<and> cost T \<le> cost pretour);
   RETURN Tour
@@ -863,8 +863,14 @@ do {
 
 lemma MSF_le_OPTWEIGHT:
   assumes \<open>s.MSF F\<close>
+  assumes \<open>2 \<le> card V\<close> \<comment> \<open>rm\<close>
   shows \<open>set_cost F \<le> OPTWEIGHT\<close>
-  sorry
+proof -
+  from assms(1) have \<open>set_cost F \<le> set_cost F'\<close> if \<open>s.basis F'\<close> for F'
+    by (simp add: edge_weight_alt s.minBasis_def that)
+  then show ?thesis
+    sorry
+qed
 
 proposition \<open>algo_sketch \<le> twoApprox\<close>
   unfolding algo_sketch_def apply refine_vcg apply auto
