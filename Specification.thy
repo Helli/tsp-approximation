@@ -483,14 +483,16 @@ lemma adj_vertices_simps[simp]:
     \<open>snd(snd(last ps)) = fst e \<Longrightarrow> adj_vertices (ps@[e]) = insert (snd(snd e)) (adj_vertices ps)\<close>
   by (auto simp: adj_vertices_def)
 
-definition (in valid_graph) is_simple_undir :: \<open>_ \<Rightarrow> (_,_) path \<Rightarrow> _ \<Rightarrow> bool\<close> where
-  \<open>is_simple_undir v ps v' \<longleftrightarrow> is_path_undir G v ps v' \<and> distinct (map fst ps)\<close>
+abbreviation (in valid_graph) is_simple_undir1 :: \<open>_ \<Rightarrow> (_,_) path \<Rightarrow> _ \<Rightarrow> bool\<close> where
+  \<open>is_simple_undir1 v ps v' == is_path_undir G v ps v' \<and> distinct (map fst ps)\<close>
 text \<open>This means that a simple path may go back to a visited node at the end, e.g.\ via a loop:\<close>
 lemma (in valid_graph)
   assumes \<open>x\<noteq>y\<close> \<open>{x,y} \<subseteq> V\<close>
   assumes \<open>{(x,w1,y),(y,w2,y)} \<subseteq> E\<close>
-  shows \<open>is_simple_undir x [(x,w1,y),(y,w2,y)] y\<close>
-  unfolding is_simple_undir_def using assms by auto
+  shows \<open>is_simple_undir1 x [(x,w1,y),(y,w2,y)] y\<close>
+  using assms by auto
+definition (in valid_graph) is_simple_undir2 where
+  \<open>is_simple_undir2 v ps v' \<longleftrightarrow> is_simple_undir1 v ps v' \<and> v' \<notin> int_vertices ps\<close>
 
 definition (in valid_graph) is_trace :: \<open>('v,'w) path \<Rightarrow> bool\<close> where \<comment> \<open>non-standard definition. Also not thoroughly thought through.\<close>
   \<open>is_trace ps \<longleftrightarrow> (if ps=[] then V={} \<or> card V = 1 else adj_vertices ps = V)\<close>
@@ -500,23 +502,18 @@ lemma (in valid_graph) is_trace_snoc:
   by (simp add: adj_vertices_int_vertices is_trace_def)
 
 definition (in valid_graph) is_hamiltonian_path where \<comment> \<open>or \<open>simple trace\<close>\<close>
-  \<open>is_hamiltonian_path v ps v' \<longleftrightarrow> is_trace ps \<and> is_simple_undir v ps v'\<close> \<comment> \<open>abolish vertex arguments?\<close>
+  \<open>is_hamiltonian_path v ps v' \<longleftrightarrow> is_trace ps \<and> is_simple_undir2 v ps v'\<close> \<comment> \<open>abolish vertex arguments?\<close>
 
 definition (in valid_graph) is_hamiltonian :: \<open>('v,'w) path \<Rightarrow> bool\<close> where \<comment> \<open>to-do: unconventional intermediate definition, only for experimentation\<close>
   \<open>is_hamiltonian ps \<longleftrightarrow> (if ps=[] then V={} \<or> card V = 1 else int_vertices ps = V)\<close>
 
 definition (in valid_graph) is_hamiltonian_circuit where
-  \<open>is_hamiltonian_circuit v ps \<longleftrightarrow> is_hamiltonian ps \<and> is_simple_undir v ps v\<close> \<comment> \<open>abolish vertex argument?\<close>
+  \<open>is_hamiltonian_circuit v ps \<longleftrightarrow> is_hamiltonian ps \<and> is_simple_undir1 v ps v\<close> \<comment> \<open>abolish vertex argument?\<close>
 
 text\<open>to-do: remove the special case for \<^term>\<open>card V = 1\<close>. For all other cases, the definition is fine, but this should hold:\<close>
 lemma (in valid_graph)
   \<open>V = {y} \<Longrightarrow> is_hamiltonian_circuit v ps \<Longrightarrow> v=y \<and> (\<exists>w. ps=[(v,w,v)])\<close>
   oops
-
-lemma (in valid_graph) is_hamiltonian_iff: \<open>is_hamiltonian_path v ps v \<longleftrightarrow> is_hamiltonian_circuit v ps\<close>
-  apply (cases ps rule: rev_cases)
-   apply (simp_all add: is_hamiltonian_path_def is_hamiltonian_circuit_def is_trace_def is_hamiltonian_def adj_vertices_int_vertices is_simple_undir_def)
-  by auto (smt fst_conv insert_iff int_vertices_simps(2) is_path_undir.elims(1))+
 
 term \<open>valid_graph.is_path\<close>
 find_theorems \<open>valid_graph.is_path\<close>
@@ -526,8 +523,8 @@ text \<open>Reuse @{const kon_graph}, but interpreted differently: Between to-do
 
 definition \<open>kon_path = [(a,ab1,b),(b,bd1,d),(d,cd1,c)]\<close>
 
-lemma is_simple_path_kon_path: \<open>kon_graph.is_simple_undir a kon_path c\<close>
-  unfolding kon_graph.is_simple_undir_def by (simp add: kon_path_def) (simp add: kon_graph_def)
+lemma is_simple_path_kon_path: \<open>kon_graph.is_simple_undir2 a kon_path c\<close>
+  unfolding kon_graph.is_simple_undir2_def by (simp add: kon_path_def) (simp add: kon_graph_def)
 
 lemma is_hamiltonian_path_kon_path: \<open>kon_graph.is_hamiltonian_path a kon_path c\<close>
   apply (simp add: kon_graph.is_hamiltonian_path_def is_simple_path_kon_path)
@@ -537,8 +534,8 @@ lemma is_hamiltonian_path_kon_path: \<open>kon_graph.is_hamiltonian_path a kon_p
 
 definition \<open>kon_circuit = kon_path @ [(c,ac2,a)]\<close>
 
-lemma is_simple_path_kon_circuit: \<open>kon_graph.is_simple_undir a kon_circuit a\<close>
-  unfolding kon_graph.is_simple_undir_def by (simp add: kon_circuit_def kon_path_def) (simp add: kon_graph_def)
+lemma is_simple_path_kon_circuit: \<open>kon_graph.is_simple_undir1 a kon_circuit a\<close>
+  by (simp add: kon_circuit_def kon_path_def) (simp add: kon_graph_def)
 
 lemma is_hamiltonian_circuit_kon_circuit: \<open>kon_graph.is_hamiltonian_circuit a kon_circuit\<close>
   unfolding kon_graph.is_hamiltonian_circuit_def kon_graph.is_hamiltonian_def
@@ -561,8 +558,8 @@ abbreviation set_cost where
 lemma edge_weight_sum_list: \<open>distinct ps \<Longrightarrow> edge_weight \<lparr>nodes=ARBITRARY, edges= set ps\<rparr> = sum_list (map (fst \<circ> snd) ps)\<close>
   unfolding edge_weight_def by (auto simp: sum_list_distinct_conv_sum_set)
 
-lemma is_simple_undir_distinct: \<open>is_simple_undir v ps v' \<Longrightarrow> distinct ps\<close>
-  by (induction ps arbitrary: v) (auto simp: is_simple_undir_def)
+lemma is_simple_undir_distinct: \<open>is_simple_undir1 v ps v' \<Longrightarrow> distinct ps\<close>
+  by (induction ps arbitrary: v) auto
 
 lemma is_hamiltonian_circuit_distinct:
   \<open>is_hamiltonian_circuit v ps \<Longrightarrow> distinct ps\<close>
@@ -609,20 +606,20 @@ lemma complete_finite_weighted_graph_intro:
 end
 
 lemma (in valid_graph) delete_node_was_simple_undir:
-  \<open>valid_graph.is_simple_undir (delete_node v G) v1 ps v2 \<Longrightarrow> is_simple_undir v1 ps v2\<close>
-  by (meson delete_node_valid delete_node_was_path valid_graph.is_simple_undir_def valid_graph_axioms)
+  \<open>valid_graph.is_simple_undir1 (delete_node v G) v1 ps v2 \<Longrightarrow> is_simple_undir1 v1 ps v2\<close>
+  by (meson delete_node_valid delete_node_was_path valid_graph_axioms)
 
-lemma (in valid_graph) is_simple_undir_Cons[intro]:
+lemma (in valid_graph) is_simple_undir1_Cons[intro]:
   assumes \<open>(v,w,v') \<in> E \<or> (v',w,v) \<in> E\<close>
   assumes \<open>v \<notin> int_vertices ps\<close>
-  assumes \<open>is_simple_undir v' ps vl\<close>
-  shows \<open>is_simple_undir v ((v,w,v')#ps) vl\<close>
-  using assms unfolding is_simple_undir_def by (simp add: int_vertices_def)
+  assumes \<open>is_simple_undir1 v' ps vl\<close>
+  shows \<open>is_simple_undir1 v ((v,w,v')#ps) vl\<close>
+  using assms by (simp add: int_vertices_def)
 
-lemma (in valid_graph) is_simple_undir_step:
-\<open>is_simple_undir v ((x,w,y) # ps) v' \<longleftrightarrow>
-  v=x \<and> ((x,w,y) \<in> E \<or> (y,w,x) \<in> E) \<and> x \<notin> int_vertices ps \<and> is_simple_undir y ps v'\<close>
-  unfolding is_simple_undir_def by (auto simp: int_vertices_def)
+lemma (in valid_graph) is_simple_undir1_step:
+\<open>is_simple_undir1 v ((x,w,y) # ps) v' \<longleftrightarrow>
+  v=x \<and> ((x,w,y) \<in> E \<or> (y,w,x) \<in> E) \<and> x \<notin> int_vertices ps \<and> is_simple_undir1 y ps v'\<close>
+  by (auto simp: int_vertices_def)
 
 lemma (in valid_graph) hamiltonian_impl_finiteV:
   \<open>is_hamiltonian_path v ps v' \<Longrightarrow> finite V\<close>
@@ -632,7 +629,7 @@ lemma (in valid_graph) hamiltonian_impl_finiteV:
 lemma (in valid_graph) is_hamiltonian_circuit_rotate1:
   assumes \<open>is_hamiltonian_circuit v (e#ps)\<close>
   shows \<open>is_hamiltonian_circuit (snd (snd e)) (ps@[e])\<close>
-  using assms unfolding is_hamiltonian_circuit_def is_hamiltonian_def is_simple_undir_def apply auto
+  using assms unfolding is_hamiltonian_circuit_def is_hamiltonian_def apply auto
   using triple_of_parts by (metis (no_types) is_path_undir.simps(2) is_path_undir_simps(2) is_path_undir_split)
 
 lemma (in valid_graph) is_hamiltonian_circuit_rotate1_ex:
@@ -647,15 +644,15 @@ lemma (in valid_graph) is_hamiltonian_circuit_int_vertices:
 
 lemma (in valid_graph) trivial_hamiltonian_circuit_Ball:
   \<open>is_hamiltonian_circuit v [] \<Longrightarrow> \<forall>v'\<in>V. is_hamiltonian_circuit v' []\<close>
-  by (simp add: is_hamiltonian_circuit_def is_simple_undir_def)
+  by (simp add: is_hamiltonian_circuit_def)
 
 lemma (in valid_graph) is_hamiltonian_circuit_inV:
   \<open>is_hamiltonian_circuit v ps \<Longrightarrow> v \<in> V\<close>
-  by (meson is_hamiltonian_circuit_def is_path_undir_memb is_simple_undir_def)
+  by (meson is_hamiltonian_circuit_def is_path_undir_memb)
 
 lemma (in valid_graph) is_hamiltonian_circuit_length:
   \<open>2 \<le> card V \<Longrightarrow> is_hamiltonian_circuit v ps \<Longrightarrow> length ps = card V\<close>
-  unfolding is_hamiltonian_circuit_def is_hamiltonian_def is_simple_undir_def int_vertices_def
+  unfolding is_hamiltonian_circuit_def is_hamiltonian_def int_vertices_def
   by (metis Suc_1 Suc_n_not_le_n card_empty distinct_card length_map list.size(3))
 
 corollary (in valid_graph) is_hamiltonian_circuit_length_le:
@@ -663,7 +660,7 @@ corollary (in valid_graph) is_hamiltonian_circuit_length_le:
   shows \<open>length ps \<le> card V\<close>
 proof -
   have \<open>length ps \<le> card V\<close> if \<open>card V = 1\<close> using assms that
-    unfolding is_hamiltonian_circuit_def is_hamiltonian_def is_simple_undir_def int_vertices_def
+    unfolding is_hamiltonian_circuit_def is_hamiltonian_def int_vertices_def
     by (metis One_nat_def Suc_n_not_le_n distinct_card length_map linear list.size(3))
   moreover have False if \<open>card V = 0\<close>
   proof cases
@@ -673,7 +670,7 @@ proof -
   next
     assume \<open>infinite V\<close>
     with assms show False
-      by (meson hamiltonian_impl_finiteV is_hamiltonian_iff)
+      by (metis List.finite_set One_nat_def card_1_singletonE finite.emptyI finite.simps int_vertices_def is_hamiltonian_circuit_def is_hamiltonian_def)
   qed
   ultimately show ?thesis
     using assms is_hamiltonian_circuit_length by fastforce
@@ -683,7 +680,7 @@ lemma (in finite_graph) finitely_many_hamiltonian_circuits:
   \<open>finite {ps. \<exists>v. is_hamiltonian_circuit v ps}\<close>
 proof -
   have \<open>set ps \<subseteq> E \<union> (\<lambda>(v1,w,v2). (v2,w,v1)) ` E\<close> if \<open>\<exists>v. is_hamiltonian_circuit v ps\<close> for ps
-    using that unfolding is_hamiltonian_circuit_def is_simple_undir_def apply auto
+    using that unfolding is_hamiltonian_circuit_def apply auto
     by (metis (mono_tags, lifting) is_path_undir_memb_edges prod.simps(2) rev_image_eqI)
   moreover have \<open>finite \<dots>\<close>
     by (simp add: finite_E)
@@ -714,7 +711,7 @@ next
     apply (induction i) using assms(2) apply auto
     using is_hamiltonian_circuit_rotate1_ex by blast
   ultimately have \<open>is_hamiltonian_circuit v' (rotate i ps)\<close>
-    unfolding is_hamiltonian_circuit_def is_simple_undir_def using is_path_undir.elims(2) by fastforce
+    unfolding is_hamiltonian_circuit_def using is_path_undir.elims(2) by fastforce
   then show ?thesis
     by blast
 qed
@@ -752,7 +749,7 @@ proof (induction \<open>card V\<close> arbitrary: v G rule: nat_induct_at_least[
     using G.complete by blast
   show ?case
     apply (rule exI[of _ \<open>[(v,w,v'),(v',w,v)]\<close>])
-    apply (auto simp: G.is_hamiltonian_circuit_def G.is_hamiltonian_def G.is_simple_undir_def base v' GV w)
+    apply (auto simp: G.is_hamiltonian_circuit_def G.is_hamiltonian_def base v' GV w)
     using w by blast
 next
   case (Suc n)
@@ -769,33 +766,34 @@ next
     unfolding nG' using G.complete by fast
   from Suc.hyps(2)[OF n v G'.complete_finite_weighted_graph_axioms]
   obtain ps' where ps': \<open>G'.is_hamiltonian_circuit v' ps'\<close> by blast
-  have G': \<open>G'.is_hamiltonian ps'\<close> \<open>G'.is_simple_undir v' ps' v'\<close>
+  have G': \<open>G'.is_hamiltonian ps'\<close> \<open>G'.is_simple_undir1 v' ps' v'\<close>
    by (auto simp: ps'[unfolded G'.is_hamiltonian_circuit_def])
-  then have *: \<open>int_vertices ps' = G'.V\<close> \<open>G.is_simple_undir v' ps' v'\<close>
+  then have *: \<open>int_vertices ps' = G'.V\<close> \<open>G.is_simple_undir1 v' ps' v'\<close>
     unfolding G'.is_hamiltonian_def apply auto
       apply (metis all_not_in_conv int_vertices_empty)
     using nG'(2) apply (metis Suc_1 Suc_n_not_le_n int_vertices_simps(1))
     using G.delete_node_was_simple_undir by blast
   then have \<open>v \<notin> int_vertices ps'\<close>
     using nG' by blast
-  from * nG'(2) obtain w_discard v1 ps'' where ps'': \<open>ps' = (v',w_discard,v1)#ps''\<close>
-    by (metis all_not_in_conv int_vertices_empty is_path_undir.elims(2) v G.is_simple_undir_def)
+  from * G'(2) obtain w_discard v1 ps'' where ps'': \<open>ps' = (v',w_discard,v1)#ps''\<close>
+    by (metis G'.is_hamiltonian_circuit_def G'.is_path_undir_simps(1) int_vertices_simps(1) is_path_undir.simps(2) memb_imp_not_empty neq_NilE old.prod.exhaust prod_cases3 ps')
   then have \<open>v1 \<in> G.V\<close> \<open>v \<notin> int_vertices ps''\<close>
-    using *(2) G.valid_graph_axioms valid_graph.is_simple_undir_def apply fastforce
+    using *(2) G.valid_graph_axioms apply fastforce
     using \<open>v \<notin> int_vertices ps'\<close> ps'' by auto
   with *(1) obtain w1 where **: \<open>(v,w1,v1) \<in> G.E \<or> (v1,w1,v) \<in> G.E\<close>
-    by (metis G'(2) G'.is_path_undir_simps Suc.prems(1) \<open>v \<notin> int_vertices ps'\<close> G.complete is_path_undir.simps(2) ps'' G'.is_simple_undir_def)
+    by (metis G'(2) G'.is_path_undir_simps Suc.prems(1) \<open>v \<notin> int_vertices ps'\<close> G.complete is_path_undir.simps(2) ps'')
   let ?ps = \<open>(v',w,v)#(v,w1,v1)#ps''\<close>
-  from *(2)[unfolded ps''] have \<open>G.is_simple_undir v1 ps'' v'\<close>
-    unfolding G.is_simple_undir_def by simp
-  with ** have \<open>G.is_simple_undir v ((v,w1,v1)#ps'') v'\<close>
-    using \<open>v \<notin> int_vertices ps''\<close> \<open>v \<in> G.V\<close> by (simp add: int_vertices_def G.is_simple_undir_def)
+  from *(2)[unfolded ps''] have \<open>G.is_simple_undir1 v1 ps'' v'\<close>
+    by simp
+  with ** have \<open>G.is_simple_undir1 v ((v,w1,v1)#ps'') v'\<close>
+    using \<open>v \<notin> int_vertices ps''\<close> \<open>v \<in> G.V\<close> by (simp add: int_vertices_def)
   moreover have \<open>v' \<notin> int_vertices ((v,w1,v1)#ps'')\<close>
-    by (metis DiffE G'(2) G'.is_simple_undir_def distinct.simps(2) insert_iff int_vertices_def int_vertices_simps(2) list.map(2) nG'(1) prod.sel(1) ps'' v)
+    by (metis DiffE G'(2) distinct.simps(2) insert_iff int_vertices_def int_vertices_simps(2) list.map(2) nG'(1) prod.sel(1) ps'' v)
   ultimately have \<open>G.is_hamiltonian_circuit v' ?ps\<close>
     unfolding G.is_hamiltonian_circuit_def using w apply auto
     using G'(1) apply (simp_all add: G.is_hamiltonian_def G'.is_hamiltonian_def)
-    using ps'' nG' using Suc.prems(1) by auto
+         apply (simp_all add: img_fst int_vertices_def)
+    by (metis *(1) Set.set_insert Suc.prems(1) fst_conv insert_Diff_single insert_absorb2 insert_commute int_vertices_def int_vertices_simps(2) list.set_map nG'(1) ps'')+
   then show ?case
     using G.is_hamiltonian_circuit_rotate1 by fastforce
 qed
@@ -804,7 +802,7 @@ lemma is_hamiltonian_circuit_fst:
   assumes \<open>is_hamiltonian_circuit v (p#ps)\<close>
   shows \<open>fst p = v\<close>
 proof -
-  from assms[unfolded is_hamiltonian_circuit_def is_hamiltonian_def is_simple_undir_def]
+  from assms[unfolded is_hamiltonian_circuit_def is_hamiltonian_def]
   show \<open>fst p = v\<close>
     by (cases p) simp
 qed
@@ -868,7 +866,7 @@ do {
 
 lemma is_simple_undir_indep:
   assumes \<open>2 \<le> card V\<close> \<comment> \<open>rm\<close>
-  assumes \<open>is_simple_undir v ps v'\<close>
+  assumes \<open>is_simple_undir2 v ps v'\<close>
   assumes \<open>v \<noteq> v'\<close>
   shows \<open>subforest (set ps)\<close>
   using assms(2,3) try
@@ -882,16 +880,7 @@ next
     using prod_cases3 by blast
   have \<open>subforest (insert e (set ps)) \<longleftrightarrow> (\<forall>p. \<not>is_path_undir (ind (set ps)) x p y)\<close>
     apply (rule s.augment_forest[simplified])
-    using Cons.IH[of y] Cons.prems apply (auto simp: is_simple_undir_step)[]
-    subgoal proof goal_cases
-      case 1
-      show ?case
-      proof (cases \<open>y = v'\<close>)
-        case True
-        with 1 show ?thesis
-          sorry
-      qed (simp add: "1"(1))
-    qed
+    using Cons.IH[of y] Cons.prems apply (auto simp: is_simple_undir1_step)[]
     sorry
   then show ?case
     sorry
