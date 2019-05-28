@@ -861,6 +861,22 @@ do {
   RETURN Tour
 }\<close>
 
+lemma is_simple_undir_indep:
+  assumes \<open>2 \<le> card V\<close> \<comment> \<open>rm\<close>
+  assumes \<open>is_simple_undir v ps v'\<close>
+  assumes \<open>v \<noteq> v'\<close>
+  shows \<open>subforest (set ps)\<close>
+  using assms(2,3)
+proof (induction ps arbitrary: v)
+  case Nil
+  then show ?case
+    by auto
+next
+  case (Cons a ps)
+  then show ?case try sorry
+  find_theorems subforest insert
+qed
+
 lemma MSF_le_OPTWEIGHT:
   assumes \<open>s.MSF F\<close>
   assumes \<open>2 \<le> card V\<close> \<comment> \<open>rm\<close>
@@ -868,6 +884,10 @@ lemma MSF_le_OPTWEIGHT:
 proof -
   from assms(1) have \<open>set_cost F \<le> set_cost F'\<close> if \<open>s.basis F'\<close> for F'
     by (simp add: edge_weight_alt s.minBasis_def that)
+  moreover have \<open>s.SpanningForest (set (tl OPT))\<close>
+  proof -
+    from assms(2) have \<open>is_hamiltonian_circuit (fst (hd OPT)) OPT\<close>
+      using is_arg_min_OPT unfolding is_arg_min_def by blast
   then show ?thesis
     sorry
 qed
