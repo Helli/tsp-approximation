@@ -871,33 +871,44 @@ lemma is_simple_undir_indep:
   assumes \<open>is_simple_undir v ps v'\<close>
   assumes \<open>v \<noteq> v'\<close>
   shows \<open>subforest (set ps)\<close>
-  using assms(2,3)
+  using assms(2,3) try
 proof (induction ps arbitrary: v)
   case Nil
   then show ?case
     by auto
 next
   case (Cons e ps)
-  let ?x = \<open>fst e\<close> and ?y = \<open>snd (snd e)\<close>
-  have \<open>subforest (insert e (set ps)) \<longleftrightarrow> (\<forall>p. \<not>is_path_undir (ind (set ps)) ?x p ?y)\<close>
+  then obtain x w y where e[simp]: \<open>e=(x,w,y)\<close>
+    using prod_cases3 by blast
+  have \<open>subforest (insert e (set ps)) \<longleftrightarrow> (\<forall>p. \<not>is_path_undir (ind (set ps)) x p y)\<close>
     apply (rule s.augment_forest[simplified])
-    using Cons.IH[of ?y] Cons.prems try0
+    using Cons.IH[of y] Cons.prems apply (auto simp: is_simple_undir_step)[]
+    subgoal proof goal_cases
+      case 1
+      show ?case
+      proof (cases \<open>y = v'\<close>)
+        case True
+        with 1 show ?thesis
+          sorry
+      qed (simp add: "1"(1))
+    qed
+    sorry
   then show ?case
     sorry
 qed
 
 lemma MSF_le_OPTWEIGHT:
   assumes \<open>s.MSF F\<close>
-  assumes \<open>2 \<le> card V\<close> \<comment> \<open>rm\<close>
   shows \<open>set_cost F \<le> OPTWEIGHT\<close>
 proof -
   from assms(1) have \<open>set_cost F \<le> set_cost F'\<close> if \<open>s.basis F'\<close> for F'
     by (simp add: edge_weight_alt s.minBasis_def that)
   moreover have \<open>s.SpanningForest (set (tl OPT))\<close>
   proof -
-    from assms(2) have \<open>is_hamiltonian_circuit (fst (hd OPT)) OPT\<close>
-      using is_arg_min_OPT unfolding is_arg_min_def by blast
-  then show ?thesis
+    show ?thesis
+      sorry
+  qed
+  ultimately show ?thesis
     sorry
 qed
 
