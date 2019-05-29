@@ -883,43 +883,31 @@ do {
   RETURN Tour
 }\<close>
 
-lemma neuland: \<open>is_simple_undir2 v ((x,w,y)#ps) v' \<Longrightarrow> v\<noteq>y\<close>
+lemma (in valid_graph) neuland: \<open>is_simple_undir2 v ((x,w,y)#ps) v' \<Longrightarrow> v\<noteq>y\<close>
   unfolding is_simple_undir2_def by (cases ps) auto
 
-lemma tmp: \<open>is_simple_undir2 v ((x,w,y) # ps) v' \<Longrightarrow> ps\<noteq>[] \<Longrightarrow> adj_vertices ((x,w,y) # ps) = insert x (adj_vertices ps)\<close>
+lemma (in valid_graph) tmp: \<open>is_simple_undir2 v ((x,w,y) # ps) v' \<Longrightarrow> ps\<noteq>[] \<Longrightarrow> adj_vertices ((x,w,y) # ps) = insert x (adj_vertices ps)\<close>
   unfolding is_simple_undir2_def using adj_vertices_simps(1) by fastforce
 
-lemma is_path_undir_adj_vertices:
+lemma (in valid_graph) is_path_undir_adj_vertices:
   \<open>is_path_undir G v ps v' \<Longrightarrow> (x,w,y) \<in> set ps \<Longrightarrow> x \<in> adj_vertices ps\<close>
   \<open>is_path_undir G v ps v' \<Longrightarrow> (x,w,y) \<in> set ps \<Longrightarrow> y \<in> adj_vertices ps\<close>
    apply (metis adj_vertices.elims empty_iff empty_set img_fst insert_iff list.set_map)
 proof (induction ps arbitrary: v)
-  case (Cons a ps)
+  case (Cons _ ps)
   then show ?case
     apply (cases ps) by auto (metis is_path_undir.simps(2) prod.collapse)+
 qed simp
 
-lemma
-  assumes \<open>v \<noteq> y\<close> \<open>nodes_connected (ind (set ps)) v y\<close> \<open>is_simple_undir2 y' ps v'\<close>
+lemma (in valid_graph) tmp':
+  assumes \<open>v \<noteq> y\<close> \<open>nodes_connected \<lparr>nodes=V, edges=set ps\<rparr> v y\<close> \<open>is_simple_undir2 y' ps v'\<close>
   shows \<open>v \<in> adj_vertices ps\<close>
 proof -
   from assms(1-2) obtain w y where \<open>(v,w,y) \<in> set ps \<or> (y,w,v) \<in> set ps\<close>
-  apply auto apply (induct_tac p)
-  apply (induction ps arbitrary: y') using s.connected_same apply auto
-  using is_path_undir.elims(2) apply fastforc
-proof goal_cases
-  case (1 x w b ps p y)
-  then have \<open>v \<noteq> b\<close>
-    by (metis (no_types, lifting) adj_vertices.elims insertCI int_vertices_def int_vertices_simps(2) is_simple_undir1_step is_simple_undir2_def list.set_map triple_of_parts)
-  (*note * = 1(1)[OF this]*)
-  have \<open>is_simple_undir2 b ps v'\<close>
-    using "1"(3) "1"(6) is_simple_undir2_step by blast
-  note ** = 1(1)[OF _ this]
-  then have \<open>v \<in> adj_vertices ps\<close>
-  have \<open>adj_vertices ((x, w, b) # ps) = insert x (adj_vertices ps)\<close>
-    using tmp "1"(3) "1"(6) by blas
-  from 1 ** show ?case sorry
-  oops
+    apply auto apply (case_tac p) by auto blast+
+  with assms(3) show ?thesis
+    using is_path_undir_adj_vertices(1) is_path_undir_adj_vertices(2) is_simple_undir2_def by blast
+qed
 
 lemma is_simple_undir2_forest:
   assumes \<open>2 \<le> card V\<close> \<comment> \<open>rm\<close>
