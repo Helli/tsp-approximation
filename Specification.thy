@@ -900,7 +900,7 @@ proof (induction ps arbitrary: v)
 qed simp
 
 lemma (in valid_graph) tmp':
-  assumes \<open>v \<noteq> y\<close> \<open>nodes_connected \<lparr>nodes=V, edges=set ps\<rparr> v y\<close> \<open>is_simple_undir2 y' ps v'\<close>
+  assumes \<open>v \<noteq> y\<close> \<open>nodes_connected \<lparr>nodes = V, edges = set ps\<rparr> v y\<close> \<open>is_simple_undir2 y' ps v'\<close>
   shows \<open>v \<in> adj_vertices ps\<close>
 proof -
   from assms(1-2) obtain w y where \<open>(v,w,y) \<in> set ps \<or> (y,w,v) \<in> set ps\<close>
@@ -936,19 +936,10 @@ proof (induction ps arbitrary: v)
   next
     case False
     note Cons(2)[simplified, unfolded is_simple_undir2_step[OF this], simplified]
-    then show ?thesis sorry
-  qed
-    using is_simple_undir2_step Cons(2)[simplified]
-    find_theorems intro
-  finally show ?case
-    .
-  with Cons show ?case apply auto
-  have \<open>subforest (insert e (set ps)) \<longleftrightarrow> (\<forall>p. \<not>is_path_undir (ind (set ps)) x p y)\<close>
-    apply (rule s.augment_forest[simplified])
-    using Cons.IH[of y] Cons.prems apply (auto simp: is_simple_undir1_step)[]
-    sorry
-  then show ?case
-    sorry
+    then show ?thesis
+      using ne tmp' by blast
+  qed done
+  finally show ?case .
 qed simp
 
 lemma MSF_le_OPTWEIGHT:
