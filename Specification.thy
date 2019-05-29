@@ -876,6 +876,19 @@ do {
 lemma neuland: \<open>is_simple_undir2 v ((x,w,y)#ps) v' \<Longrightarrow> v\<noteq>y\<close>
   unfolding is_simple_undir2_def by (cases ps) auto
 
+lemma tmp: \<open>is_simple_undir2 v ((x,w,y) # ps) v' \<Longrightarrow> ps\<noteq>[] \<Longrightarrow> adj_vertices ((x,w,y) # ps) = insert x (adj_vertices ps)\<close>
+  unfolding is_simple_undir2_def adj_vertices_def by simp
+
+lemma \<open>v \<noteq> y \<Longrightarrow> nodes_connected (ind (set ps)) v y \<Longrightarrow> is_simple_undir2 y ps v' \<Longrightarrow> v \<in> adj_vertices ps\<close>
+  apply auto apply (induction ps arbitrary: y) apply auto
+  using s.connected_same apply auto[1]
+proof goal_cases
+  case (1 x w b ps p y)
+  have \<open>adj_vertices ((x, w, b) # ps) = insert x (adj_vertices ps)\<close>
+    using tmp
+  then show ?case sorry
+qed
+
 lemma is_simple_undir2_forest:
   assumes \<open>2 \<le> card V\<close> \<comment> \<open>rm\<close>
   assumes \<open>is_simple_undir2 v ps v'\<close>
@@ -886,28 +899,24 @@ proof (induction ps arbitrary: v)
   then obtain w y where e[simp]: \<open>e=(v,w,y)\<close>
     by (cases e) (simp add: is_simple_undir2_def)
   have ne: \<open>v \<noteq> y\<close>
-    sorry
+    using Cons.prems neuland by auto
   from Cons interpret grove: forest \<open>ind (set ps)\<close>
     by (auto simp: is_simple_undir2_def)
   have \<open>ind (set (e # ps)) = add_edge v w y (ind (set ps))\<close>
     unfolding int_vertices_def apply auto
-    by (metis (no_types, hide_lams) Cons.prems add_edge_def e graph.select_convs(1) graph.select_convs(2) insert_absorb is_path_undir_memb is_simple_undir1_step is_simple_undir2_def nodes_add_edge)
-    by (smt Cons.prems add_edge_def delete_add_edge e graph.select_convs(1-2) img_fst int_vertices_def is_path_undir_memb is_simple_undir1_step is_simple_undir2_def list.set_map nodes_delete_edge)
+    by (smt Cons.prems e edges_add_edge graph.ext_inject insert_absorb is_path_undir_memb is_simple_undir1_step is_simple_undir2_def nodes_add_edge sum_of_parts)
   also have \<open>forest \<dots>\<close>
     apply (rule grove.forest_add_edge)
     apply (metis calculation graph.select_convs(1) insertCI nodes_add_edge)
     using Cons.prems is_simple_undir2_def apply auto[1] subgoal
   proof (cases \<open>ps = []\<close>)
     case True
-    then show ?thesis apply auto
+    then show ?thesis
+      using ne s.connected_same by auto
   next
     case False
-    note is_simple_undir2_step[OF this] Cons(2)[simplified]
+    note Cons(2)[simplified, unfolded is_simple_undir2_step[OF this]]
     then show ?thesis sorry
-  qed
-    case 1
-    have \<open>ps \<noteq> []\<close>
-    then show ?case sorry
   qed
     using is_simple_undir2_step Cons(2)[simplified]
     find_theorems intro
