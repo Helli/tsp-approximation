@@ -910,10 +910,9 @@ proof -
 qed
 
 lemma is_simple_undir2_forest:
-  assumes \<open>2 \<le> card V\<close> \<comment> \<open>rm\<close>
   assumes \<open>is_simple_undir2 v ps v'\<close>
   shows \<open>forest (ind (set ps))\<close>
-  using assms(2)
+  using assms
 proof (induction ps arbitrary: v)
   case (Cons e ps)
   then obtain w y where e[simp]: \<open>e=(v,w,y)\<close>
