@@ -617,9 +617,18 @@ lemma (in valid_graph) is_simple_undir1_Cons[intro]:
   using assms by (simp add: int_vertices_def)
 
 lemma (in valid_graph) is_simple_undir1_step:
-\<open>is_simple_undir1 v ((x,w,y) # ps) v' \<longleftrightarrow>
-  v=x \<and> ((x,w,y) \<in> E \<or> (y,w,x) \<in> E) \<and> x \<notin> int_vertices ps \<and> is_simple_undir1 y ps v'\<close>
+  \<open>is_simple_undir1 v ((x,w,y) # ps) v' \<longleftrightarrow>
+    v=x \<and> ((x,w,y) \<in> E \<or> (y,w,x) \<in> E) \<and> x \<notin> int_vertices ps \<and> is_simple_undir1 y ps v'\<close>
   by (auto simp: int_vertices_def)
+
+lemma (in valid_graph) is_path_undir_last:
+  \<open>ps \<noteq> [] \<Longrightarrow> is_path_undir G v ps v' \<Longrightarrow> v' = snd (snd (last ps))\<close>
+  by (induction ps arbitrary: v) auto
+
+lemma (in valid_graph) is_simple_undir2_step:
+  \<open>ps \<noteq> [] \<Longrightarrow> is_simple_undir2 v ((x,w,y) # ps) v' \<longleftrightarrow>
+    v=x \<and> ((x,w,y) \<in> E \<or> (y,w,x) \<in> E) \<and> x \<notin> adj_vertices ps \<and> is_simple_undir2 y ps v'\<close>
+  by (auto simp: is_simple_undir2_def adj_vertices_def is_path_undir_last)
 
 lemma (in valid_graph) hamiltonian_impl_finiteV:
   \<open>is_hamiltonian_path v ps v' \<Longrightarrow> finite V\<close>
@@ -867,13 +876,17 @@ do {
 lemma is_simple_undir2_forest:
   assumes \<open>2 \<le> card V\<close> \<comment> \<open>rm\<close>
   assumes \<open>is_simple_undir2 v ps v'\<close>
-  assumes \<open>v \<noteq> v'\<close>
   shows \<open>forest (ind (set ps))\<close>
-  using assms(2,3)
+  using assms(2)
 proof (induction ps arbitrary: v)
   case (Cons e ps)
-  then obtain x w y where e[simp]: \<open>e=(x,w,y)\<close>
+  obtain x w y where e[simp]: \<open>e=(x,w,y)\<close>
     by (cases e) blast
+  find_theorems \<open>forest (ind (insert _ _))\<close>
+  thm s.augment_forest
+  thm forest.forest_add_edge
+  from Cons(2) have \<open>is_simple_undir2 y ps v'\<close>
+    apply auto
   have \<open>subforest (insert e (set ps)) \<longleftrightarrow> (\<forall>p. \<not>is_path_undir (ind (set ps)) x p y)\<close>
     apply (rule s.augment_forest[simplified])
     using Cons.IH[of y] Cons.prems apply (auto simp: is_simple_undir1_step)[]
