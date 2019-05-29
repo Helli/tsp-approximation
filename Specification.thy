@@ -868,13 +868,9 @@ lemma is_simple_undir_indep:
   assumes \<open>2 \<le> card V\<close> \<comment> \<open>rm\<close>
   assumes \<open>is_simple_undir2 v ps v'\<close>
   assumes \<open>v \<noteq> v'\<close>
-  shows \<open>subforest (set ps)\<close>
-  using assms(2,3) try
+  shows \<open>forest (ind (set ps))\<close>
+  using assms(2,3)
 proof (induction ps arbitrary: v)
-  case Nil
-  then show ?case
-    by auto
-next
   case (Cons e ps)
   then obtain x w y where e[simp]: \<open>e=(x,w,y)\<close>
     using prod_cases3 by blast
@@ -884,7 +880,7 @@ next
     sorry
   then show ?case
     sorry
-qed
+qed simp
 
 lemma MSF_le_OPTWEIGHT:
   assumes \<open>s.MSF F\<close>
