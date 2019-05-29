@@ -321,9 +321,9 @@ next
   then show ?case
     by blast
 next
-  case (insert x I)
-  then obtain u w v where x: \<open>x=(u,w,v)\<close>
-    by (meson prod_cases3)
+  case (insert e I)
+  then obtain u w v where x: \<open>e=(u,w,v)\<close>
+    by (cases e) blast
   have F_in_symhull: \<open>F \<subseteq> symhull E\<close>
     by (metis graph.select_convs(2) insert.prems(2) spanning_forest_def subgraph_def)
   have f1: \<open>(u, w, v) \<notin> E\<close>
@@ -332,11 +332,11 @@ next
     by (metis Diff_subset \<open>F \<subseteq> symhull E\<close> insert.hyps(4) insertI1 subset_eq x)
   then have \<open>\<exists>a b aa. (u, w, v) = (a, b, aa) \<and> ((a, b, aa) \<in> E \<or> (aa, b, a) \<in> E)\<close>
     by (simp add: symhull_def)
-  then have *: \<open>(v,w,u)\<in>E\<close> and **: \<open>x\<notin>E\<close> and ***: \<open>x\<in>F\<close>
+  then have *: \<open>(v,w,u)\<in>E\<close> and **: \<open>e\<notin>E\<close> and ***: \<open>e\<in>F\<close>
       apply (simp add: f1)
     apply (simp add: f1 x)
     using insert.hyps(4) by auto
-  with \<open>x \<in> F\<close> have \<open>(v,w,u) \<notin> F\<close>
+  with \<open>e \<in> F\<close> have \<open>(v,w,u) \<notin> F\<close>
     using forest.no_dups insert.prems spanning_forest_def x by fastforce
   then have I: \<open>I = edges (mirror_edge u w v \<lparr>nodes=V, edges=F\<rparr>) - E\<close>
     by (metis (no_types, lifting) Diff_insert Diff_insert2 Diff_insert_absorb * edges_add_edge edges_delete_edge graph.select_convs(2) insert.hyps(2) insert.hyps(4) insert_Diff1 x)
@@ -864,7 +864,7 @@ do {
   RETURN Tour
 }\<close>
 
-lemma is_simple_undir_indep:
+lemma is_simple_undir2_forest:
   assumes \<open>2 \<le> card V\<close> \<comment> \<open>rm\<close>
   assumes \<open>is_simple_undir2 v ps v'\<close>
   assumes \<open>v \<noteq> v'\<close>
@@ -873,7 +873,7 @@ lemma is_simple_undir_indep:
 proof (induction ps arbitrary: v)
   case (Cons e ps)
   then obtain x w y where e[simp]: \<open>e=(x,w,y)\<close>
-    using prod_cases3 by blast
+    by (cases e) blast
   have \<open>subforest (insert e (set ps)) \<longleftrightarrow> (\<forall>p. \<not>is_path_undir (ind (set ps)) x p y)\<close>
     apply (rule s.augment_forest[simplified])
     using Cons.IH[of y] Cons.prems apply (auto simp: is_simple_undir1_step)[]
