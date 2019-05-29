@@ -471,17 +471,23 @@ end
 
 subsection \<open>Hamiltonian Circuits\<close>
 
-definition adj_vertices where
+fun adj_vertices where
+  \<open>adj_vertices [] = {}\<close> | \<comment> \<open>maybe better \<^const>\<open>undefined\<close>\<close>
   \<open>adj_vertices ps = insert (snd(snd(last ps))) (set (map fst ps))\<close>
 
 lemma adj_vertices_int_vertices:
-  \<open>adj_vertices ps = insert (snd(snd(last ps))) (int_vertices ps)\<close>
-  by (simp add: adj_vertices_def int_vertices_def)
+  \<open>adj_vertices ps = (case ps of
+    [] \<Rightarrow> {} |
+    ps \<Rightarrow> insert (snd(snd(last ps))) (int_vertices ps))\<close>
+  by (cases ps) (auto simp: int_vertices_def)
 
 lemma adj_vertices_simps[simp]:
     \<open>ps \<noteq> [] \<Longrightarrow> adj_vertices (e#ps) = insert (fst e) (adj_vertices ps)\<close>
-    \<open>snd(snd(last ps)) = fst e \<Longrightarrow> adj_vertices (ps@[e]) = insert (snd(snd e)) (adj_vertices ps)\<close>
-  by (auto simp: adj_vertices_def)
+    \<open>ps \<noteq> [] \<Longrightarrow> snd(snd(last ps)) = fst e \<Longrightarrow> adj_vertices (ps@[e]) = insert (snd(snd e)) (adj_vertices ps)\<close>
+  apply (cases ps) apply auto
+    apply (smt Un_iff adj_vertices.elims empty_iff insertCI insertE int_vertices_def int_vertices_simps(1) int_vertices_simps(2) int_vertices_simps(3) last_snoc)
+  apply (metis adj_vertices.simps(2) insertCI int_vertices_def list.exhaust op_list_append_elem_def snoc_eq_iff_butlast)
+  by (metis (no_types, lifting) Un_iff adj_vertices.elims insertCI insertE int_vertices_def int_vertices_simps(2) int_vertices_simps(3) snoc_eq_iff_butlast)
 
 abbreviation (in valid_graph) is_simple_undir1 :: \<open>_ \<Rightarrow> (_,_) path \<Rightarrow> _ \<Rightarrow> bool\<close> where
   \<open>is_simple_undir1 v ps v' == is_path_undir G v ps v' \<and> distinct (map fst ps)\<close>
@@ -499,7 +505,7 @@ definition (in valid_graph) is_trace :: \<open>('v,'w) path \<Rightarrow> bool\<
 
 lemma (in valid_graph) is_trace_snoc:
   \<open>is_trace (ps @ [p]) \<longleftrightarrow> insert (snd(snd p)) (int_vertices (ps@[p])) = V\<close>
-  by (simp add: adj_vertices_int_vertices is_trace_def)
+  by (cases ps) (simp_all add: adj_vertices_int_vertices is_trace_def)
 
 definition (in valid_graph) is_hamiltonian_path where \<comment> \<open>or \<open>simple trace\<close>\<close>
   \<open>is_hamiltonian_path v ps v' \<longleftrightarrow> is_trace ps \<and> is_simple_undir2 v ps v'\<close> \<comment> \<open>abolish vertex arguments?\<close>
@@ -628,12 +634,16 @@ lemma (in valid_graph) is_path_undir_last:
 lemma (in valid_graph) is_simple_undir2_step:
   \<open>ps \<noteq> [] \<Longrightarrow> is_simple_undir2 v ((x,w,y) # ps) v' \<longleftrightarrow>
     v=x \<and> ((x,w,y) \<in> E \<or> (y,w,x) \<in> E) \<and> x \<notin> adj_vertices ps \<and> is_simple_undir2 y ps v'\<close>
-  by (auto simp: is_simple_undir2_def adj_vertices_def is_path_undir_last)
+  by (cases ps) (auto simp: is_simple_undir2_def is_path_undir_last)
+
+lemma (in valid_graph) finite_adj_vertices:
+  \<open>finite (adj_vertices ps)\<close>
+  by (cases ps) simp_all
 
 lemma (in valid_graph) hamiltonian_impl_finiteV:
   \<open>is_hamiltonian_path v ps v' \<Longrightarrow> finite V\<close>
-  unfolding is_hamiltonian_path_def is_trace_def adj_vertices_def
-  by (metis List.finite_set card_1_singletonE finite.simps)
+  unfolding is_hamiltonian_path_def is_trace_def
+  by (metis card_1_singletonE finite.simps kon_graph.finite_adj_vertices)
 
 lemma (in valid_graph) is_hamiltonian_circuit_rotate1:
   assumes \<open>is_hamiltonian_circuit v (e#ps)\<close>
@@ -877,17 +887,39 @@ lemma neuland: \<open>is_simple_undir2 v ((x,w,y)#ps) v' \<Longrightarrow> v\<no
   unfolding is_simple_undir2_def by (cases ps) auto
 
 lemma tmp: \<open>is_simple_undir2 v ((x,w,y) # ps) v' \<Longrightarrow> ps\<noteq>[] \<Longrightarrow> adj_vertices ((x,w,y) # ps) = insert x (adj_vertices ps)\<close>
-  unfolding is_simple_undir2_def adj_vertices_def by simp
+  unfolding is_simple_undir2_def using adj_vertices_simps(1) by fastforce
 
-lemma \<open>v \<noteq> y \<Longrightarrow> nodes_connected (ind (set ps)) v y \<Longrightarrow> is_simple_undir2 y ps v' \<Longrightarrow> v \<in> adj_vertices ps\<close>
-  apply auto apply (induction ps arbitrary: y) apply auto
-  using s.connected_same apply auto[1]
+lemma is_path_undir_adj_vertices:
+  \<open>is_path_undir G v ps v' \<Longrightarrow> (x,w,y) \<in> set ps \<Longrightarrow> x \<in> adj_vertices ps\<close>
+  \<open>is_path_undir G v ps v' \<Longrightarrow> (x,w,y) \<in> set ps \<Longrightarrow> y \<in> adj_vertices ps\<close>
+   apply (metis adj_vertices.elims empty_iff empty_set img_fst insert_iff list.set_map)
+proof (induction ps arbitrary: v)
+  case (Cons a ps)
+  then show ?case
+    apply (cases ps) by auto (metis is_path_undir.simps(2) prod.collapse)+
+qed simp
+
+lemma
+  assumes \<open>v \<noteq> y\<close> \<open>nodes_connected (ind (set ps)) v y\<close> \<open>is_simple_undir2 y' ps v'\<close>
+  shows \<open>v \<in> adj_vertices ps\<close>
+proof -
+  from assms(1-2) obtain w y where \<open>(v,w,y) \<in> set ps \<or> (y,w,v) \<in> set ps\<close>
+  apply auto apply (induct_tac p)
+  apply (induction ps arbitrary: y') using s.connected_same apply auto
+  using is_path_undir.elims(2) apply fastforc
 proof goal_cases
   case (1 x w b ps p y)
+  then have \<open>v \<noteq> b\<close>
+    by (metis (no_types, lifting) adj_vertices.elims insertCI int_vertices_def int_vertices_simps(2) is_simple_undir1_step is_simple_undir2_def list.set_map triple_of_parts)
+  (*note * = 1(1)[OF this]*)
+  have \<open>is_simple_undir2 b ps v'\<close>
+    using "1"(3) "1"(6) is_simple_undir2_step by blast
+  note ** = 1(1)[OF _ this]
+  then have \<open>v \<in> adj_vertices ps\<close>
   have \<open>adj_vertices ((x, w, b) # ps) = insert x (adj_vertices ps)\<close>
-    using tmp
-  then show ?case sorry
-qed
+    using tmp "1"(3) "1"(6) by blas
+  from 1 ** show ?case sorry
+  oops
 
 lemma is_simple_undir2_forest:
   assumes \<open>2 \<le> card V\<close> \<comment> \<open>rm\<close>
@@ -915,7 +947,7 @@ proof (induction ps arbitrary: v)
       using ne s.connected_same by auto
   next
     case False
-    note Cons(2)[simplified, unfolded is_simple_undir2_step[OF this]]
+    note Cons(2)[simplified, unfolded is_simple_undir2_step[OF this], simplified]
     then show ?thesis sorry
   qed
     using is_simple_undir2_step Cons(2)[simplified]
