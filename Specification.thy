@@ -873,6 +873,9 @@ do {
   RETURN Tour
 }\<close>
 
+lemma neuland: \<open>is_simple_undir2 v ((x,w,y)#ps) v' \<Longrightarrow> v\<noteq>y\<close>
+  unfolding is_simple_undir2_def by (cases ps) auto
+
 lemma is_simple_undir2_forest:
   assumes \<open>2 \<le> card V\<close> \<comment> \<open>rm\<close>
   assumes \<open>is_simple_undir2 v ps v'\<close>
@@ -880,13 +883,37 @@ lemma is_simple_undir2_forest:
   using assms(2)
 proof (induction ps arbitrary: v)
   case (Cons e ps)
-  obtain x w y where e[simp]: \<open>e=(x,w,y)\<close>
-    by (cases e) blast
-  find_theorems \<open>forest (ind (insert _ _))\<close>
-  thm s.augment_forest
-  thm forest.forest_add_edge
-  from Cons(2) have \<open>is_simple_undir2 y ps v'\<close>
-    apply auto
+  then obtain w y where e[simp]: \<open>e=(v,w,y)\<close>
+    by (cases e) (simp add: is_simple_undir2_def)
+  have ne: \<open>v \<noteq> y\<close>
+    sorry
+  from Cons interpret grove: forest \<open>ind (set ps)\<close>
+    by (auto simp: is_simple_undir2_def)
+  have \<open>ind (set (e # ps)) = add_edge v w y (ind (set ps))\<close>
+    unfolding int_vertices_def apply auto
+    by (metis (no_types, hide_lams) Cons.prems add_edge_def e graph.select_convs(1) graph.select_convs(2) insert_absorb is_path_undir_memb is_simple_undir1_step is_simple_undir2_def nodes_add_edge)
+    by (smt Cons.prems add_edge_def delete_add_edge e graph.select_convs(1-2) img_fst int_vertices_def is_path_undir_memb is_simple_undir1_step is_simple_undir2_def list.set_map nodes_delete_edge)
+  also have \<open>forest \<dots>\<close>
+    apply (rule grove.forest_add_edge)
+    apply (metis calculation graph.select_convs(1) insertCI nodes_add_edge)
+    using Cons.prems is_simple_undir2_def apply auto[1] subgoal
+  proof (cases \<open>ps = []\<close>)
+    case True
+    then show ?thesis apply auto
+  next
+    case False
+    note is_simple_undir2_step[OF this] Cons(2)[simplified]
+    then show ?thesis sorry
+  qed
+    case 1
+    have \<open>ps \<noteq> []\<close>
+    then show ?case sorry
+  qed
+    using is_simple_undir2_step Cons(2)[simplified]
+    find_theorems intro
+  finally show ?case
+    .
+  with Cons show ?case apply auto
   have \<open>subforest (insert e (set ps)) \<longleftrightarrow> (\<forall>p. \<not>is_path_undir (ind (set ps)) x p y)\<close>
     apply (rule s.augment_forest[simplified])
     using Cons.IH[of y] Cons.prems apply (auto simp: is_simple_undir1_step)[]
