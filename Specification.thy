@@ -76,6 +76,9 @@ proof
     unfolding arg_min_def by presburger
 qed
 
+lemma forest_empty: \<open>forest \<lparr>nodes = V, edges = {}\<rparr>\<close>
+  by unfold_locales simp_all
+
 subsection \<open>Spanning Forests for Graphs of Type @{locale valid_unMultigraph}\<close>
 
 subsubsection \<open>Undirected Hull\<close> \<comment> \<open>or rather: symmetric hull\<close>
@@ -886,6 +889,9 @@ do {
 lemma (in valid_graph) neuland: \<open>is_simple_undir2 v ((x,w,y)#ps) v' \<Longrightarrow> v\<noteq>y\<close>
   unfolding is_simple_undir2_def by (cases ps) auto
 
+lemma (in valid_graph) neuland': \<open>is_simple_undir2 v ((x,w,y)#ps) v' \<Longrightarrow> v \<notin> adj_vertices ps\<close>
+  by (metis adj_vertices.simps(1) empty_iff is_simple_undir2_step)
+
 lemma (in valid_graph) tmp: \<open>is_simple_undir2 v ((x,w,y) # ps) v' \<Longrightarrow> ps\<noteq>[] \<Longrightarrow> adj_vertices ((x,w,y) # ps) = insert x (adj_vertices ps)\<close>
   unfolding is_simple_undir2_def using adj_vertices_simps(1) by fastforce
 
@@ -909,9 +915,18 @@ proof -
     using is_path_undir_adj_vertices(1) is_path_undir_adj_vertices(2) is_simple_undir2_def by blast
 qed
 
-lemma is_simple_undir2_forest:
+lemma (in -) is_path_undir_supset: \<open>is_path_undir \<lparr>nodes=V, edges=E\<rparr> v ps v' \<Longrightarrow> V \<subseteq> V' \<Longrightarrow> is_path_undir \<lparr>nodes=V', edges=E\<rparr> v ps v'\<close>
+  by (induction ps arbitrary: v) auto
+
+lemma (in -) delte_edge_supset: \<open>nodes (delete_edge x w y G) \<subseteq> nodes (delete_edge x w y (add_node v G))\<close>
+  by (simp add: subset_insertI)
+
+lemma (in valid_graph) rm: \<open>connected_graph G \<longleftrightarrow> (\<forall>v \<in> V. \<forall>v' \<in> V. nodes_connected G v v')\<close>
+  by (simp add: connected_graph_axioms_def connected_graph_def valid_graph_axioms)
+
+lemma (in valid_graph) is_simple_undir2_forest:
   assumes \<open>is_simple_undir2 v ps v'\<close>
-  shows \<open>forest (ind (set ps))\<close>
+  shows \<open>forest \<lparr>nodes = V, edges = set ps\<rparr>\<close>
   using assms
 proof (induction ps arbitrary: v)
   case (Cons e ps)
@@ -919,19 +934,21 @@ proof (induction ps arbitrary: v)
     by (cases e) (simp add: is_simple_undir2_def)
   have ne: \<open>v \<noteq> y\<close>
     using Cons.prems neuland by auto
-  from Cons interpret grove: forest \<open>ind (set ps)\<close>
+  have ne': \<open>v \<notin> adj_vertices ps\<close> \<comment> \<open>fixme: unused. also @{thm neuland'}\<close>
+    using Cons.prems neuland' by auto
+  from Cons interpret grove: forest \<open>\<lparr>nodes = V, edges = set ps\<rparr>\<close>
     by (auto simp: is_simple_undir2_def)
-  have \<open>ind (set (e # ps)) = add_edge v w y (ind (set ps))\<close>
-    unfolding int_vertices_def apply auto
+  have \<open>\<lparr>nodes = V, edges = set (e#ps)\<rparr> = add_edge v w y \<lparr>nodes = V, edges = set ps\<rparr>\<close>
+    apply auto
     by (smt Cons.prems e edges_add_edge graph.ext_inject insert_absorb is_path_undir_memb is_simple_undir1_step is_simple_undir2_def nodes_add_edge sum_of_parts)
   also have \<open>forest \<dots>\<close>
     apply (rule grove.forest_add_edge)
-    apply (metis calculation graph.select_convs(1) insertCI nodes_add_edge)
+    apply (metis Cons.prems graph.select_convs(1) is_path_undir_memb is_simple_undir2_def)
     using Cons.prems is_simple_undir2_def apply auto[1] subgoal
   proof (cases \<open>ps = []\<close>)
     case True
     then show ?thesis
-      using ne s.connected_same by auto
+      using is_path_undir.elims(2) ne by fastforce
   next
     case False
     note Cons(2)[simplified, unfolded is_simple_undir2_step[OF this], simplified]
@@ -939,7 +956,7 @@ proof (induction ps arbitrary: v)
       using ne tmp' by blast
   qed done
   finally show ?case .
-qed simp
+qed (simp add: forest_empty)
 
 lemma MSF_le_OPTWEIGHT:
   assumes \<open>s.MSF F\<close>
