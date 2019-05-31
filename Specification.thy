@@ -926,7 +926,8 @@ lemma (in valid_graph) rm: \<open>connected_graph G \<longleftrightarrow> (\<for
 
 lemma (in valid_graph) is_simple_undir2_forest:
   assumes \<open>is_simple_undir2 v ps v'\<close>
-  shows \<open>forest \<lparr>nodes = V, edges = set ps\<rparr>\<close>
+  shows \<open>forest \<lparr>nodes = V, edges = set ps\<rparr>
+ \<and> (\<forall>v \<in> adj_vertices ps. \<forall>v' \<in> adj_vertices ps. nodes_connected \<lparr>nodes = V, edges = set ps\<rparr> v v')\<close>
   using assms
 proof (induction ps arbitrary: v)
   case (Cons e ps)
