@@ -1000,6 +1000,13 @@ proof (induction ps arbitrary: v)
   finally show ?case .
 qed (simp add: forest_empty)
 
+corollary (in valid_graph) hamiltonian_path_is_tree:
+  assumes \<open>is_hamiltonian_path v ps v'\<close>
+  assumes \<open>2 \<le> card V\<close>
+  shows \<open>tree \<lparr>nodes=V, edges = set ps\<rparr>\<close>
+  using assms unfolding is_hamiltonian_path_def is_trace_def tree_def connected_graph_def connected_graph_axioms_def
+  by (metis empty_iff forest.axioms(1) graph.select_convs(1) is_simple_undir2_forest numeral_le_one_iff semiring_norm(69))
+
 lemma MSF_le_OPTWEIGHT:
   assumes \<open>s.MSF F\<close>
   shows \<open>set_cost F \<le> OPTWEIGHT\<close>
