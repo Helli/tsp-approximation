@@ -931,18 +931,19 @@ lemma (in valid_graph) is_simple_undir2_forest:
   using assms
 proof (induction ps arbitrary: v)
   case (Cons e ps)
-  then obtain w y where e[simp]: \<open>e=(v,w,y)\<close>
+  then obtain w v' where e[simp]: \<open>e=(v,w,v')\<close>
     by (cases e) (simp add: is_simple_undir2_def)
-  have ne: \<open>v \<noteq> y\<close>
+  have ne: \<open>v \<noteq> v'\<close>
     using Cons.prems neuland by auto
   have ne': \<open>v \<notin> adj_vertices ps\<close> \<comment> \<open>fixme: unused. also @{thm neuland'}\<close>
     using Cons.prems neuland' by auto
   from Cons interpret grove: forest \<open>\<lparr>nodes = V, edges = set ps\<rparr>\<close>
     by (auto simp: is_simple_undir2_def)
-  have \<open>\<lparr>nodes = V, edges = set (e#ps)\<rparr> = add_edge v w y \<lparr>nodes = V, edges = set ps\<rparr>\<close>
+  have \<open>\<lparr>nodes = V, edges = set (e#ps)\<rparr> = add_edge v w v' \<lparr>nodes = V, edges = set ps\<rparr>\<close>
     apply auto
     by (smt Cons.prems e edges_add_edge graph.ext_inject insert_absorb is_path_undir_memb is_simple_undir1_step is_simple_undir2_def nodes_add_edge sum_of_parts)
-  also have \<open>forest \<dots>\<close>
+  also have \<open>forest \<dots> \<and> (\<forall>v\<in>adj_vertices (e#ps). \<forall>v'\<in>adj_vertices (e#ps). nodes_connected \<dots> v v')\<close>
+    apply safe
     apply (rule grove.forest_add_edge)
     apply (metis Cons.prems graph.select_convs(1) is_path_undir_memb is_simple_undir2_def)
     using Cons.prems is_simple_undir2_def apply auto[1] subgoal
@@ -955,6 +956,16 @@ proof (induction ps arbitrary: v)
     note Cons(2)[simplified, unfolded is_simple_undir2_step[OF this], simplified]
     then show ?thesis
       using ne tmp' by blast
+  qed subgoal for x' y'
+  proof (cases \<open>ps = []\<close>)
+    case True
+    then show ?thesis apply auto
+      sorry
+  next
+    case False
+    note Cons(2)[simplified, unfolded is_simple_undir2_step[OF this], simplified]
+    then show ?thesis
+      sorry
   qed done
   finally show ?case .
 qed (simp add: forest_empty)
