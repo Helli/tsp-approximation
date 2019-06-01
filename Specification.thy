@@ -1009,6 +1009,7 @@ corollary (in valid_graph) hamiltonian_path_is_tree:
 
 lemma MSF_le_OPTWEIGHT:
   assumes \<open>s.MSF F\<close>
+  assumes \<open>2 \<le> card V\<close>
   shows \<open>set_cost F \<le> OPTWEIGHT\<close>
 proof -
   from assms(1) have \<open>set_cost F \<le> set_cost F'\<close> if \<open>s.basis F'\<close> for F'
