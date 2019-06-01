@@ -924,6 +924,20 @@ lemma (in -) delte_edge_supset: \<open>nodes (delete_edge x w y G) \<subseteq> n
 lemma (in valid_graph) rm: \<open>connected_graph G \<longleftrightarrow> (\<forall>v \<in> V. \<forall>v' \<in> V. nodes_connected G v v')\<close>
   by (simp add: connected_graph_axioms_def connected_graph_def valid_graph_axioms)
 
+lemma (in valid_graph) nodes_connected_add_edge:
+  assumes \<open>nodes_connected G v' v''\<close>
+  shows \<open>nodes_connected (add_edge v w v' G) v v''\<close>
+proof -
+  from assms obtain ps where \<open>is_path_undir G v' ps v''\<close>
+    by blast
+  then have \<open>is_path_undir (add_edge v w v' G) v' ps v''\<close>
+    by (simp add: add_edge_is_path)
+  then have \<open>is_path_undir (add_edge v w v' G) v ((v,w,v')#ps) v''\<close>
+    by simp
+  then show ?thesis
+    by blast
+qed
+
 lemma (in valid_graph) is_simple_undir2_forest:
   assumes \<open>is_simple_undir2 v ps v'\<close>
   shows \<open>forest \<lparr>nodes = V, edges = set ps\<rparr>
@@ -943,7 +957,7 @@ proof (induction ps arbitrary: v)
     apply auto
     by (smt Cons.prems e edges_add_edge graph.ext_inject insert_absorb is_path_undir_memb is_simple_undir1_step is_simple_undir2_def nodes_add_edge sum_of_parts)
   also have \<open>forest \<dots> \<and> (\<forall>v\<in>adj_vertices (e#ps). \<forall>v'\<in>adj_vertices (e#ps). nodes_connected \<dots> v v')\<close>
-    apply safe
+    apply rule
     apply (rule grove.forest_add_edge)
     apply (metis Cons.prems graph.select_convs(1) is_path_undir_memb is_simple_undir2_def)
     using Cons.prems is_simple_undir2_def apply auto[1] subgoal
@@ -956,16 +970,32 @@ proof (induction ps arbitrary: v)
     note Cons(2)[simplified, unfolded is_simple_undir2_step[OF this], simplified]
     then show ?thesis
       using ne tmp' by blast
-  qed subgoal for x' y'
+  qed subgoal
   proof (cases \<open>ps = []\<close>)
     case True
     then show ?thesis apply auto
-      sorry
+      apply (metis add_edge_valid empty_set grove.add_edge_is_connected(2) grove.valid_graph_axioms is_path_undir.simps(1) valid_graph.is_path_undir_memb)
+      using grove.add_edge_is_connected(2) apply auto[1]
+      using grove.add_edge_is_connected(1) apply auto[1]
+      by (meson add_edge_valid forest.axioms(1) forest_empty is_path_undir.simps(1) valid_graph.add_edge_is_connected(1) valid_graph.is_path_undir_memb)
   next
     case False
-    note Cons(2)[simplified, unfolded is_simple_undir2_step[OF this], simplified]
-    then show ?thesis
-      sorry
+    note rm = Cons(2)[simplified, unfolded is_simple_undir2_step[OF this], simplified]
+    note ** = Cons.IH[OF this[THEN conjunct2, THEN conjunct2],THEN conjunct2]
+    have *: \<open>adj_vertices (e#ps) = insert v (adj_vertices ps)\<close>
+      using Cons.prems False tmp by auto
+    have \<open>v' \<in> adj_vertices ps\<close>
+      by (metis * Cons.prems calculation finite_list grove.add_edge_is_connected(2) finite_adj_vertices list.simps(15) ne set_ConsD tmp')
+    then have \<open>nodes_connected \<lparr>nodes = V, edges = set ps\<rparr> v' v''\<close> if \<open>v'' \<in> adj_vertices ps\<close> for v''
+      using ** grove.add_edge_is_path that by blast
+    then have ***: \<open>nodes_connected (add_edge v w v' \<lparr>nodes = V, edges = set ps\<rparr>) v v''\<close> if \<open>v'' \<in> adj_vertices ps\<close> for v''
+      by (simp add: grove.nodes_connected_add_edge that)
+    from * show ?thesis apply (auto simp: False)
+         apply (meson add_edge_valid grove.add_edge_is_connected(2) grove.valid_graph_axioms valid_graph.is_path_undir_memb valid_graph.is_path_undir_simps(1))
+      prefer 3
+      using ** grove.add_edge_is_path apply blast apply (rule ***)
+      apply blast
+      by (meson *** add_edge_valid grove.valid_graph_axioms valid_graph.is_path_undir_sym)
   qed done
   finally show ?case .
 qed (simp add: forest_empty)
