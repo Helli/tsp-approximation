@@ -1007,14 +1007,17 @@ corollary (in valid_graph) hamiltonian_path_is_tree:
   using assms unfolding is_hamiltonian_path_def is_trace_def tree_def connected_graph_def connected_graph_axioms_def
   by (metis empty_iff forest.axioms(1) graph.select_convs(1) is_simple_undir2_forest numeral_le_one_iff semiring_norm(69))
 
-lemma MSF_le_OPTWEIGHT:
-  assumes \<open>s.MSF F\<close>
+lemma (in connected_graph) spanning_tree_eq: \<open>spanning_tree \<lparr>nodes=V, edges=F\<rparr> G \<longleftrightarrow> spanning_forest \<lparr>nodes=V, edges=F\<rparr> G\<close>
+  by (meson maximally_connected_impl_connected spanning_forest_def spanning_tree_def tree_def connected_impl_maximally_connected)
+
+lemma minimum_spanning_tree_le_OPTWEIGHT:
+  assumes \<open>minimum_spanning_tree (ind F) G\<close>
   assumes \<open>2 \<le> card V\<close>
   shows \<open>set_cost F \<le> OPTWEIGHT\<close>
 proof -
   from assms(1) have \<open>set_cost F \<le> set_cost F'\<close> if \<open>s.basis F'\<close> for F'
-    by (simp add: edge_weight_alt s.minBasis_def that)
-  moreover have \<open>s.SpanningForest (set (tl OPT))\<close>
+    by (metis (no_types, lifting) minimum_spanning_tree_def optimal_tree_def spanning_forest_eq spanning_tree_eq sum_of_parts that)
+  moreover have \<open>spanning_tree (ind (set (tl OPT))) G\<close>
   proof -
     have \<open>is_hamiltonian_circuit (fst (hd OPT)) OPT\<close>
       using is_arg_min_OPT[OF assms(2)]
@@ -1052,7 +1055,7 @@ proof goal_cases
   also have \<open>sum_list (map (fst \<circ> snd) pretour) \<le> set_cost MST + set_cost MST\<close>
     by (fact 1(3))
   also have \<open>\<dots> \<le> OPTWEIGHT + OPTWEIGHT\<close>
-    by (simp add: 1(1) assms MSF_le_OPTWEIGHT add_mono)
+    by (simp add: 1(1) assms minimum_spanning_tree_le_OPTWEIGHT add_mono)
   finally show ?case .
 qed
 
