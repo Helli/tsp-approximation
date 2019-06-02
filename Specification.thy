@@ -1016,6 +1016,25 @@ proof -
     by (simp add: edge_weight_alt s.minBasis_def that)
   moreover have \<open>s.SpanningForest (set (tl OPT))\<close>
   proof -
+    have \<open>is_hamiltonian_circuit (fst (hd OPT)) OPT\<close>
+      using is_arg_min_OPT[OF assms(2)]
+      by (simp add: is_arg_min_def)
+    moreover have \<open>2 \<le> length OPT\<close>
+      using assms(2) calculation is_hamiltonian_circuit_length by auto
+    moreover have \<open>snd (snd (last OPT)) = fst (hd OPT)\<close>
+      by (metis Nitpick.size_list_simp(2) calculation(1) calculation(2) is_hamiltonian_circuit_def is_path_undir_last rel_simps(76) zero_order(2))
+    ultimately have \<open>is_hamiltonian_path (fst (hd (tl OPT))) (tl OPT) (fst (hd OPT))\<close>
+      unfolding is_hamiltonian_circuit_def is_hamiltonian_path_def is_trace_def is_hamiltonian_def
+      apply auto
+      apply (metis Nitpick.size_list_simp(2) One_nat_def Suc_1 Suc_n_not_le_n all_not_in_conv)
+         apply (metis Nitpick.size_list_simp(2) One_nat_def Suc_1 Suc_n_not_le_n \<open>2 \<le> length OPT\<close> rel_simps(76) zero_order(2))
+      using is_path_undir_last
+      apply (smt \<open>is_hamiltonian_circuit (fst (hd OPT)) OPT\<close> adj_vertices_simps(2) append_is_Nil_conv complete_finite_weighted_graph.is_hamiltonian_circuit_fst complete_finite_weighted_graph_axioms hd_Cons_tl insert_absorb2 insert_iff int_vertices_simps(2) is_hamiltonian_circuit_int_vertices is_hamiltonian_circuit_rotate1 is_trace_def is_trace_snoc list.sel(2) tl_last)
+       apply (metis (no_types, lifting) adj_vertices.simps(2) int_vertices_def int_vertices_simps(2) list.collapse tl_Nil tl_last)
+      unfolding is_simple_undir2_def apply auto
+      apply (smt \<open>is_hamiltonian_circuit (fst (hd OPT)) OPT\<close> append_Cons hd_Cons_tl is_hamiltonian_circuit_def is_hamiltonian_circuit_fst is_hamiltonian_circuit_rotate1 is_path_undir_last is_path_undir_split list.sel(2) tl_last)
+      apply (simp add: map_tl) apply (simp add: int_vertices_def)
+      by (metis distinct_hd_tl hd_map list.sel(2) list.set_map map_tl)
     show ?thesis
       sorry
   qed
@@ -1023,7 +1042,9 @@ proof -
     sorry
 qed
 
-proposition \<open>algo_sketch \<le> twoApprox\<close>
+proposition
+  assumes \<open>2 \<le> card V\<close>
+  shows \<open>algo_sketch \<le> twoApprox\<close>
   unfolding algo_sketch_def apply refine_vcg apply auto
 proof goal_cases
   case (1 MST pretour Tour)
@@ -1031,7 +1052,7 @@ proof goal_cases
   also have \<open>sum_list (map (fst \<circ> snd) pretour) \<le> set_cost MST + set_cost MST\<close>
     by (fact 1(3))
   also have \<open>\<dots> \<le> OPTWEIGHT + OPTWEIGHT\<close>
-    by (simp add: 1(1) MSF_le_OPTWEIGHT add_mono)
+    by (simp add: 1(1) assms MSF_le_OPTWEIGHT add_mono)
   finally show ?case .
 qed
 
