@@ -435,7 +435,8 @@ begin
 
 find_theorems name: MSF_eq
 thm s.k0_spec[unfolded MSF_eq]
-thm s.k0_spec[unfolded MSF_eq, simplified]
+thm s.kruskal0_def
+thm s.kruskal0_def[simplified]
 thm spanning_forest_eq
 thm MSF_eq
 
@@ -880,7 +881,7 @@ abbreviation twoApprox where
 
 definition algo_sketch where \<open>algo_sketch =
 do {
-  MST \<leftarrow> SPEC s.minBasis;
+  MST \<leftarrow> SPEC (\<lambda>E'. minimum_spanning_tree (ind E') G);
   pretour \<leftarrow> SPEC (\<lambda>pT. is_hamiltonian pT \<and> cost pT \<le> set_cost MST + set_cost MST);
   Tour \<leftarrow> SPEC (\<lambda>T. is_hamiltonian_circuit (fst (hd T)) T \<and> cost T \<le> cost pretour);
   RETURN Tour
