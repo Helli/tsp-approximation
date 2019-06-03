@@ -1019,44 +1019,53 @@ lemma is_hamiltonian_circuit_OPT:
   \<open>2 \<le> card V \<Longrightarrow> is_hamiltonian_circuit (fst (hd OPT)) OPT\<close>
   using is_arg_min_OPT by (simp add: is_arg_min_def)
 
+end
+
+locale complete_finite_metric_graph = complete_finite_weighted_graph G for G :: \<open>(_,_::canonically_ordered_monoid_add) graph\<close>
+\<comment> \<open>to-do: replace constraint with actual metricity.\<close>
+begin
+
 lemma minimum_spanning_tree_le_OPTWEIGHT:
   assumes \<open>minimum_spanning_tree (ind F) G\<close>
   assumes \<open>2 \<le> card V\<close>
+  assumes no_id:\<open>\<And>v w.(v,w,v) \<notin> E\<close> \<comment> \<open>removable\<close>
   shows \<open>set_cost F \<le> OPTWEIGHT\<close>
 proof -
-  from assms(1) have \<open>set_cost F \<le> set_cost F'\<close> if \<open>s.basis F'\<close> for F'
-    using that by (metis (no_types, lifting) minimum_spanning_tree_def optimal_tree_def spanning_forest_eq spanning_tree_eq sum_of_parts)
-  moreover have \<open>spanning_tree (ind (set (tl OPT))) (ind (symhull E))\<close>
-  proof -
-    have \<open>2 \<le> length OPT\<close>
-      using assms(2) is_hamiltonian_circuit_OPT is_hamiltonian_circuit_length by presburger
-    moreover have \<open>snd (snd (last OPT)) = fst (hd OPT)\<close>
-      by (metis Nitpick.size_list_simp(2) assms(2) calculation is_hamiltonian_circuit_OPT is_path_undir_last rel_simps(76) is_hamiltonian_circuit_def zero_order(2))
-    ultimately have \<open>is_hamiltonian_path (fst (hd (tl OPT))) (tl OPT) (fst (hd OPT))\<close>
-      using is_hamiltonian_circuit_OPT[OF assms(2)]
-      unfolding is_hamiltonian_circuit_def is_hamiltonian_path_def is_trace_def is_hamiltonian_def
-      apply auto
-      apply (metis Nitpick.size_list_simp(2) One_nat_def Suc_1 Suc_leD assms(2) is_hamiltonian_circuit_OPT is_hamiltonian_circuit_length length_ge_1_conv)
-         apply (metis Nitpick.size_list_simp(2) One_nat_def Suc_1 Suc_n_not_le_n \<open>2 \<le> length OPT\<close> rel_simps(76) zero_order(2))
-      using is_path_undir_last assms(2)
-        apply (smt is_hamiltonian_circuit_OPT adj_vertices_simps(2) append_is_Nil_conv complete_finite_weighted_graph.is_hamiltonian_circuit_fst complete_finite_weighted_graph_axioms hd_Cons_tl insert_absorb2 insert_iff int_vertices_simps(2) is_hamiltonian_circuit_int_vertices is_hamiltonian_circuit_rotate1 is_trace_def is_trace_snoc list.sel(2) tl_last)
-       apply (metis (no_types, lifting) adj_vertices.simps(2) int_vertices_def int_vertices_simps(2) list.collapse tl_Nil tl_last)
-      unfolding is_simple_undir2_def apply auto
-      apply (smt \<open>is_hamiltonian_circuit (fst (hd OPT)) OPT\<close> append_Cons hd_Cons_tl is_hamiltonian_circuit_def is_hamiltonian_circuit_fst is_hamiltonian_circuit_rotate1 is_path_undir_last is_path_undir_split list.sel(2) tl_last)
-      apply (simp add: map_tl) apply (simp add: int_vertices_def)
-      by (metis distinct_hd_tl hd_map list.sel(2) list.set_map map_tl)
-    then show ?thesis
-      unfolding spanning_tree_def apply auto
-       apply (simp add: assms(2) hamiltonian_path_is_tree)
-      unfolding subgraph_def apply auto
-      by (meson assms(2) in_set_tlD is_hamiltonian_circuit_OPT is_path_undir_edges_symhull subsetD is_hamiltonian_circuit_def)
-  qed
-  ultimately show ?thesis
-    sorry
+  have \<open>2 \<le> length OPT\<close>
+    using assms(2) is_hamiltonian_circuit_OPT is_hamiltonian_circuit_length by presburger
+  moreover have \<open>snd (snd (last OPT)) = fst (hd OPT)\<close>
+    by (metis Nitpick.size_list_simp(2) assms(2) calculation is_hamiltonian_circuit_OPT is_path_undir_last rel_simps(76) is_hamiltonian_circuit_def zero_order(2))
+  ultimately have \<open>is_hamiltonian_path (fst (hd (tl OPT))) (tl OPT) (fst (hd OPT))\<close>
+    using is_hamiltonian_circuit_OPT[OF assms(2)]
+    unfolding is_hamiltonian_circuit_def is_hamiltonian_path_def is_trace_def is_hamiltonian_def
+    apply auto
+    apply (metis Nitpick.size_list_simp(2) One_nat_def Suc_1 Suc_leD assms(2) is_hamiltonian_circuit_OPT is_hamiltonian_circuit_length length_ge_1_conv)
+       apply (metis Nitpick.size_list_simp(2) One_nat_def Suc_1 Suc_n_not_le_n \<open>2 \<le> length OPT\<close> rel_simps(76) zero_order(2))
+    using is_path_undir_last assms(2)
+      apply (smt is_hamiltonian_circuit_OPT adj_vertices_simps(2) append_is_Nil_conv complete_finite_weighted_graph.is_hamiltonian_circuit_fst complete_finite_weighted_graph_axioms hd_Cons_tl insert_absorb2 insert_iff int_vertices_simps(2) is_hamiltonian_circuit_int_vertices is_hamiltonian_circuit_rotate1 is_trace_def is_trace_snoc list.sel(2) tl_last)
+     apply (metis (no_types, lifting) adj_vertices.simps(2) int_vertices_def int_vertices_simps(2) list.collapse tl_Nil tl_last)
+    unfolding is_simple_undir2_def apply auto
+    apply (smt \<open>is_hamiltonian_circuit (fst (hd OPT)) OPT\<close> append_Cons hd_Cons_tl is_hamiltonian_circuit_def is_hamiltonian_circuit_fst is_hamiltonian_circuit_rotate1 is_path_undir_last is_path_undir_split list.sel(2) tl_last)
+    apply (simp add: map_tl) apply (simp add: int_vertices_def)
+    by (metis distinct_hd_tl hd_map list.sel(2) list.set_map map_tl)
+  then have *: \<open>spanning_tree (ind (set (tl OPT))) (ind (symhull E))\<close>
+    unfolding spanning_tree_def apply auto
+     apply (simp add: assms(2) hamiltonian_path_is_tree)
+    unfolding subgraph_def apply auto
+    by (meson assms(2) in_set_tlD is_hamiltonian_circuit_OPT is_path_undir_edges_symhull subsetD is_hamiltonian_circuit_def)
+  have **: \<open>set_cost F \<le> set_cost F'\<close> if \<open>spanning_tree (ind F') (ind (symhull E))\<close> for F'
+    using that assms(1) minimum_spanning_tree_def minimum_spanning_tree_symhull no_id optimal_tree_def by blast
+  have \<open>cost (tl OPT) \<le> cost OPT\<close>
+    unfolding tl_def by (cases OPT) simp_all
+  also have \<open>\<dots> \<le> OPTWEIGHT\<close>
+    using OPT_sanity assms(2) by auto
+  finally show ?thesis
+    by (metis * ** assms(2) comp_apply distinct_tl edge_weight_sum_list finite_weighted_graph.is_hamiltonian_circuit_distinct finite_weighted_graph_axioms is_hamiltonian_circuit_OPT order_trans)
 qed
 
 proposition
   assumes \<open>2 \<le> card V\<close>
+  assumes no_id:\<open>\<And>v w.(v,w,v) \<notin> E\<close> \<comment> \<open>removable\<close>
   shows \<open>algo_sketch \<le> twoApprox\<close>
   unfolding algo_sketch_def apply refine_vcg apply auto
 proof goal_cases
@@ -1065,7 +1074,7 @@ proof goal_cases
   also have \<open>sum_list (map (fst \<circ> snd) pretour) \<le> set_cost MST + set_cost MST\<close>
     by (fact 1(3))
   also have \<open>\<dots> \<le> OPTWEIGHT + OPTWEIGHT\<close>
-    by (simp add: 1(1) assms minimum_spanning_tree_le_OPTWEIGHT add_mono)
+    by (simp add: 1(1) add_mono assms minimum_spanning_tree_le_OPTWEIGHT)
   finally show ?case .
 qed
 
