@@ -1011,6 +1011,14 @@ corollary (in valid_graph) hamiltonian_path_is_tree:
 lemma (in connected_graph) spanning_tree_eq: \<open>spanning_tree \<lparr>nodes=V, edges=F\<rparr> G \<longleftrightarrow> spanning_forest \<lparr>nodes=V, edges=F\<rparr> G\<close>
   by (meson maximally_connected_impl_connected spanning_forest_def spanning_tree_def tree_def connected_impl_maximally_connected)
 
+lemma (in valid_graph) is_path_undir_edges_symhull:
+  \<open>is_path_undir G v ps v' \<Longrightarrow> set ps \<subseteq> symhull E\<close>
+  unfolding symhull_def using is_path_undir_memb_edges by fast
+
+lemma is_hamiltonian_circuit_OPT:
+  \<open>2 \<le> card V \<Longrightarrow> is_hamiltonian_circuit (fst (hd OPT)) OPT\<close>
+  using is_arg_min_OPT by (simp add: is_arg_min_def)
+
 lemma minimum_spanning_tree_le_OPTWEIGHT:
   assumes \<open>minimum_spanning_tree (ind F) G\<close>
   assumes \<open>2 \<le> card V\<close>
@@ -1018,29 +1026,30 @@ lemma minimum_spanning_tree_le_OPTWEIGHT:
 proof -
   from assms(1) have \<open>set_cost F \<le> set_cost F'\<close> if \<open>s.basis F'\<close> for F'
     by (metis (no_types, lifting) minimum_spanning_tree_def optimal_tree_def spanning_forest_eq spanning_tree_eq sum_of_parts that)
-  moreover have \<open>spanning_tree (ind (set (tl OPT))) G\<close>
+  moreover have \<open>spanning_tree (ind (set (tl OPT))) (ind (symhull E))\<close>
   proof -
-    have \<open>is_hamiltonian_circuit (fst (hd OPT)) OPT\<close>
-      using is_arg_min_OPT[OF assms(2)]
-      by (simp add: is_arg_min_def)
-    moreover have \<open>2 \<le> length OPT\<close>
-      using assms(2) calculation is_hamiltonian_circuit_length by auto
+    have \<open>2 \<le> length OPT\<close>
+      using assms(2) is_hamiltonian_circuit_OPT is_hamiltonian_circuit_length by presburger
     moreover have \<open>snd (snd (last OPT)) = fst (hd OPT)\<close>
-      by (metis Nitpick.size_list_simp(2) calculation(1) calculation(2) is_hamiltonian_circuit_def is_path_undir_last rel_simps(76) zero_order(2))
+      by (metis Nitpick.size_list_simp(2) assms(2) calculation is_hamiltonian_circuit_OPT is_path_undir_last rel_simps(76) is_hamiltonian_circuit_def zero_order(2))
     ultimately have \<open>is_hamiltonian_path (fst (hd (tl OPT))) (tl OPT) (fst (hd OPT))\<close>
+      using is_hamiltonian_circuit_OPT[OF assms(2)]
       unfolding is_hamiltonian_circuit_def is_hamiltonian_path_def is_trace_def is_hamiltonian_def
       apply auto
-      apply (metis Nitpick.size_list_simp(2) One_nat_def Suc_1 Suc_n_not_le_n all_not_in_conv)
+      apply (metis Nitpick.size_list_simp(2) One_nat_def Suc_1 Suc_leD assms(2) is_hamiltonian_circuit_OPT is_hamiltonian_circuit_length length_ge_1_conv)
          apply (metis Nitpick.size_list_simp(2) One_nat_def Suc_1 Suc_n_not_le_n \<open>2 \<le> length OPT\<close> rel_simps(76) zero_order(2))
-      using is_path_undir_last
-      apply (smt \<open>is_hamiltonian_circuit (fst (hd OPT)) OPT\<close> adj_vertices_simps(2) append_is_Nil_conv complete_finite_weighted_graph.is_hamiltonian_circuit_fst complete_finite_weighted_graph_axioms hd_Cons_tl insert_absorb2 insert_iff int_vertices_simps(2) is_hamiltonian_circuit_int_vertices is_hamiltonian_circuit_rotate1 is_trace_def is_trace_snoc list.sel(2) tl_last)
+      using is_path_undir_last assms(2)
+        apply (smt is_hamiltonian_circuit_OPT adj_vertices_simps(2) append_is_Nil_conv complete_finite_weighted_graph.is_hamiltonian_circuit_fst complete_finite_weighted_graph_axioms hd_Cons_tl insert_absorb2 insert_iff int_vertices_simps(2) is_hamiltonian_circuit_int_vertices is_hamiltonian_circuit_rotate1 is_trace_def is_trace_snoc list.sel(2) tl_last)
        apply (metis (no_types, lifting) adj_vertices.simps(2) int_vertices_def int_vertices_simps(2) list.collapse tl_Nil tl_last)
       unfolding is_simple_undir2_def apply auto
       apply (smt \<open>is_hamiltonian_circuit (fst (hd OPT)) OPT\<close> append_Cons hd_Cons_tl is_hamiltonian_circuit_def is_hamiltonian_circuit_fst is_hamiltonian_circuit_rotate1 is_path_undir_last is_path_undir_split list.sel(2) tl_last)
       apply (simp add: map_tl) apply (simp add: int_vertices_def)
       by (metis distinct_hd_tl hd_map list.sel(2) list.set_map map_tl)
-    show ?thesis
-      sorry
+    then show ?thesis
+      unfolding spanning_tree_def apply auto
+       apply (simp add: assms(2) hamiltonian_path_is_tree)
+      unfolding subgraph_def apply auto
+      by (meson assms(2) in_set_tlD is_hamiltonian_circuit_OPT is_path_undir_edges_symhull subsetD is_hamiltonian_circuit_def)
   qed
   ultimately show ?thesis
     sorry
