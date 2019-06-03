@@ -1025,7 +1025,7 @@ lemma minimum_spanning_tree_le_OPTWEIGHT:
   shows \<open>set_cost F \<le> OPTWEIGHT\<close>
 proof -
   from assms(1) have \<open>set_cost F \<le> set_cost F'\<close> if \<open>s.basis F'\<close> for F'
-    by (metis (no_types, lifting) minimum_spanning_tree_def optimal_tree_def spanning_forest_eq spanning_tree_eq sum_of_parts that)
+    using that by (metis (no_types, lifting) minimum_spanning_tree_def optimal_tree_def spanning_forest_eq spanning_tree_eq sum_of_parts)
   moreover have \<open>spanning_tree (ind (set (tl OPT))) (ind (symhull E))\<close>
   proof -
     have \<open>2 \<le> length OPT\<close>
