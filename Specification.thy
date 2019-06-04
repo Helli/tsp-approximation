@@ -1056,7 +1056,7 @@ proof -
   have **: \<open>set_cost F \<le> set_cost F'\<close> if \<open>spanning_tree (ind F') (ind (symhull E))\<close> for F'
     using that assms(1) minimum_spanning_tree_def minimum_spanning_tree_symhull no_id optimal_tree_def by blast
   have \<open>cost (tl OPT) \<le> cost OPT\<close>
-    unfolding tl_def by (cases OPT) simp_all
+    by (cases OPT) simp_all
   also have \<open>\<dots> \<le> OPTWEIGHT\<close>
     using OPT_sanity assms(2) by auto
   finally show ?thesis
