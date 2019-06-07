@@ -518,7 +518,14 @@ definition (in valid_graph) is_hamiltonian :: \<open>('v,'w) path \<Rightarrow> 
   \<open>is_hamiltonian ps \<longleftrightarrow> (if ps=[] then V={} \<or> card V = 1 else int_vertices ps = V)\<close>
 
 definition (in valid_graph) is_hamiltonian_circuit where
-  \<open>is_hamiltonian_circuit v ps \<longleftrightarrow> is_hamiltonian ps \<and> is_simple_undir1 v ps v\<close> \<comment> \<open>abolish vertex argument?\<close>
+  \<open>is_hamiltonian_circuit v ps \<longleftrightarrow> int_vertices ps = V \<and> is_simple_undir1 v ps v\<close> \<comment> \<open>abolish vertex argument?\<close>
+
+definition (in valid_graph) is_hamiltonian_circuit_old where
+  \<open>is_hamiltonian_circuit_old v ps \<longleftrightarrow> is_hamiltonian ps \<and> is_simple_undir1 v ps v\<close> \<comment> \<open>abolish vertex argument?\<close>
+
+lemma (in valid_graph) tmp:
+  \<open>card V \<noteq> 1 \<Longrightarrow> is_hamiltonian_circuit_old v ps \<longleftrightarrow> is_hamiltonian_circuit v ps\<close>
+  by (metis (mono_tags, hide_lams) int_vertices_empty is_hamiltonian_circuit_def is_hamiltonian_circuit_old_def valid_graph.is_hamiltonian_def valid_graph_axioms)
 
 text\<open>to-do: remove the special case for \<^term>\<open>card V = 1\<close>. For all other cases, the definition is fine, but this should hold:\<close>
 lemma (in valid_graph)
