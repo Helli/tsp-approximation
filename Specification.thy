@@ -504,7 +504,7 @@ lemma (in valid_graph)
 definition (in valid_graph) is_simple_undir2 where
   \<open>is_simple_undir2 v ps v' \<longleftrightarrow> is_simple_undir1 v ps v' \<and> v' \<notin> int_vertices ps\<close>
 
-definition (in valid_graph) is_trace :: \<open>('v,'w) path \<Rightarrow> bool\<close> where \<comment> \<open>non-standard definition. Also not thoroughly thought through.\<close>
+definition (in valid_graph) is_trace :: \<open>('v,'w) path \<Rightarrow> bool\<close> where \<comment> \<open>non-standard definition.\<close>
   \<open>is_trace ps \<longleftrightarrow> (if ps=[] then V={} else adj_vertices ps = V)\<close>
 
 lemma (in valid_graph) conversion:
@@ -518,24 +518,13 @@ lemma (in valid_graph) is_trace_snoc:
 definition (in valid_graph) is_hamiltonian_path where \<comment> \<open>or \<open>simple trace\<close>\<close>
   \<open>is_hamiltonian_path v ps v' \<longleftrightarrow> is_trace ps \<and> is_simple_undir2 v ps v'\<close> \<comment> \<open>abolish vertex arguments?\<close>
 
-definition (in valid_graph) is_hamiltonian :: \<open>('v,'w) path \<Rightarrow> bool\<close> where \<comment> \<open>to-do: unconventional intermediate definition, only for experimentation\<close>
-  \<open>is_hamiltonian ps \<longleftrightarrow> (if ps=[] then V={} \<or> card V = 1 else int_vertices ps = V)\<close>
-
 definition (in valid_graph) is_hamiltonian_circuit where
   \<open>is_hamiltonian_circuit v ps \<longleftrightarrow> int_vertices ps = V \<and> is_simple_undir1 v ps v\<close> \<comment> \<open>abolish vertex argument?\<close>
-
-definition (in valid_graph) is_hamiltonian_circuit_old where
-  \<open>is_hamiltonian_circuit_old v ps \<longleftrightarrow> is_hamiltonian ps \<and> is_simple_undir1 v ps v\<close> \<comment> \<open>abolish vertex argument?\<close>
-
-lemma (in valid_graph) tmp:
-  \<open>card V \<noteq> 1 \<Longrightarrow> is_hamiltonian_circuit_old v ps \<longleftrightarrow> is_hamiltonian_circuit v ps\<close>
-  by (metis (mono_tags, hide_lams) int_vertices_empty is_hamiltonian_circuit_def is_hamiltonian_circuit_old_def valid_graph.is_hamiltonian_def valid_graph_axioms)
 
 lemma (in valid_graph) is_hamiltonian_circuit_length:
   \<open>is_hamiltonian_circuit v ps \<Longrightarrow> length ps = card V\<close>
   unfolding is_hamiltonian_circuit_def int_vertices_def using distinct_card by fastforce
 
-text\<open>to-do: remove the special case for \<^term>\<open>card V = 1\<close>. For all other cases, the definition is fine, but this should hold:\<close>
 lemma (in valid_graph) is_hamiltonian_circuit_singleton:
   \<open>V = {y} \<Longrightarrow> is_hamiltonian_circuit v ps \<Longrightarrow> v=y \<and> (\<exists>w. ps=[(v,w,v)])\<close>
   apply safe
@@ -573,7 +562,7 @@ lemma is_simple_path_kon_circuit: \<open>kon_graph.is_simple_undir1 a kon_circui
   by (simp add: kon_circuit_def kon_path_def) (simp add: kon_graph_def)
 
 lemma is_hamiltonian_circuit_kon_circuit: \<open>kon_graph.is_hamiltonian_circuit a kon_circuit\<close>
-  unfolding kon_graph.is_hamiltonian_circuit_def kon_graph.is_hamiltonian_def
+  unfolding kon_graph.is_hamiltonian_circuit_def
   apply (auto simp: is_simple_path_kon_circuit)
    by (auto simp: kon_circuit_def kon_path_def kon_graph_def)
 
@@ -677,7 +666,7 @@ lemma (in valid_graph) hamiltonian_impl_finiteV:
 lemma (in valid_graph) is_hamiltonian_circuit_rotate1:
   assumes \<open>is_hamiltonian_circuit v (e#ps)\<close>
   shows \<open>is_hamiltonian_circuit (snd (snd e)) (ps@[e])\<close>
-  using assms unfolding is_hamiltonian_circuit_def is_hamiltonian_def apply auto
+  using assms unfolding is_hamiltonian_circuit_def apply auto
   using triple_of_parts by (metis (no_types) is_path_undir.simps(2) is_path_undir_simps(2) is_path_undir_split)
 
 lemma (in valid_graph) is_hamiltonian_circuit_rotate1_ex:
@@ -688,7 +677,7 @@ lemma (in valid_graph) is_hamiltonian_circuit_rotate1_ex:
 
 lemma (in valid_graph) is_hamiltonian_circuit_int_vertices:
   \<open>is_hamiltonian_circuit v ps \<Longrightarrow> ps = [] \<or> int_vertices ps = V\<close>
-  by (meson is_hamiltonian_circuit_def is_hamiltonian_def valid_graph_axioms)
+  by (meson is_hamiltonian_circuit_def valid_graph_axioms)
 
 lemma (in valid_graph) trivial_hamiltonian_circuit_Ball:
   \<open>is_hamiltonian_circuit v [] \<Longrightarrow> \<forall>v'\<in>V. is_hamiltonian_circuit v' []\<close>
@@ -724,7 +713,7 @@ proof (cases \<open>ps = []\<close>)
 next
   case False
   with assms have \<open>v' \<in> int_vertices ps\<close>
-    by (simp add: is_hamiltonian_circuit_def is_hamiltonian_def)
+    by (simp add: is_hamiltonian_circuit_def)
   then obtain i e where i: \<open>i < length ps\<close> \<open>ps!i = (v',e)\<close>
     unfolding int_vertices_def by (smt fst_conv in_set_conv_nth length_map nth_map old.prod.exhaust)
   then obtain tl where \<open>rotate i ps = (v',e)#tl\<close>
@@ -771,7 +760,7 @@ proof (induction \<open>card V\<close> arbitrary: v G rule: nat_induct_at_least[
     using G.complete by blast
   show ?case
     apply (rule exI[of _ \<open>[(v,w,v'),(v',w,v)]\<close>])
-    apply (auto simp: G.is_hamiltonian_circuit_def G.is_hamiltonian_def base v' GV w)
+    apply (auto simp: G.is_hamiltonian_circuit_def base v' GV w)
     using w by blast
 next
   case (Suc n)
@@ -791,8 +780,7 @@ next
   have G': \<open>int_vertices ps' = G'.V\<close> \<open>G'.is_simple_undir1 v' ps' v'\<close>
    by (auto simp: ps'[unfolded G'.is_hamiltonian_circuit_def])
   then have *: \<open>int_vertices ps' = G'.V\<close> \<open>G.is_simple_undir1 v' ps' v'\<close>
-    unfolding G'.is_hamiltonian_def apply auto
-    using G.delete_node_was_simple_undir by blast
+    using G.delete_node_was_simple_undir by auto
   then have \<open>v \<notin> int_vertices ps'\<close>
     using nG' by blast
   from * G'(2) obtain w_discard v1 ps'' where ps'': \<open>ps' = (v',w_discard,v1)#ps''\<close>
@@ -819,7 +807,7 @@ lemma is_hamiltonian_circuit_fst:
   assumes \<open>is_hamiltonian_circuit v (p#ps)\<close>
   shows \<open>fst p = v\<close>
 proof -
-  from assms[unfolded is_hamiltonian_circuit_def is_hamiltonian_def]
+  from assms[unfolded is_hamiltonian_circuit_def]
   show \<open>fst p = v\<close>
     by (cases p) simp
 qed
@@ -876,7 +864,7 @@ abbreviation twoApprox where
 definition algo_sketch where \<open>algo_sketch =
 do {
   MST \<leftarrow> SPEC (\<lambda>E'. minimum_spanning_tree (ind E') G);
-  pretour \<leftarrow> SPEC (\<lambda>pT. is_hamiltonian pT \<and> cost pT \<le> set_cost MST + set_cost MST);
+  pretour \<leftarrow> SPEC (\<lambda>pT. int_vertices pT = V \<and> cost pT \<le> set_cost MST + set_cost MST);
   Tour \<leftarrow> SPEC (\<lambda>T. is_hamiltonian_circuit (fst (hd T)) T \<and> cost T \<le> cost pretour);
   RETURN Tour
 }\<close>
@@ -1033,7 +1021,7 @@ proof -
     by (metis Nitpick.size_list_simp(2) One_nat_def Suc_1 Suc_leD Suc_n_not_le_n calculation(1))
   ultimately have \<open>is_hamiltonian_path (fst (hd (tl OPT))) (tl OPT) (fst (hd OPT))\<close>
     using is_hamiltonian_circuit_OPT[OF assms(2)]
-    unfolding is_hamiltonian_circuit_def is_hamiltonian_path_def is_trace_def is_hamiltonian_def
+    unfolding is_hamiltonian_circuit_def is_hamiltonian_path_def is_trace_def
     apply safe apply simp
     apply (metis (no_types, hide_lams) adj_vertices.simps(2) int_vertices_def int_vertices_simps(2)
         list.exhaust_sel tl_Nil tl_last)
