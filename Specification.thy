@@ -537,6 +537,26 @@ lemma (in valid_graph) is_hamiltonian_circuit_is_cycle:
   \<open>is_hamiltonian_circuit ps \<Longrightarrow> is_cycle ps\<close>
   by (simp add: is_hamiltonian_circuit_def)
 
+lemma (in valid_graph) is_path_undir_snd_snd_last: \<open>ps \<noteq> [] \<Longrightarrow> is_path_undir G v ps v' \<Longrightarrow> snd (snd (last ps)) = v'\<close>
+  by (induction ps arbitrary: v) auto
+
+lemma (in valid_graph) is_cycle_last_eq_first:
+  \<open>is_cycle ((v,e)#ps) \<Longrightarrow> snd (snd (last ((v,e)#ps))) = v\<close>
+  using is_path_undir_snd_snd_last by fastforce
+
+lemma (in valid_graph) is_cycle_is_simple_undir:
+  \<open>is_cycle ps \<Longrightarrow> is_simple_undir ps\<close>
+proof (cases ps)
+  case Nil
+  then show ?thesis
+    by force
+next
+  case (Cons a list)
+  moreover assume \<open>is_cycle ps\<close>
+  ultimately show ?thesis
+    by (smt is_cycle.simps(2) is_simple_undir.elims(3) list.distinct(1) is_cycle_distinct is_path_undir_snd_snd_last)
+qed
+
 lemma (in valid_graph) is_hamiltonian_circuit_length:
   \<open>is_hamiltonian_circuit ps \<Longrightarrow> length ps = card V\<close>
   unfolding is_hamiltonian_circuit_def int_vertices_def by (metis distinct_card length_map is_cycle_distinct)
@@ -666,7 +686,7 @@ lemma (in valid_graph) is_simple_undir_step:
   shows \<open>(x,w,y) \<in> E \<or> (y,w,x) \<in> E\<close> \<open>x \<notin> int_vertices ps\<close> \<open>is_simple_undir ps\<close>
   using assms by (auto simp: int_vertices_def) (cases ps, auto)+
 
-lemma (in valid_graph) is_path_undir_last:
+lemma (in valid_graph) is_path_undir_last: \<comment> \<open>duplicates @{thm is_path_undir_snd_snd_last}\<close>
   \<open>ps \<noteq> [] \<Longrightarrow> is_path_undir G v ps v' \<Longrightarrow> v' = snd (snd (last ps))\<close>
   by (induction ps arbitrary: v) auto
 
@@ -716,31 +736,6 @@ proof -
     by (smt Collect_cong finite_Collect_conjI)
 qed
 
-lemma (in valid_graph) is_hamiltonian_circuit_rotate:
-  assumes \<open>v' \<in> V\<close>
-  assumes \<open>is_hamiltonian_circuit v ps\<close>
-  shows \<open>\<exists>ps'. is_hamiltonian_circuit v' ps'\<close>
-proof (cases \<open>ps = []\<close>)
-  case True
-  with assms show ?thesis
-    using trivial_hamiltonian_circuit_Ball by blast
-next
-  case False
-  with assms have \<open>v' \<in> int_vertices ps\<close>
-    by (simp add: is_hamiltonian_circuit_def)
-  then obtain i e where i: \<open>i < length ps\<close> \<open>ps!i = (v',e)\<close>
-    unfolding int_vertices_def by (smt fst_conv in_set_conv_nth length_map nth_map old.prod.exhaust)
-  then obtain tl where \<open>rotate i ps = (v',e)#tl\<close>
-    using hd_rotate_conv_nth[OF False] by (metis False list.sel(1) mod_less neq_Nil_conv rotate_is_Nil_conv)
-  moreover obtain v'' where \<open>is_hamiltonian_circuit v'' (rotate i ps)\<close>
-    apply (induction i) using assms(2) apply auto
-    using is_hamiltonian_circuit_rotate1_ex by blast
-  ultimately have \<open>is_hamiltonian_circuit v' (rotate i ps)\<close>
-    unfolding is_hamiltonian_circuit_def using is_path_undir.elims(2) by fastforce
-  then show ?thesis
-    by blast
-qed
-
 context complete_finite_weighted_graph
 begin
 
@@ -760,7 +755,7 @@ lemma complete_finite_weighted_graph_delete_node:
 
 lemma ex_hamiltonian_circuit:
   assumes \<open>2 \<le> card V\<close> \<open>v\<in>V\<close>
-  shows \<open>\<exists>ps. is_hamiltonian_circuit v ps\<close>
+  shows \<open>\<exists>ps. is_hamiltonian_circuit ps \<and> fst (hd ps) = v\<close>
   using assms complete_finite_weighted_graph_axioms
 proof (induction \<open>card V\<close> arbitrary: v G rule: nat_induct_at_least[of 2])
   case base
@@ -790,9 +785,9 @@ next
   with \<open>v \<in> G.V\<close> obtain w where w: \<open>(v,w,v') \<in> G.E \<or> (v',w,v) \<in> G.E\<close>
     unfolding nG' using G.complete by fast
   from Suc.hyps(2)[OF n v G'.complete_finite_weighted_graph_axioms]
-  obtain ps' where ps': \<open>G'.is_hamiltonian_circuit v' ps'\<close> by blast
-  have G': \<open>int_vertices ps' = G'.V\<close> \<open>G'.is_simple_undir1 v' ps' v'\<close>
-   by (auto simp: ps'[unfolded G'.is_hamiltonian_circuit_def])
+  obtain ps' where ps': \<open>G'.is_hamiltonian_circuit ps' \<and> fst (hd ps') = v'\<close> by blast
+  then have G': \<open>int_vertices ps' = G'.V\<close> \<open>G'.is_simple_undir ps' \<and> fst (hd ps') = v' \<and> snd (snd (last ps')) = v'\<close>
+   apply (auto simp: ps'[unfolded G'.is_hamiltonian_circuit_def]) oops
   then have *: \<open>int_vertices ps' = G'.V\<close> \<open>G.is_simple_undir1 v' ps' v'\<close>
     using G.delete_node_was_simple_undir by auto
   then have \<open>v \<notin> int_vertices ps'\<close>
