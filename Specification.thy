@@ -705,8 +705,8 @@ lemma (in finite_graph) finitely_many_hamiltonian_circuits:
 proof -
   have \<open>set ps \<subseteq> E \<union> (\<lambda>(v1,w,v2). (v2,w,v1)) ` E\<close> if \<open>is_hamiltonian_circuit ps\<close> for ps
     using that unfolding is_hamiltonian_circuit_def
-    apply (cases ps) apply auto
-    apply (simp add: rev_image_eqI) using is_path_undir_memb_edges
+    apply (cases ps) apply (auto simp: rev_image_eqI) using is_path_undir_memb_edges
+    by (metis (mono_tags, lifting) old.prod.case rev_image_eqI)+
   moreover have \<open>finite \<dots>\<close>
     by (simp add: finite_E)
   moreover have \<open>length ps = card V\<close> if \<open>is_hamiltonian_circuit ps\<close> for ps
