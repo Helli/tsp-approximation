@@ -493,16 +493,24 @@ lemma adj_vertices_simps[simp]:
   apply (metis adj_vertices.simps(2) insertCI int_vertices_def list.exhaust op_list_append_elem_def snoc_eq_iff_butlast)
   by (metis (no_types, lifting) Un_iff adj_vertices.elims insertCI insertE int_vertices_def int_vertices_simps(2) int_vertices_simps(3) snoc_eq_iff_butlast)
 
-abbreviation (in valid_graph) is_simple_undir1 :: \<open>_ \<Rightarrow> (_,_) path \<Rightarrow> _ \<Rightarrow> bool\<close> where
-  \<open>is_simple_undir1 v ps v' == is_path_undir G v ps v' \<and> distinct (map fst ps)\<close>
-text \<open>This means that a simple path may go back to a visited node at the end, e.g.\ via a loop:\<close>
+fun (in valid_graph) is_cycle :: \<open>(_,_) path \<Rightarrow> bool\<close> where \<comment> \<open>to-do: connect to the cycle basis\<close>
+  \<open>is_cycle [] \<longleftrightarrow> True\<close> |
+  \<open>is_cycle ((v,e)#es) \<longleftrightarrow> is_path_undir G v ((v,e)#es) v \<and> distinct (v # map fst es)\<close>
+
+lemma (in valid_graph) is_cycle_distinct:
+  \<open>is_cycle es \<Longrightarrow> distinct (map fst es)\<close> by (cases es) auto
+
 lemma (in valid_graph)
   assumes \<open>x\<noteq>y\<close> \<open>{x,y} \<subseteq> V\<close>
   assumes \<open>{(x,w1,y),(y,w2,y)} \<subseteq> E\<close>
-  shows \<open>is_simple_undir1 x [(x,w1,y),(y,w2,y)] y\<close>
-  using assms by auto
+  shows \<open>is_cycle [(x,w1,y),(y,w2,y)]\<close>
+  oops
+txt \<open>To-do: merge the two definitions below, maybe using @{const Let}?\<close>
+fun (in valid_graph) is_simple_undir :: \<open>(_,_) path \<Rightarrow> bool\<close> where
+  \<open>is_simple_undir [] \<longleftrightarrow> True\<close> |
+  \<open>is_simple_undir ((v,e)#es) \<longleftrightarrow> is_path_undir G v ((v,e)#es) (snd (snd (last ((v,e)#es)))) \<and> distinct (map fst ((v,e)#es))\<close>
 definition (in valid_graph) is_simple_undir2 where
-  \<open>is_simple_undir2 v ps v' \<longleftrightarrow> is_simple_undir1 v ps v' \<and> v' \<notin> int_vertices ps\<close>
+  \<open>is_simple_undir2 ps \<longleftrightarrow> is_simple_undir ps \<and> snd (snd (last ps)) \<notin> int_vertices ps\<close>
 
 definition (in valid_graph) is_trace :: \<open>('v,'w) path \<Rightarrow> bool\<close> where \<comment> \<open>non-standard definition.\<close>
   \<open>is_trace ps \<longleftrightarrow> (if ps=[] then V={} else adj_vertices ps = V)\<close>
@@ -516,19 +524,17 @@ lemma (in valid_graph) is_trace_snoc:
   by (cases ps) (simp_all add: adj_vertices_int_vertices is_trace_def)
 
 definition (in valid_graph) is_hamiltonian_path where \<comment> \<open>or \<open>simple trace\<close>\<close>
-  \<open>is_hamiltonian_path v ps v' \<longleftrightarrow> is_trace ps \<and> is_simple_undir2 v ps v'\<close> \<comment> \<open>abolish vertex arguments?\<close>
+  \<open>is_hamiltonian_path ps \<longleftrightarrow> is_trace ps \<and> is_simple_undir2 ps\<close>
 
 definition (in valid_graph) is_hamiltonian_circuit where
-  \<open>is_hamiltonian_circuit v ps \<longleftrightarrow> int_vertices ps = V \<and> is_simple_undir1 v ps v\<close> \<comment> \<open>abolish vertex argument?\<close>
+  \<open>is_hamiltonian_circuit ps \<longleftrightarrow> int_vertices ps = V \<and> is_cycle ps\<close>
 
 lemma (in valid_graph) is_hamiltonian_circuit_length:
-  \<open>is_hamiltonian_circuit v ps \<Longrightarrow> length ps = card V\<close>
-  unfolding is_hamiltonian_circuit_def int_vertices_def using distinct_card by fastforce
+  \<open>is_hamiltonian_circuit ps \<Longrightarrow> length ps = card V\<close>
+  unfolding is_hamiltonian_circuit_def int_vertices_def by (metis distinct_card length_map is_cycle_distinct)
 
 lemma (in valid_graph) is_hamiltonian_circuit_singleton:
-  \<open>V = {y} \<Longrightarrow> is_hamiltonian_circuit v ps \<Longrightarrow> v=y \<and> (\<exists>w. ps=[(v,w,v)])\<close>
-  apply safe
-  using is_hamiltonian_circuit_def is_path_undir_memb apply blast
+  \<open>V = {v} \<Longrightarrow> is_hamiltonian_circuit ps \<Longrightarrow> \<exists>w. ps=[(v,w,v)]\<close>
 proof goal_cases
   case 1
   then have \<open>length ps = 1\<close>
@@ -539,7 +545,7 @@ proof goal_cases
     using is_hamiltonian_circuit_def by auto
 qed
 
-lemma (in valid_graph) \<open>\<not>is_hamiltonian_circuit v []\<close>
+lemma (in valid_graph) is_hamiltonian_circuit_empty: \<open>is_hamiltonian_circuit [] \<longleftrightarrow> V = {}\<close>
   unfolding is_hamiltonian_circuit_def by fastforce
 
 term \<open>valid_graph.is_path\<close>
@@ -550,10 +556,10 @@ text \<open>Reuse @{const kon_graph}, but interpreted differently: Between to-do
 
 definition \<open>kon_path = [(a,ab1,b),(b,bd1,d),(d,cd1,c)]\<close>
 
-lemma is_simple_path_kon_path: \<open>kon_graph.is_simple_undir2 a kon_path c\<close>
+lemma is_simple_path_kon_path: \<open>kon_graph.is_simple_undir2 kon_path\<close>
   unfolding kon_graph.is_simple_undir2_def by (simp add: kon_path_def) (simp add: kon_graph_def)
 
-lemma is_hamiltonian_path_kon_path: \<open>kon_graph.is_hamiltonian_path a kon_path c\<close>
+lemma is_hamiltonian_path_kon_path: \<open>kon_graph.is_hamiltonian_path kon_path\<close>
   apply (simp add: kon_graph.is_hamiltonian_path_def is_simple_path_kon_path)
   apply (simp add: kon_path_def kon_graph.is_trace_def)
   apply eval
@@ -561,13 +567,14 @@ lemma is_hamiltonian_path_kon_path: \<open>kon_graph.is_hamiltonian_path a kon_p
 
 definition \<open>kon_circuit = kon_path @ [(c,ac2,a)]\<close>
 
-lemma is_simple_path_kon_circuit: \<open>kon_graph.is_simple_undir1 a kon_circuit a\<close>
+lemma is_simple_path_kon_circuit: \<open>kon_graph.is_simple_undir kon_circuit\<close>
   by (simp add: kon_circuit_def kon_path_def) (simp add: kon_graph_def)
 
-lemma is_hamiltonian_circuit_kon_circuit: \<open>kon_graph.is_hamiltonian_circuit a kon_circuit\<close>
+lemma is_hamiltonian_circuit_kon_circuit: \<open>kon_graph.is_hamiltonian_circuit kon_circuit\<close>
   unfolding kon_graph.is_hamiltonian_circuit_def
-  apply (auto simp: is_simple_path_kon_circuit)
-   by (auto simp: kon_circuit_def kon_path_def kon_graph_def)
+  apply (auto simp: kon_circuit_def kon_path_def)
+           apply (auto simp: kon_graph_def)
+  done
 
 text \<open>to-do: Complete notes on the DFS phase without the notion \<open>Eulerian\<close>.\<close>
 
