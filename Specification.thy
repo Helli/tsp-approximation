@@ -592,26 +592,30 @@ abbreviation set_cost where
 lemma edge_weight_sum_list: \<open>distinct ps \<Longrightarrow> edge_weight \<lparr>nodes=ARBITRARY, edges= set ps\<rparr> = sum_list (map (fst \<circ> snd) ps)\<close>
   unfolding edge_weight_def by (auto simp: sum_list_distinct_conv_sum_set)
 
-lemma is_hamiltonian_circuit_distinct:
-  \<open>is_hamiltonian_circuit v ps \<Longrightarrow> distinct ps\<close>
-  by (auto simp: is_hamiltonian_circuit_def is_simple_undir_distinct)
+lemma is_hamiltonian_circuit_distinct_vertices:
+  \<open>is_hamiltonian_circuit ps \<Longrightarrow> distinct (map fst ps)\<close>
+  by (cases ps) (auto simp: is_hamiltonian_circuit_def)
+
+lemma is_hamiltonian_circuit_distinct_edges:
+  \<open>is_hamiltonian_circuit ps \<Longrightarrow> distinct ps\<close>
+  using is_hamiltonian_circuit_distinct_vertices distinct_mapI by blast
 
 lemma tour_edge_weight:
-  \<open>is_hamiltonian_circuit (fst (hd ps)) ps \<and> cost ps = w \<longleftrightarrow>
-   is_hamiltonian_circuit (fst (hd ps)) ps \<and> edge_weight \<lparr>nodes=V, edges= set ps\<rparr> = w\<close>
-  by (auto simp: edge_weight_sum_list is_hamiltonian_circuit_distinct)
+  \<open>is_hamiltonian_circuit ps \<and> cost ps = w \<longleftrightarrow>
+   is_hamiltonian_circuit ps \<and> edge_weight \<lparr>nodes=V, edges= set ps\<rparr> = w\<close>
+  by (auto simp: edge_weight_sum_list is_hamiltonian_circuit_distinct_edges)
 
 definition OPT_alt where
-  \<open>OPT_alt = (ARG_MIN (edge_weight \<circ> ind \<circ> set) ps . is_hamiltonian_circuit (fst (hd ps)) ps)\<close>
+  \<open>OPT_alt = (ARG_MIN (edge_weight \<circ> ind \<circ> set) ps . is_hamiltonian_circuit ps)\<close>
 
 definition OPT where
-  \<open>OPT = (ARG_MIN (sum_list \<circ> (map (fst \<circ> snd))) ps . is_hamiltonian_circuit (fst (hd ps)) ps)\<close>
+  \<open>OPT = (ARG_MIN (sum_list \<circ> (map (fst \<circ> snd))) ps . is_hamiltonian_circuit ps)\<close>
 
 lemma OPT_sanity: \<open>OPT = OPT_alt\<close> unfolding OPT_def OPT_alt_def
-  using is_hamiltonian_circuit_distinct[THEN edge_weight_sum_list] by fastforce
+  using is_hamiltonian_circuit_distinct_edges[THEN edge_weight_sum_list] by fastforce
 
 definition OPTWEIGHT where
-  \<open>OPTWEIGHT = Min {w. (\<exists>ps. is_hamiltonian_circuit (fst (hd ps)) ps \<and> cost ps = w)}\<close>
+  \<open>OPTWEIGHT = Min {w. (\<exists>ps. is_hamiltonian_circuit ps \<and> cost ps = w)}\<close>
 
 end
 
