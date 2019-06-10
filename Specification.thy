@@ -539,6 +539,9 @@ proof goal_cases
     using is_hamiltonian_circuit_def by auto
 qed
 
+lemma (in valid_graph) \<open>\<not>is_hamiltonian_circuit v []\<close>
+  unfolding is_hamiltonian_circuit_def by fastforce
+
 term \<open>valid_graph.is_path\<close>
 find_theorems \<open>valid_graph.is_path\<close>
 
