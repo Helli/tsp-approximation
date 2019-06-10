@@ -592,9 +592,6 @@ abbreviation set_cost where
 lemma edge_weight_sum_list: \<open>distinct ps \<Longrightarrow> edge_weight \<lparr>nodes=ARBITRARY, edges= set ps\<rparr> = sum_list (map (fst \<circ> snd) ps)\<close>
   unfolding edge_weight_def by (auto simp: sum_list_distinct_conv_sum_set)
 
-lemma is_simple_undir_distinct: \<open>is_simple_undir1 v ps v' \<Longrightarrow> distinct ps\<close>
-  by (induction ps arbitrary: v) auto
-
 lemma is_hamiltonian_circuit_distinct:
   \<open>is_hamiltonian_circuit v ps \<Longrightarrow> distinct ps\<close>
   by (auto simp: is_hamiltonian_circuit_def is_simple_undir_distinct)
