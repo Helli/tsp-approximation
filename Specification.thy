@@ -529,6 +529,14 @@ definition (in valid_graph) is_hamiltonian_path where \<comment> \<open>or \<ope
 definition (in valid_graph) is_hamiltonian_circuit where
   \<open>is_hamiltonian_circuit ps \<longleftrightarrow> int_vertices ps = V \<and> is_cycle ps\<close>
 
+lemma (in valid_graph) is_hamiltonian_circuit_int_vertices:
+  \<open>is_hamiltonian_circuit ps \<Longrightarrow> int_vertices ps = V\<close>
+  by (simp add: is_hamiltonian_circuit_def)
+
+lemma (in valid_graph) is_hamiltonian_circuit_is_cycle:
+  \<open>is_hamiltonian_circuit ps \<Longrightarrow> is_cycle ps\<close>
+  by (simp add: is_hamiltonian_circuit_def)
+
 lemma (in valid_graph) is_hamiltonian_circuit_length:
   \<open>is_hamiltonian_circuit ps \<Longrightarrow> length ps = card V\<close>
   unfolding is_hamiltonian_circuit_def int_vertices_def by (metis distinct_card length_map is_cycle_distinct)
@@ -641,28 +649,30 @@ lemma complete_finite_weighted_graph_intro:
 end
 
 lemma (in valid_graph) delete_node_was_simple_undir:
-  \<open>valid_graph.is_simple_undir1 (delete_node v G) v1 ps v2 \<Longrightarrow> is_simple_undir1 v1 ps v2\<close>
-  by (meson delete_node_valid delete_node_was_path valid_graph_axioms)
+  \<open>valid_graph.is_simple_undir (delete_node v G) ps \<Longrightarrow> is_simple_undir ps\<close>
+  by (smt delete_node_valid is_simple_undir.simps delete_node_was_path
+    valid_graph.is_simple_undir.elims(2) valid_graph_axioms)
 
 lemma (in valid_graph) is_simple_undir1_Cons[intro]:
+  assumes \<open>fst (hd ps) = v'\<close>
   assumes \<open>(v,w,v') \<in> E \<or> (v',w,v) \<in> E\<close>
   assumes \<open>v \<notin> int_vertices ps\<close>
-  assumes \<open>is_simple_undir1 v' ps vl\<close>
-  shows \<open>is_simple_undir1 v ((v,w,v')#ps) vl\<close>
-  using assms by (simp add: int_vertices_def)
+  assumes \<open>is_simple_undir ps\<close>
+  shows \<open>is_simple_undir ((v,w,v')#ps)\<close>
+  using assms by (cases ps) (auto simp: int_vertices_def E_validD)
 
-lemma (in valid_graph) is_simple_undir1_step:
-  \<open>is_simple_undir1 v ((x,w,y) # ps) v' \<longleftrightarrow>
-    v=x \<and> ((x,w,y) \<in> E \<or> (y,w,x) \<in> E) \<and> x \<notin> int_vertices ps \<and> is_simple_undir1 y ps v'\<close>
-  by (auto simp: int_vertices_def)
+lemma (in valid_graph) is_simple_undir_step:
+  assumes \<open>is_simple_undir ((x,w,y) # ps)\<close>
+  shows \<open>(x,w,y) \<in> E \<or> (y,w,x) \<in> E\<close> \<open>x \<notin> int_vertices ps\<close> \<open>is_simple_undir ps\<close>
+  using assms by (auto simp: int_vertices_def) (cases ps, auto)+
 
 lemma (in valid_graph) is_path_undir_last:
   \<open>ps \<noteq> [] \<Longrightarrow> is_path_undir G v ps v' \<Longrightarrow> v' = snd (snd (last ps))\<close>
   by (induction ps arbitrary: v) auto
 
 lemma (in valid_graph) is_simple_undir2_step:
-  \<open>ps \<noteq> [] \<Longrightarrow> is_simple_undir2 v ((x,w,y) # ps) v' \<longleftrightarrow>
-    v=x \<and> ((x,w,y) \<in> E \<or> (y,w,x) \<in> E) \<and> x \<notin> adj_vertices ps \<and> is_simple_undir2 y ps v'\<close>
+  \<open>is_simple_undir2 ((x,w,y) # ps) \<Longrightarrow>
+    ((x,w,y) \<in> E \<or> (y,w,x) \<in> E) \<and> x \<notin> adj_vertices ps \<and> is_simple_undir2 ps\<close>
   by (cases ps) (auto simp: is_simple_undir2_def is_path_undir_last)
 
 lemma (in valid_graph) finite_adj_vertices:
@@ -670,43 +680,36 @@ lemma (in valid_graph) finite_adj_vertices:
   by (cases ps) simp_all
 
 lemma (in valid_graph) hamiltonian_impl_finiteV:
-  \<open>is_hamiltonian_path v ps v' \<Longrightarrow> finite V\<close>
+  \<open>is_hamiltonian_path ps \<Longrightarrow> finite V\<close>
   unfolding is_hamiltonian_path_def is_trace_def
   by (metis finite.emptyI kon_graph.finite_adj_vertices)
 
+lemma (in valid_graph) is_cycle_rotate1:
+  assumes \<open>is_cycle (e#ps)\<close>
+  shows \<open>is_cycle (ps@[e])\<close>
+  using assms apply (cases e) apply (induction ps)
+  by (auto simp: E_validD)
+
+lemma (in valid_graph) is_hamiltonian_circuit_rotate1':
+  assumes \<open>is_hamiltonian_circuit (e#ps)\<close>
+  shows \<open>is_hamiltonian_circuit (ps@[e])\<close>
+  using assms unfolding is_hamiltonian_circuit_def by (simp add: is_cycle_rotate1)
+
 lemma (in valid_graph) is_hamiltonian_circuit_rotate1:
-  assumes \<open>is_hamiltonian_circuit v (e#ps)\<close>
-  shows \<open>is_hamiltonian_circuit (snd (snd e)) (ps@[e])\<close>
-  using assms unfolding is_hamiltonian_circuit_def apply auto
-  using triple_of_parts by (metis (no_types) is_path_undir.simps(2) is_path_undir_simps(2) is_path_undir_split)
-
-lemma (in valid_graph) is_hamiltonian_circuit_rotate1_ex:
-  assumes \<open>is_hamiltonian_circuit v ps\<close>
-  shows \<open>\<exists>v'. is_hamiltonian_circuit v' (rotate1 ps)\<close>
-  apply (cases ps)
-  using assms is_hamiltonian_circuit_rotate1 by fastforce+
-
-lemma (in valid_graph) is_hamiltonian_circuit_int_vertices:
-  \<open>is_hamiltonian_circuit v ps \<Longrightarrow> ps = [] \<or> int_vertices ps = V\<close>
-  by (meson is_hamiltonian_circuit_def valid_graph_axioms)
-
-lemma (in valid_graph) trivial_hamiltonian_circuit_Ball:
-  \<open>is_hamiltonian_circuit v [] \<Longrightarrow> \<forall>v'\<in>V. is_hamiltonian_circuit v' []\<close>
-  by (simp add: is_hamiltonian_circuit_def)
-
-lemma (in valid_graph) is_hamiltonian_circuit_inV:
-  \<open>is_hamiltonian_circuit v ps \<Longrightarrow> v \<in> V\<close>
-  by (meson is_hamiltonian_circuit_def is_path_undir_memb)
+  assumes \<open>is_hamiltonian_circuit ps\<close>
+  shows \<open>is_hamiltonian_circuit (rotate1 ps)\<close>
+  using assms by (cases ps) (auto simp: assms is_hamiltonian_circuit_rotate1')
 
 lemma (in finite_graph) finitely_many_hamiltonian_circuits:
-  \<open>finite {ps. \<exists>v. is_hamiltonian_circuit v ps}\<close>
+  \<open>finite {ps. is_hamiltonian_circuit ps}\<close>
 proof -
-  have \<open>set ps \<subseteq> E \<union> (\<lambda>(v1,w,v2). (v2,w,v1)) ` E\<close> if \<open>\<exists>v. is_hamiltonian_circuit v ps\<close> for ps
-    using that unfolding is_hamiltonian_circuit_def apply auto
-    by (metis (mono_tags, lifting) is_path_undir_memb_edges prod.simps(2) rev_image_eqI)
+  have \<open>set ps \<subseteq> E \<union> (\<lambda>(v1,w,v2). (v2,w,v1)) ` E\<close> if \<open>is_hamiltonian_circuit ps\<close> for ps
+    using that unfolding is_hamiltonian_circuit_def
+    apply (cases ps) apply auto
+    apply (simp add: rev_image_eqI) using is_path_undir_memb_edges
   moreover have \<open>finite \<dots>\<close>
     by (simp add: finite_E)
-  moreover have \<open>length ps = card V\<close> if \<open>\<exists>v. is_hamiltonian_circuit v ps\<close> for ps
+  moreover have \<open>length ps = card V\<close> if \<open>is_hamiltonian_circuit ps\<close> for ps
     using is_hamiltonian_circuit_length that by blast
   ultimately show ?thesis
     using finite_lists_length_eq[of \<open>E \<union> (\<lambda>(v1,w,v2). (v2,w,v1)) ` E\<close> \<open>card V\<close>]
