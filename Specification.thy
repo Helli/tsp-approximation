@@ -1070,6 +1070,8 @@ proof goal_cases
   finally show ?case .
 qed
 
+term conc_fun
+
 end
 
 subsection \<open>Symmetric TSP\<close>
