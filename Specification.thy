@@ -309,7 +309,7 @@ lemma (in finite_weighted_graph) spanning_forest_symhull_preimage:
   shows \<open>\<exists>F'. spanning_forest \<lparr>nodes=V, edges=F'\<rparr> \<lparr>nodes=V, edges=E\<rparr>
     \<and> edge_weight \<lparr>nodes=V, edges=F'\<rparr> = edge_weight \<lparr>nodes=V, edges=F\<rparr>\<close>
   using assms
-proof (induction \<open>F - E\<close> arbitrary: F rule: infinite_finite_induct) \<comment> \<open>maybe use @{thm diff_induct}?\<close>
+proof (induction \<open>F - E\<close> arbitrary: F rule: infinite_finite_induct)
   case infinite
   have \<open>finite F\<close>
     by (metis finite_weighted_graph_symhull finite_graph.finite_E finite_weighted_graph.axioms graph.select_convs(2) infinite.prems(2) infinite_super spanning_forest_def subgraph_def)
