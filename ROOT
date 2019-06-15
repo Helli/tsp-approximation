@@ -1,10 +1,11 @@
-session TSP = Kruskal +
+session TSP = DFS_Framework +
   description
     \<open>to-do: use cases (also hamiltonian cycles for grid graphs, cf. lawler p.60/61?);
       maybe refer to thesis.\<close>
   options [document=pdf, document_output="output"]
   sessions
     Koenigsberg_Friendship
+    Kruskal
   theories [document=false]
     Graph_Definition_Impl
   theories
