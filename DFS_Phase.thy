@@ -392,6 +392,44 @@ lemma [autoref_rules]:
   unfolding cycc_state_erel_def ss_impl_rel_def R_def
   by auto
 
+(* for Digraph: *)
+type_synonym 'a slg = "'a \<Rightarrow> 'a list"
+
+definition slg_rel :: "('a\<times>'b) set \<Rightarrow> ('a slg \<times> 'b digraph) set" where 
+  slg_rel_def_internal: "slg_rel R \<equiv> 
+  (R \<rightarrow> \<langle>R\<rangle>list_set_rel) O br (\<lambda>succs. {(u,v). v\<in>succs u}) (\<lambda>_. True)"
+
+lemma slg_rel_def: "\<langle>R\<rangle>slg_rel = 
+  (R \<rightarrow> \<langle>R\<rangle>list_set_rel) O br (\<lambda>succs. {(u,v). v\<in>succs u}) (\<lambda>_. True)"
+  unfolding slg_rel_def_internal relAPP_def by simp
+
+record ('vi,'ei,'v0i) gen_g_impl =
+  gi_V :: 'vi
+  gi_E :: 'ei
+  gi_V0 :: 'v0i
+
+definition gen_g_impl_rel_ext_internal_def: "\<And> Rm Rv Re Rv0. gen_g_impl_rel_ext Rm Rv Re Rv0
+  \<equiv> { (gen_g_impl_ext Vi Ei V0i mi, graph_rec_ext V E V0 m) 
+      | Vi Ei V0i mi V E V0 m. 
+        (Vi,V)\<in>Rv \<and> (Ei,E)\<in>Re \<and> (V0i,V0)\<in>Rv0 \<and> (mi,m)\<in>Rm
+    }"
+
+lemma gen_g_impl_rel_ext_def: "\<And>Rm Rv Re Rv0. \<langle>Rm,Rv,Re,Rv0\<rangle>gen_g_impl_rel_ext
+  \<equiv> { (gen_g_impl_ext Vi Ei V0i mi, graph_rec_ext V E V0 m) 
+      | Vi Ei V0i mi V E V0 m. 
+        (Vi,V)\<in>Rv \<and> (Ei,E)\<in>Re \<and> (V0i,V0)\<in>Rv0 \<and> (mi,m)\<in>Rm
+    }"
+  unfolding gen_g_impl_rel_ext_internal_def relAPP_def by simp
+
+definition g_impl_rel_ext_internal_def: 
+  "g_impl_rel_ext Rm Rv 
+  \<equiv> \<langle>Rm,\<langle>Rv\<rangle>fun_set_rel,\<langle>Rv\<rangle>slg_rel,\<langle>Rv\<rangle>list_set_rel\<rangle>gen_g_impl_rel_ext"
+
+lemma g_impl_rel_ext_def: "\<langle>Rm,Rv\<rangle>g_impl_rel_ext
+  \<equiv> \<langle>Rm,\<langle>Rv\<rangle>fun_set_rel,\<langle>Rv\<rangle>slg_rel,\<langle>Rv\<rangle>list_set_rel\<rangle>gen_g_impl_rel_ext"
+  unfolding g_impl_rel_ext_internal_def relAPP_def by simp
+(* end for Digraph *)
+
 text \<open>Finally, we can synthesize an implementation for our cyclicity checker,
   using the standard Autoref-approach:\<close>
 schematic_goal cyc_checker_impl:
