@@ -431,67 +431,6 @@ lemma g_impl_rel_ext_def: "\<langle>Rm,Rv\<rangle>g_impl_rel_ext
   unfolding g_impl_rel_ext_internal_def relAPP_def by simp
 (* end for Digraph *)
 
-text \<open>Finally, we can synthesize an implementation for our cyclicity checker,
-  using the standard Autoref-approach:\<close>
-schematic_goal cyc_checker_impl:
-  defines "V \<equiv> Id :: ('v \<times> 'v::hashable) set"
-  assumes [unfolded V_def,autoref_rules]:
-    "(Gi, G) \<in> \<langle>Rm, V\<rangle>g_impl_rel_ext"
-  notes [unfolded V_def,autoref_tyrel] = 
-    TYRELI[where R="\<langle>V\<rangle>dflt_ahs_rel"]
-    TYRELI[where R="\<langle>V \<times>\<^sub>r \<langle>V\<rangle>list_set_rel\<rangle>ras_rel"]
-  shows "nres_of (?c::?'c dres) \<le>\<Down>?R (cyc_checker_impl G)"
-  unfolding DFS_code_unfold
-  using [[autoref_trace_failed_id, goals_limit=1]]
-  apply (autoref_monadic (trace))
-  done
-concrete_definition cyc_checker_code uses cyc_checker_impl
-export_code cyc_checker_code checking SML
-
-text \<open>Combining the refinement steps yields a correctness 
-  theorem for the cyclicity checker implementation:\<close>
-theorem cyc_checker_code_correct:
-  assumes 1: "fb_graph G"
-  assumes 2: "(Gi, G) \<in> \<langle>Rm, Id\<rangle>g_impl_rel_ext"
-  assumes 4: "cyc_checker_code Gi = dRETURN x"
-  shows "x \<longleftrightarrow> (\<not>acyclic (g_E G \<inter> ((g_E G)\<^sup>* `` g_V0 G) \<times> UNIV))"
-proof -
-  note cyc_checker_code.refine[OF 2]
-  also note cyc_checker_impl_refine
-  also note cyc_checker_correct
-  finally show ?thesis using 1 4
-  unfolding cyc_checker_spec_def by auto
-qed
-
-text \<open>We can repeat the same boilerplate for the recursive version of the algorithm:\<close>
-schematic_goal cyc_checker_rec_impl:
-  defines "V \<equiv> Id :: ('v \<times> 'v::hashable) set"
-  assumes [unfolded V_def,autoref_rules]:
-    "(Gi, G) \<in> \<langle>Rm, V\<rangle>g_impl_rel_ext"
-  notes [unfolded V_def,autoref_tyrel] = 
-    TYRELI[where R="\<langle>V\<rangle>dflt_ahs_rel"]
-    TYRELI[where R="\<langle>V \<times>\<^sub>r \<langle>V\<rangle>list_set_rel\<rangle>ras_rel"]
-  shows "nres_of (?c::?'c dres) \<le>\<Down>?R (cyc_checker_rec_impl G)"
-  unfolding DFS_code_unfold
-  using [[autoref_trace_failed_id, goals_limit=1]]
-  apply (autoref_monadic (trace))
-  done
-concrete_definition cyc_checker_rec_code uses cyc_checker_rec_impl
-prepare_code_thms cyc_checker_rec_code_def
-export_code cyc_checker_rec_code checking SML
-
-lemma cyc_checker_rec_code_correct:
-  assumes 1: "fb_graph G"
-  assumes 2: "(Gi, G) \<in> \<langle>Rm, Id\<rangle>g_impl_rel_ext"
-  assumes 4: "cyc_checker_rec_code Gi = dRETURN x"
-  shows "x \<longleftrightarrow> (\<not>acyclic (g_E G \<inter> ((g_E G)\<^sup>* `` g_V0 G) \<times> UNIV))"
-proof -
-  note cyc_checker_rec_code.refine[OF 2]
-  also note cyc_checker_rec_impl_refine
-  also note cyc_checker_correct
-  finally show ?thesis using 1 4 
-  unfolding cyc_checker_spec_def by auto
-qed
 
 text \<open>And, again, for the total correct version. 
   Note that we generate a plain implementation, not inside a monad:\<close>
