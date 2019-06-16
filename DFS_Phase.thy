@@ -6,6 +6,13 @@ theory DFS_Phase
     DFS_Framework.Impl_Rev_Array_Stack
 begin
 
+context complete_finite_weighted_graph begin
+
+sublocale dgraph: graph \<open>\<lparr>g_V = V, g_E = {(v,v'). \<exists>w. (v,w,v') \<in> E}, g_V0 = {}\<rparr>\<close>
+  by standard (auto simp: E_validD)
+
+end
+
 text \<open>
   This example presents a simple cyclicity checker: 
     Given a directed graph with start nodes, decide whether it's reachable 
