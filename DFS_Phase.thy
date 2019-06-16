@@ -409,25 +409,25 @@ record ('vi,'ei,'v0i) gen_g_impl =
   gi_E :: 'ei
   gi_V0 :: 'v0i
 
-definition gen_g_impl_rel_ext_internal_def: "\<And> Rm Rv Re Rv0. gen_g_impl_rel_ext Rm Rv Re Rv0
+definition gen_f_impl_rel_ext_internal_def: "\<And> Rm Rv Re Rv0. gen_f_impl_rel_ext Rm Rv Re Rv0
   \<equiv> { (gen_g_impl_ext Vi Ei V0i mi, graph_rec_ext V E V0 m) 
       | Vi Ei V0i mi V E V0 m. 
         (Vi,V)\<in>Rv \<and> (Ei,E)\<in>Re \<and> (V0i,V0)\<in>Rv0 \<and> (mi,m)\<in>Rm
     }"
 
-lemma gen_g_impl_rel_ext_def: "\<And>Rm Rv Re Rv0. \<langle>Rm,Rv,Re,Rv0\<rangle>gen_g_impl_rel_ext
+lemma gen_f_impl_rel_ext_def: "\<And>Rm Rv Re Rv0. \<langle>Rm,Rv,Re,Rv0\<rangle>gen_f_impl_rel_ext
   \<equiv> { (gen_g_impl_ext Vi Ei V0i mi, graph_rec_ext V E V0 m) 
       | Vi Ei V0i mi V E V0 m. 
         (Vi,V)\<in>Rv \<and> (Ei,E)\<in>Re \<and> (V0i,V0)\<in>Rv0 \<and> (mi,m)\<in>Rm
     }"
-  unfolding gen_g_impl_rel_ext_internal_def relAPP_def by simp
+  unfolding gen_f_impl_rel_ext_internal_def relAPP_def by simp
 
-definition g_impl_rel_ext_internal_def: 
-  "g_impl_rel_ext Rm Rv 
+definition f_impl_rel_ext_internal_def: 
+  "f_impl_rel_ext Rm Rv 
   \<equiv> \<langle>Rm,\<langle>Rv\<rangle>fun_set_rel,\<langle>Rv\<rangle>slg_rel,\<langle>Rv\<rangle>list_set_rel\<rangle>gen_g_impl_rel_ext"
 
 lemma g_impl_rel_ext_def: "\<langle>Rm,Rv\<rangle>g_impl_rel_ext
-  \<equiv> \<langle>Rm,\<langle>Rv\<rangle>fun_set_rel,\<langle>Rv\<rangle>slg_rel,\<langle>Rv\<rangle>list_set_rel\<rangle>gen_g_impl_rel_ext"
+  \<equiv> \<langle>Rm,\<langle>Rv\<rangle>fun_set_rel,\<langle>Rv\<rangle>Digraph_Impl.slg_rel,\<langle>Rv\<rangle>list_set_rel\<rangle>gen_g_impl_rel_ext"
   unfolding g_impl_rel_ext_internal_def relAPP_def by simp
 (* end for Digraph *)
 
