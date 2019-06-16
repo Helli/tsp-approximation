@@ -2,6 +2,7 @@
 theory DFS_Phase
   imports Specification
     DFS_Framework.DFS_Framework
+    CAVA_Automata.Digraph_Impl
     DFS_Framework.Impl_Rev_Array_Stack
 begin
 
