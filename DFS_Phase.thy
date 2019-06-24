@@ -8,7 +8,10 @@ begin
 
 context complete_finite_weighted_graph begin
 
-sublocale dgraph: graph \<open>\<lparr>g_V = V, g_E = {(v,v'). \<exists>w. (v,w,v') \<in> E}, g_V0 = {}\<rparr>\<close>
+definition v where
+  \<open>v = (SOME v. v \<in> V)\<close>
+
+sublocale dgraph: graph \<open>\<lparr>g_V = V, g_E = {(v,v'). \<exists>w. (v,w,v') \<in> E}, g_V0 = {v}\<rparr>\<close>
   by standard (auto simp: E_validD)
 
 end
