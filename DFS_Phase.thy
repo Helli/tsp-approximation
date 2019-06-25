@@ -6,7 +6,8 @@ theory DFS_Phase
     DFS_Framework.Impl_Rev_Array_Stack
 begin
 
-locale node_in_graph = complete_finite_weighted_graph + fixes v
+locale node_in_graph = complete_finite_weighted_graph G for G::\<open>('v::{hashable},'w::weight) graph\<close> +
+  fixes v::\<open>'v::{hashable}\<close>
   assumes v_in_V: \<open>v \<in> V\<close>
 begin
 
@@ -473,7 +474,7 @@ qed
 context node_in_graph
 begin
 
-thm cyccI'[OF dgraph.graph_axioms]
+thm cyc_checker_codeT_correct[OF dgraph.graph_axioms]
 
 end
 
