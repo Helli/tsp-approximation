@@ -470,4 +470,11 @@ proof -
   unfolding cyc_checkerT_spec_def by auto
 qed
 
+context node_in_graph
+begin
+
+thm cyccI'[OF dgraph.graph_axioms]
+
+end
+
 end
