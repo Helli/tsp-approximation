@@ -34,7 +34,8 @@ text \<open> Define a state, based on the DFS-state.
   In our case, we just add a break-flag.
 \<close>
 record 'v cycc_state = "'v state" +
-  break :: bool
+  break :: \<open>'v list\<close>
+
 
 text \<open>Some utility lemmas for the simplifier, to handle idiosyncrasies of
   the record package. \<close>
