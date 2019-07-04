@@ -50,11 +50,11 @@ text \<open>
   all operations default to skip, and just add the operations we are 
   interested in: Initially, the break flag is false, it is set if we 
   encounter a back-edge, and once set, the algorithm shall terminate immediately. \<close>
-definition cycc_params :: "('v,unit cycc_state_ext) parameterization"
+definition cycc_params :: "('v,('v,unit) cycc_state_ext) parameterization"
 where "cycc_params \<equiv> dflt_parametrization state.more 
-  (RETURN \<lparr> break = False \<rparr>) \<lparr>
-  on_back_edge := \<lambda>_ _ _. RETURN \<lparr> break = True \<rparr>,
-  is_break := break \<rparr>"
+  (RETURN \<lparr> break = [] \<rparr>) \<lparr>
+  on_back_edge := \<lambda>_ _ _. RETURN \<lparr> break = [] \<rparr>,
+  is_break := \<lambda>s. break s = [] \<rparr>"
 lemmas cycc_params_simp[simp] = 
   gen_parameterization.simps[mk_record_simp, OF cycc_params_def[simplified]]
 
