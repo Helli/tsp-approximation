@@ -210,28 +210,6 @@ context cycc_invar begin
     
 end
 
-text \<open>Finally, we define a specification for cyclicity checking,
-  and prove that our cyclicity checker satisfies the specification: \<close>
-definition "cyc_checker_spec G \<equiv> do {
-  ASSERT (fb_graph G);
-  SPEC (\<lambda>r. r \<longleftrightarrow> \<not>acyclic (g_E G \<inter> ((g_E G)\<^sup>* `` g_V0 G) \<times> UNIV))}"
-
-theorem cyc_checker_correct: "cyc_checker G \<le> cyc_checker_spec G"
-  unfolding cyc_checker_def cyc_checker_spec_def
-proof (refine_vcg le_ASSERTI order_trans[OF DFS.it_dfs_correct], clarsimp_all)
-  assume "fb_graph G"
-  then interpret fb_graph G .
-  interpret cycc by unfold_locales
-  show "DFS G cycc_params" by unfold_locales
-next
-  fix s
-  assume "cycc_invar G s"
-  then interpret cycc_invar G s .
-  assume "\<not>cycc.cond TYPE('b) G s"
-  thus "break s = (\<not> acyclic (g_E G \<inter> cycc.reachable TYPE('b) G \<times> UNIV))"
-    by (rule cycc_correct_aux)
-qed
-
 text \<open>The same for the total correct variant:\<close>
 definition "cyc_checkerT_spec G \<equiv> do {
   ASSERT (graph G \<and> finite (graph_defs.reachable G));
