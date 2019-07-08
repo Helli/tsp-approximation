@@ -656,8 +656,8 @@ end
 subsection \<open>Complete Graphs\<close>
 
 text \<open>The definition below is non-standard: It allows for additional edges, e.g. loops.\<close>
-locale complete_finite_weighted_graph = finite_weighted_graph +
-  assumes complete: \<open>v1\<in>V \<Longrightarrow> v2\<in>V \<Longrightarrow> v1\<noteq>v2 \<Longrightarrow> \<exists>w. (v1,w,v2)\<in>E \<or> (v2,w,v1)\<in>E\<close>
+locale complete_finite_weighted_graph = finite_weighted_graph + fixes weight
+  assumes complete: \<open>(v,w,v') \<in> E \<longleftrightarrow> v\<in>V \<and> v'\<in>V \<and> f v v' = w\<close>
     \<comment> \<open>maybe use \<^const>\<open>Ex1\<close>?\<close>
 
 context finite_weighted_graph
