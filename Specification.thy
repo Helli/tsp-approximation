@@ -657,8 +657,10 @@ subsection \<open>Complete Graphs\<close>
 
 text \<open>The definition below is non-standard: It allows for additional edges, e.g. loops.\<close>
 locale complete_finite_weighted_graph = finite_weighted_graph + fixes weight
-  assumes complete: \<open>(v,w,v') \<in> E \<longleftrightarrow> v\<in>V \<and> v'\<in>V \<and> weight v v' = w\<close>
+  assumes complete: \<open>(v,w,v') \<in> E \<longleftrightarrow> v\<noteq>v' \<and> \<comment> \<open>rm\<close> v\<in>V \<and> v'\<in>V \<and> weight v v' = w\<close>
     \<comment> \<open>maybe use \<^const>\<open>Ex1\<close>?\<close>
+
+lemma \<open>nodes x \<noteq> {} \<Longrightarrow> edges x \<noteq> {} \<Longrightarrow> \<not>complete_finite_weighted_graph x y\<close> try oops
 
 context finite_weighted_graph
 begin
