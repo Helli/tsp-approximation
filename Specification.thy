@@ -659,15 +659,17 @@ text \<open>The definition below is non-standard: It allows for additional edges
 locale complete_finite_weighted_graph = finite_weighted_graph + fixes weight
   assumes complete: \<open>(v,w,v') \<in> E \<longleftrightarrow> v\<noteq>v' \<and> \<comment> \<open>rm\<close> v\<in>V \<and> v'\<in>V \<and> weight v v' = w\<close>
     \<comment> \<open>maybe use \<^const>\<open>Ex1\<close>?\<close>
+begin
+
+lemma rtl: \<open>v\<in>V \<Longrightarrow> v'\<in>V \<Longrightarrow> v\<noteq>v' \<Longrightarrow> (v,weight v v',v') \<in> E\<close>
+  using complete by blast
+
+end
 
 lemma \<open>nodes x \<noteq> {} \<Longrightarrow> edges x \<noteq> {} \<Longrightarrow> \<not>complete_finite_weighted_graph x y\<close> try oops
 
 context finite_weighted_graph
 begin
-
-lemma complete_finite_weighted_graph_sanity_check:
-  \<open>complete_finite_weighted_graph G \<longleftrightarrow> (\<forall>v1\<in>V. \<forall>v2\<in>V. v1\<noteq>v2 \<longrightarrow> (\<exists>w. (v1,w,v2) \<in> E) \<or> (\<exists>w. (v2,w,v1) \<in> E))\<close>
-  by (meson complete_finite_weighted_graph_axioms_def complete_finite_weighted_graph_def finite_weighted_graph_axioms)
 
 lemma complete_finite_weighted_graph_intro:
   assumes \<open>\<And>v1 v2. v1\<in>V \<Longrightarrow> v2\<in>V \<Longrightarrow> (\<exists>w. (v1,w,v2) \<in> E) \<or> (\<exists>w. (v2,w,v1) \<in> E)\<close>
