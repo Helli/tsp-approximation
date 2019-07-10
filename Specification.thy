@@ -610,8 +610,6 @@ lemma is_hamiltonian_circuit_kon_circuit: \<open>kon_graph.is_hamiltonian_circui
            apply (auto simp: kon_graph_def)
   done
 
-text \<open>to-do: Complete notes on the DFS phase without the notion \<open>Eulerian\<close>.\<close>
-
 subsection \<open>Tours and Costs\<close>
 
 context finite_weighted_graph
@@ -655,10 +653,8 @@ end
 
 subsection \<open>Complete Graphs\<close>
 
-text \<open>The definition below is non-standard: It allows for additional edges, e.g. loops.\<close>
 locale complete_finite_weighted_graph = finite_weighted_graph + fixes weight
   assumes complete: \<open>(v,w,v') \<in> E \<longleftrightarrow> v\<noteq>v' \<and> \<comment> \<open>rm\<close> v\<in>V \<and> v'\<in>V \<and> weight v v' = w\<close>
-    \<comment> \<open>maybe use \<^const>\<open>Ex1\<close>?\<close>
 begin
 
 lemma rtl: \<open>v\<in>V \<Longrightarrow> v'\<in>V \<Longrightarrow> v\<noteq>v' \<Longrightarrow> (v,weight v v',v') \<in> E\<close>
