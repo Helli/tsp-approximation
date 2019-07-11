@@ -660,6 +660,12 @@ begin
 lemma rtl: \<open>v\<in>V \<Longrightarrow> v'\<in>V \<Longrightarrow> v\<noteq>v' \<Longrightarrow> (v,weight v v',v') \<in> E\<close>
   using complete by blast
 
+lemma nodes_neq: \<open>(v,w,v') \<in> E \<Longrightarrow> v\<noteq>v'\<close>
+  by (simp add: complete)
+
+lemma \<open>(v,w,v') : E \<Longrightarrow> w = weight v v'\<close>
+  by (simp add: complete)
+
 end
 
 lemma \<open>nodes x \<noteq> {} \<Longrightarrow> edges x \<noteq> {} \<Longrightarrow> \<not>complete_finite_weighted_graph x y\<close> try oops
