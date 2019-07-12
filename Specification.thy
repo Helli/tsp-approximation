@@ -663,7 +663,7 @@ lemma rtl: \<open>v\<in>V \<Longrightarrow> v'\<in>V \<Longrightarrow> v\<noteq>
 lemma nodes_neq: \<open>(v,w,v') \<in> E \<Longrightarrow> v\<noteq>v'\<close>
   by (simp add: complete)
 
-lemma \<open>(v,w,v') : E \<Longrightarrow> w = weight v v'\<close>
+lemma label_is_weight: \<open>(v,w,v') : E \<Longrightarrow> w = weight v v'\<close>
   by (simp add: complete)
 
 end
@@ -674,9 +674,21 @@ context finite_weighted_graph
 begin
 
 lemma complete_finite_weighted_graph_intro:
-  assumes \<open>\<And>v1 v2. v1\<in>V \<Longrightarrow> v2\<in>V \<Longrightarrow> (\<exists>w. (v1,w,v2) \<in> E) \<or> (\<exists>w. (v2,w,v1) \<in> E)\<close>
-  shows \<open>complete_finite_weighted_graph G\<close>
-  using assms complete_finite_weighted_graph_sanity_check by blast
+  assumes \<open>\<And>v v'. v\<in>V \<Longrightarrow> v'\<in>V \<Longrightarrow> v\<noteq>v' \<Longrightarrow> (v, weight v v', v') \<in> E\<close>
+  assumes \<open>\<And>v w v'. (v,w,v') \<in> E \<Longrightarrow> v\<noteq>v'\<close>
+  assumes \<open>\<And>v w v'. (v,w,v') \<in> E \<Longrightarrow> w = weight v v'\<close>
+  shows \<open>complete_finite_weighted_graph G weight\<close>
+proof -
+  have f1: "\<forall>g f. (\<exists>v w va. ((v::'v, w::'w, va) \<in> edges g) \<noteq> (v \<noteq> va \<and> v \<in> nodes g \<and> va \<in> nodes g \<and> f v va = w)) \<or> complete_finite_weighted_graph_axioms g f"
+    using complete_finite_weighted_graph_axioms.intro by fastforce
+  obtain vv :: "('v \<Rightarrow> 'v \<Rightarrow> 'w) \<Rightarrow> ('v, 'w) graph \<Rightarrow> 'v" and ww :: "('v \<Rightarrow> 'v \<Rightarrow> 'w) \<Rightarrow> ('v, 'w) graph \<Rightarrow> 'w" and vva :: "('v \<Rightarrow> 'v \<Rightarrow> 'w) \<Rightarrow> ('v, 'w) graph \<Rightarrow> 'v" where
+    "\<forall>x0 x1. (\<exists>v2 v3 v4. ((v2, v3, v4) \<in> edges x1) \<noteq> (v2 \<noteq> v4 \<and> v2 \<in> nodes x1 \<and> v4 \<in> nodes x1 \<and> x0 v2 v4 = v3)) = (((vv x0 x1, ww x0 x1, vva x0 x1) \<in> edges x1) \<noteq> (vv x0 x1 \<noteq> vva x0 x1 \<and> vv x0 x1 \<in> nodes x1 \<and> vva x0 x1 \<in> nodes x1 \<and> x0 (vv x0 x1) (vva x0 x1) = ww x0 x1))"
+    by moura
+  then have "\<forall>g f. ((vv f g, ww f g, vva f g) \<in> edges g) \<noteq> (vv f g \<noteq> vva f g \<and> vv f g \<in> nodes g \<and> vva f g \<in> nodes g \<and> f (vv f g) (vva f g) = ww f g) \<or> complete_finite_weighted_graph_axioms g f"
+    using f1 by presburger
+  then show ?thesis
+    by (metis (no_types) assms complete_finite_weighted_graph.intro finite_weighted_graph_axioms is_path_undir_simps(2) is_path_undir_memb)
+qed
 
 end
 
