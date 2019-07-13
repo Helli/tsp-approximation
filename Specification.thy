@@ -770,12 +770,12 @@ lemma complete': \<open>v1\<in>V \<Longrightarrow> v2\<in>V \<Longrightarrow> v1
   using complete by blast
 
 lemma complete_finite_weighted_graph_delete_node:
-  \<open>complete_finite_weighted_graph (delete_node v G)\<close>
+  \<open>complete_finite_weighted_graph (delete_node v G) weight\<close>
   apply intro_locales
     apply (simp add: valid_graph_axioms)
    apply unfold_locales unfolding delete_node_def
     apply auto
-  using complete by blast
+  using complete by blast+
 
 lemma ex_hamiltonian_circuit:
   assumes \<open>2 \<le> card V\<close> \<open>v\<in>V\<close>
