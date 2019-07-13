@@ -1036,8 +1036,9 @@ lemma is_hamiltonian_circuit_OPT:
 
 end
 
-locale complete_finite_metric_graph = complete_finite_weighted_graph G for G :: \<open>(_,_::canonically_ordered_monoid_add) graph\<close>
-\<comment> \<open>to-do: replace constraint with actual metricity.\<close>
+locale complete_finite_metric_graph = complete_finite_weighted_graph G dist for G
+  \<comment> \<open>Usage of \<^const>\<open>dist\<close> forces the node type to be a \<^class>\<open>metric_space\<close> (as we want),
+    see subsection \<^bold>\<open>Extra type constraints\<close> in \<^theory>\<open>HOL.Real_Vector_Spaces\<close>.\<close>
 begin
 
 lemma minimum_spanning_tree_le_OPTWEIGHT:
@@ -1045,7 +1046,7 @@ lemma minimum_spanning_tree_le_OPTWEIGHT:
   assumes \<open>2 \<le> card V\<close>
   assumes no_id:\<open>\<And>v w.(v,w,v) \<notin> E\<close> \<comment> \<open>removable\<close>
   shows \<open>set_cost F \<le> OPTWEIGHT\<close>
-proof -
+proof - oops
   have \<open>2 \<le> length OPT\<close>
     using assms(2) is_hamiltonian_circuit_OPT is_hamiltonian_circuit_length by presburger
   moreover have \<open>snd (snd (last OPT)) = fst (hd OPT)\<close>
