@@ -1092,7 +1092,21 @@ proof goal_cases
   finally show ?case .
 qed
 
-term conc_fun
+definition the_circuit where
+  \<open>the_circuit ns = (THE c. map fst c = ns \<and> is_cycle c)\<close>
+
+lemma
+  assumes \<open>is_cycle ps\<close>
+  shows \<open>the_circuit (map fst ps) = ps\<close> \<open>is_cycle ps\<close>
+  using assms apply (simp_all add: is_hamiltonian_circuit_def the_circuit_def)
+proof (induction ps rule: length_induct)
+  case (1 xs)
+  then show ?case
+  proof (cases xs)
+    case (Cons a as)
+    then show ?thesis sorry
+  qed force
+qed
 
 end
 
