@@ -1080,7 +1080,6 @@ qed
 
 proposition
   assumes \<open>2 \<le> card V\<close>
-  assumes \<open>\<And>v w.(v,w,v) \<notin> E\<close> \<comment> \<open>removable\<close>
   shows \<open>algo_sketch \<le> twoApprox\<close>
   unfolding algo_sketch_def apply refine_vcg apply auto
 proof goal_cases
