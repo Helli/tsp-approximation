@@ -1092,20 +1092,56 @@ proof goal_cases
   finally show ?case .
 qed
 
-definition the_circuit where
-  \<open>the_circuit ns = (THE c. map fst c = ns \<and> is_cycle c)\<close>
+definition the_path where
+  \<open>the_path nodelist = (case nodelist of
+    [] \<Rightarrow> [] |
+    (n#ns) \<Rightarrow> (THE ps. map fst ps = nodelist \<and> is_path_undir G n ps (last nodelist)))\<close>
+
+thm Case_def
+lemma meh: \<open>is_cycle ((v,w,v')#cs) \<Longrightarrow> is_path_undir G v' cs v\<close>
+  by fastforce
+
+lemma simple_case: \<open>map fst (the_path []) = []\<close>
+  by (simp add: the_path_def)
 
 lemma
-  assumes \<open>is_cycle ps\<close>
-  shows \<open>the_circuit (map fst ps) = ps\<close> \<open>is_cycle ps\<close>
-  using assms apply (simp_all add: is_hamiltonian_circuit_def the_circuit_def)
-proof (induction ps rule: length_induct)
+  assumes \<open>distinct (n#n'#ns)\<close> \<open>set (n#n'#ns) \<subseteq> V\<close>
+  shows \<open>map fst (the_path (n#n'#ns)) = (n#n'#ns) \<and> is_path_undir G n (the_path (n#n'#ns)) (last (n#n'#ns))\<close>
+proof -
+  have \<open>map fst (THE ps. map fst ps = n#n'#ns \<and> is_path_undir G n ps (last (n#n'#ns))) = n#n'#ns \<and>
+    is_path_undir G n (THE ps. map fst ps = n#n'#ns \<and> is_path_undir G n ps (last (n#n'#ns))) (last (n#n'#ns))\<close>
+    unfolding the_path_def apply (rule theI') using assms
+  proof (induction ns arbitrary: n n')
+    case Nil
+    then show ?case
+      apply simp
+      apply (rule ex1I[of _ \<open>[(n, dist n n', n'), (n', dist n' n, n)]\<close>])
+      apply auto
+  next
+    case (Cons a ns)
+    then show ?case sorry
+  qed
+    apply simp
+  using assms
+proof (induction ps)
+  case Nil
+  then show ?case
+    by simp
+next
+  case (Cons a ps)
+  then show ?case sorry
+qed
   case (1 xs)
   then show ?case
   proof (cases xs)
     case (Cons a as)
-    then show ?thesis sorry
-  qed force
+    then show ?thesis
+    proof (cases a)
+      case (fields v w v')
+      then show ?thesis sorry
+    qed
+    qed
+  qed forc
 qed
 
 end
