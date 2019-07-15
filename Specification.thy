@@ -663,7 +663,7 @@ lemma rtl: \<open>v\<in>V \<Longrightarrow> v'\<in>V \<Longrightarrow> v\<noteq>
 lemma nodes_neq: \<open>(v,w,v') \<in> E \<Longrightarrow> v\<noteq>v'\<close>
   by (simp add: complete)
 
-lemma label_is_weight: \<open>(v,w,v') : E \<Longrightarrow> w = weight v v'\<close>
+lemma label_is_weight: \<open>(v,w,v') \<in> E \<Longrightarrow> w = weight v v'\<close>
   by (simp add: complete)
 
 end
@@ -1041,6 +1041,9 @@ locale complete_finite_metric_graph = complete_finite_weighted_graph G dist for 
     see subsection \<^bold>\<open>Extra type constraints\<close> in \<^theory>\<open>HOL.Real_Vector_Spaces\<close>.\<close>
 begin
 
+lemma label_is_weight': \<open>(v,w,v') \<in> E \<Longrightarrow> w = dist v' v\<close>
+  by (simp add: dist_commute label_is_weight)
+
 lemma zero_le_weight: \<open>e \<in> E \<Longrightarrow> 0 \<le> fst (snd e)\<close>
   by (metis label_is_weight prod.collapse zero_le_dist)
 
@@ -1093,56 +1096,43 @@ proof goal_cases
 qed
 
 definition the_path where
-  \<open>the_path nodelist = (case nodelist of
+  \<open>the_path nodelist lst = (case nodelist of
     [] \<Rightarrow> [] |
-    (n#ns) \<Rightarrow> (THE ps. map fst ps = nodelist \<and> is_path_undir G n ps (last nodelist)))\<close>
+    (n#ns) \<Rightarrow> (THE ps. map fst ps = nodelist \<and> is_path_undir G n ps lst))\<close>
 
-thm Case_def
 lemma meh: \<open>is_cycle ((v,w,v')#cs) \<Longrightarrow> is_path_undir G v' cs v\<close>
   by fastforce
 
-lemma simple_case: \<open>map fst (the_path []) = []\<close>
+lemma simple_case: \<open>map fst (the_path [] v) = []\<close>
   by (simp add: the_path_def)
 
+\<comment> \<open>remove n'? ps' ~> ps?\<close>
 lemma
-  assumes \<open>distinct (n#n'#ns)\<close> \<open>set (n#n'#ns) \<subseteq> V\<close>
-  shows \<open>map fst (the_path (n#n'#ns)) = (n#n'#ns) \<and> is_path_undir G n (the_path (n#n'#ns)) (last (n#n'#ns))\<close>
+  assumes \<open>distinct (n#n'#ns)\<close> \<open>set (n#n'#ns) \<subseteq> V\<close> \<open>lst\<in>V\<close> \<open>lst \<noteq> last (n#n'#ns)\<close>
+  defines \<open>ps \<equiv> the_path (n#n'#ns) lst\<close>
+  shows \<open>map fst ps = (n#n'#ns) \<and> is_path_undir G n ps lst\<close>
 proof -
-  have \<open>map fst (THE ps. map fst ps = n#n'#ns \<and> is_path_undir G n ps (last (n#n'#ns))) = n#n'#ns \<and>
-    is_path_undir G n (THE ps. map fst ps = n#n'#ns \<and> is_path_undir G n ps (last (n#n'#ns))) (last (n#n'#ns))\<close>
-    unfolding the_path_def apply (rule theI') using assms
-  proof (induction ns arbitrary: n n')
+  have \<open>\<exists>!ps. map fst ps = (n#n'#ns) \<and> is_path_undir G n ps lst\<close>
+  using assms proof (induction ns arbitrary: n n' ps)
     case Nil
     then show ?case
       apply simp
-      apply (rule ex1I[of _ \<open>[(n, dist n n', n'), (n', dist n' n, n)]\<close>])
-      apply auto
+      apply (rule ex1I[of _ \<open>[(n, dist n n', n'), (n', dist n' lst, lst)]\<close>])
+      by (auto simp: rtl label_is_weight label_is_weight')
   next
-    case (Cons a ns)
-    then show ?case sorry
+    case (Cons n'' ns)
+    then have ex1: \<open>\<exists>!ps. map fst ps = n' # n'' # ns \<and> is_path_undir G n' ps lst\<close>
+      by force
+    then obtain ps' where ps': \<open>map fst ps' = n' # n'' # ns\<close> \<open>is_path_undir G n' ps' lst\<close>
+      by meson
+    then have others: \<open>map fst ps = n' # n'' # ns \<and> is_path_undir G n' ps lst \<Longrightarrow> ps = ps'\<close> for ps
+      by (metis ex1)
+    show ?case
+      apply (rule ex1I[of _ \<open>(n, dist n n', n')#ps'\<close>])
+      using Cons.hyps(2) Cons.hyps(3) ps'(1) ps'(2) rtl apply auto[1]
+    proof
   qed
-    apply simp
-  using assms
-proof (induction ps)
-  case Nil
-  then show ?case
-    by simp
-next
-  case (Cons a ps)
-  then show ?case sorry
-qed
-  case (1 xs)
-  then show ?case
-  proof (cases xs)
-    case (Cons a as)
-    then show ?thesis
-    proof (cases a)
-      case (fields v w v')
-      then show ?thesis sorry
-    qed
-    qed
-  qed forc
-qed
+
 
 end
 
