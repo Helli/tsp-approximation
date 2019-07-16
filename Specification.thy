@@ -1098,41 +1098,49 @@ qed
 definition the_path where
   \<open>the_path nodelist lst = (case nodelist of
     [] \<Rightarrow> [] |
-    (n#ns) \<Rightarrow> (THE ps. map fst ps = nodelist \<and> is_path_undir G n ps lst))\<close>
+    n # ns \<Rightarrow> THE ps. map fst ps = nodelist \<and> is_path_undir G n ps lst)\<close>
 
 lemma meh: \<open>is_cycle ((v,w,v')#cs) \<Longrightarrow> is_path_undir G v' cs v\<close>
   by fastforce
 
-lemma simple_case: \<open>map fst (the_path [] v) = []\<close>
+lemma ex1_edge_path:
+  assumes \<open>distinct (n#ns)\<close> \<comment> \<open>inequality of neighbouring nodes would suffice...\<close>
+    and \<open>set (n#ns) \<subseteq> V\<close> \<open>lst\<in>V\<close> \<open>lst \<noteq> last (n#ns)\<close>
+  shows \<open>\<exists>!ps. map fst ps = (n#ns) \<and> is_path_undir G n ps lst\<close>
+  using assms
+proof (induction ns arbitrary: n)
+  case Nil
+  show ?case
+    apply (rule ex1I[of _ \<open>[(n, dist n lst, lst)]\<close>])
+    using Nil by (auto simp: rtl label_is_weight label_is_weight')
+next
+  case (Cons n' ns)
+  then have ex1: \<open>\<exists>!ps. map fst ps = n' # ns \<and> is_path_undir G n' ps lst\<close>
+    by force
+  then obtain ps where ps: \<open>map fst ps = n' # ns\<close> \<open>is_path_undir G n' ps lst\<close>
+    by meson
+  then have others: \<open>map fst ps' = n' # ns \<and> is_path_undir G n' ps' lst \<Longrightarrow> ps' = ps\<close> for ps'
+    by (metis ex1)
+  show ?case
+    apply (rule ex1I[of _ \<open>(n, dist n n', n') # ps\<close>])
+    using Cons.prems(1) Cons.prems(2) ps rtl apply simp
+    by (auto simp: label_is_weight label_is_weight' others)
+qed
+
+lemma the_path_empty: \<open>map fst (the_path [] v) = []\<close>
   by (simp add: the_path_def)
 
-\<comment> \<open>remove n'? ps' ~> ps?\<close>
-lemma
-  assumes \<open>distinct (n#n'#ns)\<close> \<open>set (n#n'#ns) \<subseteq> V\<close> \<open>lst\<in>V\<close> \<open>lst \<noteq> last (n#n'#ns)\<close>
-  defines \<open>ps \<equiv> the_path (n#n'#ns) lst\<close>
-  shows \<open>map fst ps = (n#n'#ns) \<and> is_path_undir G n ps lst\<close>
+lemma the_path:
+  assumes \<open>distinct (n#ns)\<close> \<comment> \<open>inequality of neighbouring nodes would suffice...\<close>
+    and \<open>set (n#ns) \<subseteq> V\<close> \<open>lst\<in>V\<close> \<open>lst \<noteq> last (n#ns)\<close>
+  shows \<open>map fst (the_path (n#ns) lst) = (n#ns)\<close> \<open>is_path_undir G n (the_path (n#ns) lst) lst\<close>
 proof -
-  have \<open>\<exists>!ps. map fst ps = (n#n'#ns) \<and> is_path_undir G n ps lst\<close>
-  using assms proof (induction ns arbitrary: n n' ps)
-    case Nil
-    then show ?case
-      apply simp
-      apply (rule ex1I[of _ \<open>[(n, dist n n', n'), (n', dist n' lst, lst)]\<close>])
-      by (auto simp: rtl label_is_weight label_is_weight')
-  next
-    case (Cons n'' ns)
-    then have ex1: \<open>\<exists>!ps. map fst ps = n' # n'' # ns \<and> is_path_undir G n' ps lst\<close>
-      by force
-    then obtain ps' where ps': \<open>map fst ps' = n' # n'' # ns\<close> \<open>is_path_undir G n' ps' lst\<close>
-      by meson
-    then have others: \<open>map fst ps = n' # n'' # ns \<and> is_path_undir G n' ps lst \<Longrightarrow> ps = ps'\<close> for ps
-      by (metis ex1)
-    show ?case
-      apply (rule ex1I[of _ \<open>(n, dist n n', n')#ps'\<close>])
-      using Cons.hyps(2) Cons.hyps(3) ps'(1) ps'(2) rtl apply auto[1]
-    proof
-  qed
-
+  from ex1_edge_path[OF assms, THEN theI']
+  have \<open>map fst (the_path (n#ns) lst) = (n#ns) \<and> is_path_undir G n (the_path (n#ns) lst) lst\<close>
+    by (simp add: the_path_def)
+  then show \<open>map fst (the_path (n#ns) lst) = (n#ns)\<close> \<open>is_path_undir G n (the_path (n#ns) lst) lst\<close>
+    by auto
+qed
 
 end
 
