@@ -1103,8 +1103,8 @@ definition the_path where
 lemma meh: \<open>is_cycle ((v,w,v')#cs) \<Longrightarrow> is_path_undir G v' cs v\<close>
   by fastforce
 
-lemma ex1_edge_path:
-  assumes \<open>distinct (n#ns)\<close> \<comment> \<open>inequality of neighbouring nodes would suffice...\<close>
+lemma ex1_edge_path: \<comment> \<open>In the general \<open>weight\<close> setting, commutativity would miss...\<close>
+  assumes \<open>distinct (n#ns)\<close> \<comment> \<open>inequality of neighbouring nodes suffices...\<close>
     and \<open>set (n#ns) \<subseteq> V\<close> \<open>lst\<in>V\<close> \<open>lst \<noteq> last (n#ns)\<close>
   shows \<open>\<exists>!ps. map fst ps = (n#ns) \<and> is_path_undir G n ps lst\<close>
   using assms
