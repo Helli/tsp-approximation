@@ -1142,6 +1142,15 @@ proof -
     by auto
 qed
 
+lemma is_cycle_last:
+  \<open>is_cycle (p#ps) \<Longrightarrow> snd (snd (last (p#ps))) \<noteq> last (map fst (p#ps))\<close>
+  by (smt complete fst_conv hd_last_singletonI is_cycle.elims(2) is_path_undir_last is_path_undir_simps(2) last_ConsL list.sel(1) list.sel(3) list.simps(3) list.simps(9) map_is_Nil_conv prod.collapse) 
+
+lemma the_cycle:
+  assumes \<open>is_cycle ps\<close>
+  shows \<open>the_path (map fst ps) (snd (snd (last ps))) = ps\<close>
+  using assms
+
 end
 
 subsection \<open>Symmetric TSP\<close>
