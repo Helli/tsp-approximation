@@ -1100,9 +1100,6 @@ definition the_path where
     [] \<Rightarrow> [] |
     n # ns \<Rightarrow> THE ps. map fst ps = nodelist \<and> is_path_undir G n ps lst)\<close>
 
-lemma meh: \<open>is_cycle ((v,w,v')#cs) \<Longrightarrow> is_path_undir G v' cs v\<close>
-  by fastforce
-
 lemma ex1_edge_path: \<comment> \<open>In the general \<open>weight\<close> setting, commutativity would miss...\<close>
   assumes \<open>distinct (n#ns)\<close> \<comment> \<open>inequality of neighbouring nodes suffices...\<close>
     and \<open>set (n#ns) \<subseteq> V\<close> \<open>lst\<in>V\<close> \<open>lst \<noteq> last (n#ns)\<close>
@@ -1149,7 +1146,7 @@ lemma is_cycle_last:
 lemma the_cycle:
   assumes \<open>is_cycle ps\<close>
   shows \<open>the_path (map fst ps) (snd (snd (last ps))) = ps\<close>
-  using assms
+  using assms oops
 
 end
 
