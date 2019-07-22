@@ -1103,7 +1103,7 @@ definition the_path where
 lemma ex1_edge_path: \<comment> \<open>In the general \<open>weight\<close> setting, commutativity would miss...\<close>
   assumes \<open>distinct (n#ns)\<close> \<comment> \<open>inequality of neighbouring nodes suffices...\<close>
     and \<open>set (n#ns) \<subseteq> V\<close> \<open>lst\<in>V\<close> \<open>lst \<noteq> last (n#ns)\<close>
-  shows \<open>\<exists>!ps. map fst ps = (n#ns) \<and> is_path_undir G n ps lst\<close>
+  shows \<open>\<exists>!ps. map fst ps = n#ns \<and> is_path_undir G n ps lst\<close>
   using assms
 proof (induction ns arbitrary: n)
   case Nil
@@ -1130,12 +1130,12 @@ lemma the_path_empty: \<open>map fst (the_path [] v) = []\<close>
 lemma the_path:
   assumes \<open>distinct (n#ns)\<close> \<comment> \<open>inequality of neighbouring nodes would suffice...\<close>
     and \<open>set (n#ns) \<subseteq> V\<close> \<open>lst\<in>V\<close> \<open>lst \<noteq> last (n#ns)\<close>
-  shows \<open>map fst (the_path (n#ns) lst) = (n#ns)\<close> \<open>is_path_undir G n (the_path (n#ns) lst) lst\<close>
+  shows \<open>map fst (the_path (n#ns) lst) = n#ns\<close> \<open>is_path_undir G n (the_path (n#ns) lst) lst\<close>
 proof -
   from ex1_edge_path[OF assms, THEN theI']
-  have \<open>map fst (the_path (n#ns) lst) = (n#ns) \<and> is_path_undir G n (the_path (n#ns) lst) lst\<close>
+  have \<open>map fst (the_path (n#ns) lst) = n#ns \<and> is_path_undir G n (the_path (n#ns) lst) lst\<close>
     by (simp add: the_path_def)
-  then show \<open>map fst (the_path (n#ns) lst) = (n#ns)\<close> \<open>is_path_undir G n (the_path (n#ns) lst) lst\<close>
+  then show \<open>map fst (the_path (n#ns) lst) = n#ns\<close> \<open>is_path_undir G n (the_path (n#ns) lst) lst\<close>
     by auto
 qed
 
@@ -1146,7 +1146,17 @@ lemma is_cycle_last:
 lemma the_cycle:
   assumes \<open>is_cycle ps\<close>
   shows \<open>the_path (map fst ps) (snd (snd (last ps))) = ps\<close>
-  using assms oops
+proof (cases ps)
+  case Nil
+  then show ?thesis
+    using the_path_empty by auto
+next
+  case (Cons p ps)
+  then show ?thesis sorry
+qed
+  apply (simp add: the_path_def)
+  using nodes_neq apply blast
+  using nodes_neq apply blast oops
 
 end
 
