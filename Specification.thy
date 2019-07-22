@@ -1143,20 +1143,41 @@ lemma is_cycle_last:
   \<open>is_cycle (p#ps) \<Longrightarrow> snd (snd (last (p#ps))) \<noteq> last (map fst (p#ps))\<close>
   by (smt complete fst_conv hd_last_singletonI is_cycle.elims(2) is_path_undir_last is_path_undir_simps(2) last_ConsL list.sel(1) list.sel(3) list.simps(3) list.simps(9) map_is_Nil_conv prod.collapse) 
 
-lemma the_cycle:
-  assumes \<open>is_cycle ps\<close>
-  shows \<open>the_path (map fst ps) (snd (snd (last ps))) = ps\<close>
-proof (cases ps)
-  case Nil
-  then show ?thesis
-    using the_path_empty by auto
+lemma the_cycle':
+  assumes \<open>is_path_undir G v ((v,e)#ps) v'\<close> \<open>distinct (v' # map fst ((v,e)#ps))\<close>
+  shows \<open>\<exists>!ps'. map fst ps' = map fst ((v, e) # ps) \<and>
+               is_path_undir G n ps' (snd (snd (last ((v, e) # ps))))\<close>
+proof (induction G v \<open>(v,e)#ps\<close> v' rule: is_path_undir.induct)
+  case 1
+  then show ?case sorry
 next
-  case (Cons p ps)
-  then show ?thesis sorry
+  case (2 G v w v2 v')
+  then show ?case sorry
 qed
-  apply (simp add: the_path_def)
-  using nodes_neq apply blast
-  using nodes_neq apply blast oops
+  case (1 G v v')
+  then show ?case
+    by (simp add: complete_finite_metric_graph.the_path_def)
+next
+  case (2 G v v1 w v2 p v')
+  then show ?case
+    apply auto
+    apply (simp add: complete_finite_metric_graph.the_path_def)
+
+  using assms complete_finite_metric_graph_axioms
+lemma the_cycle:
+  assumes \<open>is_path_undir G v ps v'\<close> \<open>distinct (v' # map fst ps)\<close>
+  shows \<open>the_path (map fst ps) (snd (snd (last ps))) = ps\<close>
+  using assms complete_finite_metric_graph_axioms
+proof (induction G v ps v' rule: is_path_undir.induct)
+  case (1 G v v')
+  then show ?case
+    by (simp add: complete_finite_metric_graph.the_path_def)
+next
+  case (2 G v v1 w v2 p v')
+  then show ?case
+    apply auto
+    apply (simp add: complete_finite_metric_graph.the_path_def)
+  qed
 
 end
 
