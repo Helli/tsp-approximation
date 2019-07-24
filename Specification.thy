@@ -1145,39 +1145,17 @@ lemma is_cycle_last:
 
 lemma the_cycle':
   assumes \<open>is_path_undir G v ((v,e)#ps) v'\<close> \<open>distinct (v' # map fst ((v,e)#ps))\<close>
-  shows \<open>\<exists>!ps'. map fst ps' = map fst ((v, e) # ps) \<and>
-               is_path_undir G n ps' (snd (snd (last ((v, e) # ps))))\<close>
-proof (induction G v \<open>(v,e)#ps\<close> v' rule: is_path_undir.induct)
-  case 1
-  then show ?case sorry
-next
-  case (2 G v w v2 v')
-  then show ?case sorry
-qed
-  case (1 G v v')
-  then show ?case
-    by (simp add: complete_finite_metric_graph.the_path_def)
-next
-  case (2 G v v1 w v2 p v')
-  then show ?case
-    apply auto
-    apply (simp add: complete_finite_metric_graph.the_path_def)
+  shows \<open>\<exists>!ps'. map fst ps' = map fst ((v,e)#ps) \<and> is_path_undir G v ps' (snd (snd (last ((v,e)#ps))))\<close>
+  using assms sorry
+proof (induction ps arbitrary: v)
+  case Nil
+  then show ?case apply simp
+    by (smt complete_finite_weighted_graph.complete complete_finite_weighted_graph_axioms fst_conv is_path_undir.elims(2) is_path_undir_last label_is_weight' last_ConsL list.sel(3) list.simps(9) map_is_Nil_conv snd_con
 
-  using assms complete_finite_metric_graph_axioms
 lemma the_cycle:
   assumes \<open>is_path_undir G v ps v'\<close> \<open>distinct (v' # map fst ps)\<close>
   shows \<open>the_path (map fst ps) (snd (snd (last ps))) = ps\<close>
-  using assms complete_finite_metric_graph_axioms
-proof (induction G v ps v' rule: is_path_undir.induct)
-  case (1 G v v')
-  then show ?case
-    by (simp add: complete_finite_metric_graph.the_path_def)
-next
-  case (2 G v v1 w v2 p v')
-  then show ?case
-    apply auto
-    apply (simp add: complete_finite_metric_graph.the_path_def)
-  qed
+  using assms unfolding the_path_def apply auto using the_cycle' sorry
 
 end
 
