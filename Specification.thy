@@ -3,6 +3,7 @@ theory Specification
   imports
     Koenigsberg_Friendship.KoenigsbergBridge
     Graph_Definition_Impl
+"HOL-ex.Sketch_and_Explore"
 begin
 
 lemma sum_of_parts(*rm*): \<open>\<lparr>nodes= nodes G, edges=edges G\<rparr> = G\<close>
@@ -1143,14 +1144,58 @@ lemma is_cycle_last:
   \<open>is_cycle (p#ps) \<Longrightarrow> snd (snd (last (p#ps))) \<noteq> last (map fst (p#ps))\<close>
   by (smt complete fst_conv hd_last_singletonI is_cycle.elims(2) is_path_undir_last is_path_undir_simps(2) last_ConsL list.sel(1) list.sel(3) list.simps(3) list.simps(9) map_is_Nil_conv prod.collapse) 
 
+lemma argh:
+  assumes \<open>is_path_undir G v ps v'\<close>
+  shows \<open>\<exists>!ps'. map fst ps' = map fst ps \<and> is_path_undir G v ps' v'\<close>
+  using assms
+proof (induction G v ps v' rule: is_path_undir.induct)
+  case (1 G v v')
+  then show ?case
+    by force
+next
+  case (2 G v v1 w v2 ps v')
+  then have a: \<open>ps' = ps\<close> if \<open>map fst ps' = map fst ps\<close> \<open>is_path_undir G v2 ps' v'\<close> for ps'
+    using that by auto
+  show ?case
+    apply (rule ex1I[of _ \<open>(v1, w, v2) # ps\<close>])
+    using "2.prems" apply blast
+  proof -
+    show "ps' = (v1, w, v2) # ps"
+      if "map fst ps' = map fst ((v1, w, v2) # ps) \<and> is_path_undir G v ps' v'" for ps' :: "('a \<times> real \<times> 'a) list"
+    proof (cases ps')
+      case Nil
+      then show ?thesis
+        using that by auto
+    next
+      case (Cons p ps'')
+      then have \<open>ps'' = ps\<close>
+      using that apply simp
+        apply (cases p) using a[of ps'']
+    qed
+    using that sorry
+qed
+    using a apply simp  apply auto
+    
+qed
+
 lemma the_cycle':
   assumes \<open>is_path_undir G v ((v,e)#ps) v'\<close> \<open>distinct (v' # map fst ((v,e)#ps))\<close>
   shows \<open>\<exists>!ps'. map fst ps' = map fst ((v,e)#ps) \<and> is_path_undir G v ps' (snd (snd (last ((v,e)#ps))))\<close>
-  using assms sorry
-proof (induction ps arbitrary: v)
+  using assms
+proof (induction ps arbitrary: v e)
   case Nil
-  then show ?case apply simp
-    by (smt complete_finite_weighted_graph.complete complete_finite_weighted_graph_axioms fst_conv is_path_undir.elims(2) is_path_undir_last label_is_weight' last_ConsL list.sel(3) list.simps(9) map_is_Nil_conv snd_con
+  then show ?case apply auto
+    using is_path_undir_last apply force
+    using label_is_weight' apply blast
+    using label_is_weight label_is_weight' apply blast
+    using label_is_weight label_is_weight' apply blast
+    using label_is_weight by blast
+next
+  case (Cons p ps)
+  show ?case
+  proof 
+qed
+
 
 lemma the_cycle:
   assumes \<open>is_path_undir G v ps v'\<close> \<open>distinct (v' # map fst ps)\<close>
