@@ -3,7 +3,6 @@ theory Specification
   imports
     Koenigsberg_Friendship.KoenigsbergBridge
     Graph_Definition_Impl
-"HOL-ex.Sketch_and_Explore"
 begin
 
 lemma sum_of_parts(*rm*): \<open>\<lparr>nodes= nodes G, edges=edges G\<rparr> = G\<close>
@@ -1175,7 +1174,7 @@ next
     using that sorry
 qed
     using a apply simp  apply auto
-    
+
 qed
 
 lemma the_cycle':
@@ -1193,7 +1192,7 @@ proof (induction ps arbitrary: v e)
 next
   case (Cons p ps)
   show ?case
-  proof 
+  proof
 qed
 
 
