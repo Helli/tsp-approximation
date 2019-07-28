@@ -1153,7 +1153,9 @@ proof (induction G v ps v' rule: is_path_undir.induct)
     by force
 next
   case (2 G v v1 w v2 ps v')
-  then have a: \<open>ps' = ps\<close> if \<open>map fst ps' = map fst ps\<close> \<open>is_path_undir G v2 ps' v'\<close> for ps'
+  then have important: \<open>v = v1\<close>
+    by simp
+  from 2 have a: \<open>ps' = ps\<close> if \<open>map fst ps' = map fst ps\<close> \<open>is_path_undir G v2 ps' v'\<close> for ps'
     using that by auto
   show ?case
     apply (rule ex1I[of _ \<open>(v1, w, v2) # ps\<close>])
@@ -1167,9 +1169,43 @@ next
         using that by auto
     next
       case (Cons p ps'')
-      then have \<open>ps'' = ps\<close>
-      using that apply simp
-        apply (cases p) using a[of ps'']
+      have \<open>snd (snd p) = v2\<close>
+        apply (cases p)
+      have \<open>ps'' = ps\<close>
+      proof (rule a)
+        show "map fst ps'' = map fst ps"
+          using local.Cons that by auto
+        show "is_path_undir G v2 ps'' v'"
+        proof -
+          obtain aa :: "('a \<times> real \<times> 'a) list \<Rightarrow> 'a" and pp :: "('a \<times> real \<times> 'a) list \<Rightarrow> real \<times> 'a" and pps :: "('a \<times> real \<times> 'a) list \<Rightarrow> ('a \<times> real \<times> 'a) list" where
+            f1: "\<forall>ps. ps = [] \<or> ps = (aa ps, pp ps) # pps ps"
+            using is_simple_undir.cases by moura
+          have f2: "\<forall>a aa p ps ab g. aa = a \<or> \<not> is_path_undir g aa ((a, p::real \<times> 'a) # ps) ab"
+            by fastforce
+          have f3: "\<forall>ps p f. hd (map f ((p::'a \<times> real \<times> 'a) # ps)) = (f p::'a)"
+            by simp
+          have f4: "\<forall>ps. hd ps # pps ps = ps \<or> ps = []"
+            using f1 by (metis (no_types) list.sel(1))
+          have f5: "is_path_undir G v2 ps v'"
+            using "2.prems" by force
+          have f6: "is_path_undir G (snd (snd p)) ps'' v'"
+            by (metis (no_types) is_path_undir.simps(2) local.Cons prod.collapse that)
+          { assume "ps'' \<noteq> []"
+            then have "is_path_undir G v2 ps'' v' \<or> map fst ps'' \<noteq> [] \<and> ps'' \<noteq> [] \<or> ps \<noteq> [] \<and> ps'' \<noteq> []"
+              by fastforce
+            then have ?thesis
+              using f6 f5 f4 f3 f2 by (metis (no_types) \<open>map fst ps'' = map fst ps\<close> list.simps(8) prod.collapse) }
+          then show ?thesis
+            using f5 \<open>map fst ps'' = map fst ps\<close> by fastforce
+        qed
+      qed
+      moreover have \<open>p = (v1, w, v2)\<close>
+        apply (cases p) apply auto
+        using local.Cons that apply auto[1] defer
+        ultimately show ?thesis
+          using Cons
+          sorry
+qed
     qed
     using that sorry
 qed
