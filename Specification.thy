@@ -1146,7 +1146,7 @@ lemma is_cycle_last:
 lemma argh:
   assumes \<open>is_path_undir G v ps v'\<close>
   shows \<open>\<exists>!ps'. map fst ps' = map fst ps \<and> is_path_undir G v ps' v'\<close>
-  using assms
+  using assms complete_finite_metric_graph_axioms
 proof (induction G v ps v' rule: is_path_undir.induct)
   case (1 G v v')
   then show ?case
@@ -1169,8 +1169,33 @@ next
         using that by auto
     next
       case (Cons p ps'')
-      have \<open>snd (snd p) = v2\<close>
-        apply (cases p)
+      have *: \<open>snd (snd p) = v2\<close>
+      proof (cases p)
+        case (fields a b c)
+        obtain aa :: "('a \<times> real \<times> 'a) list \<Rightarrow> 'a" and pp :: "('a \<times> real \<times> 'a) list \<Rightarrow> real \<times> 'a" and pps :: "('a \<times> real \<times> 'a) list \<Rightarrow> ('a \<times> real \<times> 'a) list" where
+          "\<forall>ps. ps = [] \<or> ps = (aa ps, pp ps) # pps ps"
+          using is_simple_undir.cases by moura
+        then have f2: "\<forall>ps. hd ps # pps ps = ps \<or> ps = []"
+          by (metis (no_types) list.sel(1))
+        have f3: "is_path_undir G v2 ps v'"
+          using "2.prems" by force
+        have f4: "\<forall>ps a aa p ab g. a = aa \<or> \<not> is_path_undir g a ((aa, p::real \<times> 'a) # ps) ab"
+          by fastforce
+        have f5: "is_path_undir G v1 ps' v'"
+          using important that by blast
+        have f6: "map fst ps = tl (map fst ps')"
+          by (simp add: that)
+        have f7: "\<forall>f. tl (map f ps'::'a list) = map f (tl ps')"
+          by (simp add: local.Cons)
+        then have f8: "v2 # map fst (pps ps) = map fst (tl ps') \<or> ps = []"
+          using f6 f4 f3 f2 by (metis (no_types) map_eq_Cons_conv prod.exhaust_sel)
+        have f9: "is_path_undir G (snd (snd p)) (tl ps') v'"
+          using f5 fields local.Cons by auto
+        have "v2 # tl (map fst (tl ps')) = map fst (tl ps') \<or> v' = v2"
+          using f8 f3 by auto
+        then show ?thesis
+          using f9 f8 f7 f6 by auto
+      qed
       have \<open>ps'' = ps\<close>
       proof (rule a)
         show "map fst ps'' = map fst ps"
@@ -1199,18 +1224,12 @@ next
             using f5 \<open>map fst ps'' = map fst ps\<close> by fastforce
         qed
       qed
-      moreover have \<open>p = (v1, w, v2)\<close>
-        apply (cases p) apply auto
-        using local.Cons that apply auto[1] defer
-        ultimately show ?thesis
-          using Cons
-          sorry
-qed
+      moreover have \<open>p = (v1, w, v2)\<close> using * "2.prems"
+        by (smt complete_finite_metric_graph_def complete_finite_weighted_graph_axioms_def complete_finite_weighted_graph_def dist_commute is_path_undir.simps(2) Cons prod.exhaust_sel that)
+      ultimately show ?thesis
+        using Cons by blast
     qed
-    using that sorry
-qed
-    using a apply simp  apply auto
-
+  qed
 qed
 
 lemma the_cycle':
