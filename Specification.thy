@@ -1250,11 +1250,20 @@ next
   proof
 qed
 
+thm is_path_undir_last
+
+lemma neq_Nil_mapE[elim?]:
+  assumes "xs \<noteq> []"
+  obtains y ys where "map fhdh xs = y#ys"
+  using assms  by (metis Nil_is_map_conv list.exhaust)
 
 lemma the_cycle:
-  assumes \<open>is_path_undir G v ps v'\<close> \<open>distinct (v' # map fst ps)\<close>
-  shows \<open>the_path (map fst ps) (snd (snd (last ps))) = ps\<close>
-  using assms unfolding the_path_def apply auto using the_cycle' sorry
+  assumes \<open>is_path_undir G v ps v'\<close>
+  shows \<open>the_path (map fst ps) v' = ps\<close>
+  using assms unfolding the_path_def apply auto apply (cases \<open>ps = []\<close>) apply auto
+  using argh
+
+  thm neq_Nil_mapE
 
 end
 
