@@ -1143,7 +1143,7 @@ lemma is_cycle_last:
   \<open>is_cycle (p#ps) \<Longrightarrow> snd (snd (last (p#ps))) \<noteq> last (map fst (p#ps))\<close>
   by (smt complete fst_conv hd_last_singletonI is_cycle.elims(2) is_path_undir_last is_path_undir_simps(2) last_ConsL list.sel(1) list.sel(3) list.simps(3) list.simps(9) map_is_Nil_conv prod.collapse) 
 
-lemma argh:
+lemma ex1_the_path:
   assumes \<open>is_path_undir G v ps v'\<close>
   shows \<open>\<exists>!ps'. map fst ps' = map fst ps \<and> is_path_undir G v ps' v'\<close>
   using assms complete_finite_metric_graph_axioms
@@ -1254,7 +1254,7 @@ thm is_path_undir_last
 
 lemma neq_Nil_mapE[elim?]:
   assumes "xs \<noteq> []"
-  obtains y ys where "map fhdh xs = y#ys"
+  obtains y ys where "map f xs = y#ys"
   using assms  by (metis Nil_is_map_conv list.exhaust)
 
 lemma the_cycle:
@@ -1262,8 +1262,9 @@ lemma the_cycle:
   shows \<open>the_path (map fst ps) v' = ps\<close>
   using assms unfolding the_path_def apply auto apply (cases \<open>ps = []\<close>) apply auto
   using argh
+  by (smt assms complete_finite_weighted_graph_axioms complete_finite_weighted_graph_axioms_def complete_finite_weighted_graph_def finite_graph_def finite_weighted_graph_def fst_conv is_path_undir.elims(2) list.simps(5) list.simps(9) mem_Collect_eq mem_Collect_eq mem_Collect_eq the_equality valid_graph.is_path_undir_las
 
-  thm neq_Nil_mapE
+  thm neq_NilE
 
 end
 
