@@ -219,7 +219,7 @@ theorem cyc_checkerT_correct: "cyc_checkerT G \<le> cyc_checkerT_spec G"
   unfolding cyc_checkerT_def cyc_checkerT_spec_def
 proof (refine_vcg le_ASSERTI order_trans[OF DFS.it_dfsT_correct], clarsimp_all)
   assume "graph G" then interpret graph G .
-  assume "finite (graph_defs.reachable G)" 
+  assume "finite (graph_defs.reachable G)"
   then interpret fb_graph G by (rule fb_graphI_fr)
   interpret cycc by unfold_locales
   show "DFS G cycc_params" by unfold_locales

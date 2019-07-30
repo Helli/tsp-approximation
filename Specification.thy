@@ -1143,19 +1143,128 @@ lemma is_cycle_last:
   \<open>is_cycle (p#ps) \<Longrightarrow> snd (snd (last (p#ps))) \<noteq> last (map fst (p#ps))\<close>
   by (smt complete fst_conv hd_last_singletonI is_cycle.elims(2) is_path_undir_last is_path_undir_simps(2) last_ConsL list.sel(1) list.sel(3) list.simps(3) list.simps(9) map_is_Nil_conv prod.collapse) 
 
+lemma ex1_the_path:
+  assumes \<open>is_path_undir G v ps v'\<close>
+  shows \<open>\<exists>!ps'. map fst ps' = map fst ps \<and> is_path_undir G v ps' v'\<close>
+  using assms complete_finite_metric_graph_axioms
+proof (induction G v ps v' rule: is_path_undir.induct)
+  case (1 G v v')
+  then show ?case
+    by force
+next
+  case (2 G v v1 w v2 ps v')
+  then have important: \<open>v = v1\<close>
+    by simp
+  from 2 have a: \<open>ps' = ps\<close> if \<open>map fst ps' = map fst ps\<close> \<open>is_path_undir G v2 ps' v'\<close> for ps'
+    using that by auto
+  show ?case
+    apply (rule ex1I[of _ \<open>(v1, w, v2) # ps\<close>])
+    using "2.prems" apply blast
+  proof -
+    show "ps' = (v1, w, v2) # ps"
+      if "map fst ps' = map fst ((v1, w, v2) # ps) \<and> is_path_undir G v ps' v'" for ps' :: "('a \<times> real \<times> 'a) list"
+    proof (cases ps')
+      case Nil
+      then show ?thesis
+        using that by auto
+    next
+      case (Cons p ps'')
+      have *: \<open>snd (snd p) = v2\<close>
+      proof (cases p)
+        case (fields a b c)
+        obtain aa :: "('a \<times> real \<times> 'a) list \<Rightarrow> 'a" and pp :: "('a \<times> real \<times> 'a) list \<Rightarrow> real \<times> 'a" and pps :: "('a \<times> real \<times> 'a) list \<Rightarrow> ('a \<times> real \<times> 'a) list" where
+          "\<forall>ps. ps = [] \<or> ps = (aa ps, pp ps) # pps ps"
+          using is_simple_undir.cases by moura
+        then have f2: "\<forall>ps. hd ps # pps ps = ps \<or> ps = []"
+          by (metis (no_types) list.sel(1))
+        have f3: "is_path_undir G v2 ps v'"
+          using "2.prems" by force
+        have f4: "\<forall>ps a aa p ab g. a = aa \<or> \<not> is_path_undir g a ((aa, p::real \<times> 'a) # ps) ab"
+          by fastforce
+        have f5: "is_path_undir G v1 ps' v'"
+          using important that by blast
+        have f6: "map fst ps = tl (map fst ps')"
+          by (simp add: that)
+        have f7: "\<forall>f. tl (map f ps'::'a list) = map f (tl ps')"
+          by (simp add: local.Cons)
+        then have f8: "v2 # map fst (pps ps) = map fst (tl ps') \<or> ps = []"
+          using f6 f4 f3 f2 by (metis (no_types) map_eq_Cons_conv prod.exhaust_sel)
+        have f9: "is_path_undir G (snd (snd p)) (tl ps') v'"
+          using f5 fields local.Cons by auto
+        have "v2 # tl (map fst (tl ps')) = map fst (tl ps') \<or> v' = v2"
+          using f8 f3 by auto
+        then show ?thesis
+          using f9 f8 f7 f6 by auto
+      qed
+      have \<open>ps'' = ps\<close>
+      proof (rule a)
+        show "map fst ps'' = map fst ps"
+          using local.Cons that by auto
+        show "is_path_undir G v2 ps'' v'"
+        proof -
+          obtain aa :: "('a \<times> real \<times> 'a) list \<Rightarrow> 'a" and pp :: "('a \<times> real \<times> 'a) list \<Rightarrow> real \<times> 'a" and pps :: "('a \<times> real \<times> 'a) list \<Rightarrow> ('a \<times> real \<times> 'a) list" where
+            f1: "\<forall>ps. ps = [] \<or> ps = (aa ps, pp ps) # pps ps"
+            using is_simple_undir.cases by moura
+          have f2: "\<forall>a aa p ps ab g. aa = a \<or> \<not> is_path_undir g aa ((a, p::real \<times> 'a) # ps) ab"
+            by fastforce
+          have f3: "\<forall>ps p f. hd (map f ((p::'a \<times> real \<times> 'a) # ps)) = (f p::'a)"
+            by simp
+          have f4: "\<forall>ps. hd ps # pps ps = ps \<or> ps = []"
+            using f1 by (metis (no_types) list.sel(1))
+          have f5: "is_path_undir G v2 ps v'"
+            using "2.prems" by force
+          have f6: "is_path_undir G (snd (snd p)) ps'' v'"
+            by (metis (no_types) is_path_undir.simps(2) local.Cons prod.collapse that)
+          { assume "ps'' \<noteq> []"
+            then have "is_path_undir G v2 ps'' v' \<or> map fst ps'' \<noteq> [] \<and> ps'' \<noteq> [] \<or> ps \<noteq> [] \<and> ps'' \<noteq> []"
+              by fastforce
+            then have ?thesis
+              using f6 f5 f4 f3 f2 by (metis (no_types) \<open>map fst ps'' = map fst ps\<close> list.simps(8) prod.collapse) }
+          then show ?thesis
+            using f5 \<open>map fst ps'' = map fst ps\<close> by fastforce
+        qed
+      qed
+      moreover have \<open>p = (v1, w, v2)\<close> using * "2.prems"
+        by (smt complete_finite_metric_graph_def complete_finite_weighted_graph_axioms_def complete_finite_weighted_graph_def dist_commute is_path_undir.simps(2) Cons prod.exhaust_sel that)
+      ultimately show ?thesis
+        using Cons by blast
+    qed
+  qed
+qed
+
 lemma the_cycle':
   assumes \<open>is_path_undir G v ((v,e)#ps) v'\<close> \<open>distinct (v' # map fst ((v,e)#ps))\<close>
   shows \<open>\<exists>!ps'. map fst ps' = map fst ((v,e)#ps) \<and> is_path_undir G v ps' (snd (snd (last ((v,e)#ps))))\<close>
-  using assms sorry
-proof (induction ps arbitrary: v)
+  using assms
+proof (induction ps arbitrary: v e)
   case Nil
-  then show ?case apply simp
-    by (smt complete_finite_weighted_graph.complete complete_finite_weighted_graph_axioms fst_conv is_path_undir.elims(2) is_path_undir_last label_is_weight' last_ConsL list.sel(3) list.simps(9) map_is_Nil_conv snd_con
+  then show ?case apply auto
+    using is_path_undir_last apply force
+    using label_is_weight' apply blast
+    using label_is_weight label_is_weight' apply blast
+    using label_is_weight label_is_weight' apply blast
+    using label_is_weight by blast
+next
+  case (Cons p ps)
+  show ?case
+  proof
+qed
+
+thm is_path_undir_last
+
+lemma neq_Nil_mapE[elim?]:
+  assumes "xs \<noteq> []"
+  obtains y ys where "map f xs = y#ys"
+  using assms  by (metis Nil_is_map_conv list.exhaust)
 
 lemma the_cycle:
-  assumes \<open>is_path_undir G v ps v'\<close> \<open>distinct (v' # map fst ps)\<close>
-  shows \<open>the_path (map fst ps) (snd (snd (last ps))) = ps\<close>
-  using assms unfolding the_path_def apply auto using the_cycle' sorry
+  assumes \<open>is_path_undir G v ps v'\<close>
+  shows \<open>the_path (map fst ps) v' = ps\<close>
+  using assms unfolding the_path_def apply auto apply (cases \<open>ps = []\<close>) apply auto
+  using argh
+  by (smt assms complete_finite_weighted_graph_axioms complete_finite_weighted_graph_axioms_def complete_finite_weighted_graph_def finite_graph_def finite_weighted_graph_def fst_conv is_path_undir.elims(2) list.simps(5) list.simps(9) mem_Collect_eq mem_Collect_eq mem_Collect_eq the_equality valid_graph.is_path_undir_las
+
+  thm neq_NilE
 
 end
 
