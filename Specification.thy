@@ -1233,24 +1233,9 @@ next
 qed
 
 lemma the_cycle':
-  assumes \<open>is_path_undir G v ((v,e)#ps) v'\<close> \<open>distinct (v' # map fst ((v,e)#ps))\<close>
+  assumes \<open>is_path_undir G v ((v,e)#ps) v'\<close>
   shows \<open>\<exists>!ps'. map fst ps' = map fst ((v,e)#ps) \<and> is_path_undir G v ps' (snd (snd (last ((v,e)#ps))))\<close>
-  using assms
-proof (induction ps arbitrary: v e)
-  case Nil
-  then show ?case apply auto
-    using is_path_undir_last apply force
-    using label_is_weight' apply blast
-    using label_is_weight label_is_weight' apply blast
-    using label_is_weight label_is_weight' apply blast
-    using label_is_weight by blast
-next
-  case (Cons p ps)
-  show ?case
-  proof
-qed
-
-thm is_path_undir_last
+  using assms ex1_the_path is_path_undir_last by blast
 
 lemma neq_Nil_mapE[elim?]:
   assumes "xs \<noteq> []"
