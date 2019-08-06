@@ -1095,6 +1095,9 @@ proof goal_cases
   finally show ?case .
 qed
 
+subsubsection \<open>Conversion Between Path Representations\<close>
+
+text \<open>Node lists to edge lists. (The reverse is just \<^term>\<open>map fst\<close>)\<close>
 definition the_path where
   \<open>the_path nodelist lst = (case nodelist of
     [] \<Rightarrow> [] |
@@ -1270,6 +1273,8 @@ proof -
   then show "(THE ps. map fst ps = v # map fst list \<and> is_path_undir G v ps v') = (v, aa, b) # list"
     using a1 \<open>\<And>v'a v' v ps e. \<lbrakk>is_path_undir G v ((v, e) # ps) v'a; is_path_undir G v ((v, e) # ps) v'\<rbrakk> \<Longrightarrow> (THE x. map fst x = map fst ((v, e) # ps) \<and> is_path_undir G v x (snd (snd (last ((v, e) # ps))))) = (v, e) # ps\<close> assms by auto
 qed
+
+subsubsection \<open>Lifting to (Hamiltonian) cycles\<close>
 
 end
 
