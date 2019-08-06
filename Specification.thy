@@ -1242,14 +1242,34 @@ lemma neq_Nil_mapE[elim?]:
   obtains y ys where "map f xs = y#ys"
   using assms  by (metis Nil_is_map_conv list.exhaust)
 
+lemma the_cycle'':
+  assumes \<open>is_path_undir G v ((v,e)#ps) v'\<close>
+  shows \<open>map fst ((v,e)#ps) = map fst ((v,e)#ps) \<and> is_path_undir G v ((v,e)#ps) (snd (snd (last ((v,e)#ps))))\<close>
+  using assms is_path_undir_last by blast
+
 lemma the_cycle:
   assumes \<open>is_path_undir G v ps v'\<close>
   shows \<open>the_path (map fst ps) v' = ps\<close>
-  using assms unfolding the_path_def apply auto apply (cases \<open>ps = []\<close>) apply auto
-  using argh
-  by (smt assms complete_finite_weighted_graph_axioms complete_finite_weighted_graph_axioms_def complete_finite_weighted_graph_def finite_graph_def finite_weighted_graph_def fst_conv is_path_undir.elims(2) list.simps(5) list.simps(9) mem_Collect_eq mem_Collect_eq mem_Collect_eq the_equality valid_graph.is_path_undir_las
-
-  thm neq_NilE
+  using assms unfolding the_path_def apply (cases ps)
+   apply simp using is_path_undir_last the_cycle'[THEN the1_equality, OF _ the_cycle''] apply auto
+subgoal proof -
+fix aa :: real and b :: 'a and list :: "('a \<times> real \<times> 'a) list"
+  assume a1: "ps = (v, aa, b) # list"
+assume "\<And>ps v v'. \<lbrakk>ps \<noteq> []; is_path_undir G v ps v'\<rbrakk> \<Longrightarrow> v' = snd (snd (last ps))"
+  then have "snd (snd (last ps)) = v'"
+using a1 assms by blast
+  then show "(THE ps. map fst ps = v # map fst list \<and> is_path_undir G v ps v') = (v, aa, b) # list"
+using a1 \<open>\<And>v'a v' v ps e. \<lbrakk>is_path_undir G v ((v, e) # ps) v'a; is_path_undir G v ((v, e) # ps) v'\<rbrakk> \<Longrightarrow> (THE x. map fst x = map fst ((v, e) # ps) \<and> is_path_undir G v x (snd (snd (last ((v, e) # ps))))) = (v, e) # ps\<close> assms by auto
+qed
+proof -
+  fix aa :: real and b :: 'a and list :: "('a \<times> real \<times> 'a) list"
+  assume a1: "ps = (v, aa, b) # list"
+  assume "\<And>ps v v'. \<lbrakk>ps \<noteq> []; is_path_undir G v ps v'\<rbrakk> \<Longrightarrow> v' = snd (snd (last ps))"
+  then have "snd (snd (last ps)) = v'"
+    using a1 assms by blast
+  then show "(THE ps. map fst ps = v # map fst list \<and> is_path_undir G v ps v') = (v, aa, b) # list"
+    using a1 \<open>\<And>v'a v' v ps e. \<lbrakk>is_path_undir G v ((v, e) # ps) v'a; is_path_undir G v ((v, e) # ps) v'\<rbrakk> \<Longrightarrow> (THE x. map fst x = map fst ((v, e) # ps) \<and> is_path_undir G v x (snd (snd (last ((v, e) # ps))))) = (v, e) # ps\<close> assms by auto
+qed
 
 end
 
