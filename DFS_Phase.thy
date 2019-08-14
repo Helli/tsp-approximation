@@ -60,6 +60,7 @@ lemmas cycc_params_simp[simp] =
 
 interpretation cycc: param_DFS_defs where param=cycc_params for G .
 
+(*
 text \<open>We now can define our cyclicity checker. 
   The partially correct version asserts a finitely branching graph:\<close>
 definition "cyc_checker G \<equiv> do {
@@ -67,6 +68,7 @@ definition "cyc_checker G \<equiv> do {
   s \<leftarrow> cycc.it_dfs TYPE('a) G;
   RETURN (break s)
 }"
+*)
 
 text \<open>The total correct variant asserts finitely many reachable nodes.\<close>
 definition "cyc_checkerT G \<equiv> do {
