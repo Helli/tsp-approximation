@@ -1274,6 +1274,11 @@ proof -
     using a1 \<open>\<And>v'a v' v ps e. \<lbrakk>is_path_undir G v ((v, e) # ps) v'a; is_path_undir G v ((v, e) # ps) v'\<rbrakk> \<Longrightarrow> (THE x. map fst x = map fst ((v, e) # ps) \<and> is_path_undir G v x (snd (snd (last ((v, e) # ps))))) = (v, e) # ps\<close> assms by auto
 qed
 
+lemma is_cycle_the_path:
+  assumes \<open>is_cycle ps\<close>
+  shows "the_path (map fst ps) (fst (hd ps)) = ps"
+  by (smt Nil_is_map_conv assms the_cycle fst_conv is_cycle.elims(2) list.sel(1) list.simps(4) the_path_def)
+
 subsubsection \<open>Lifting to (Hamiltonian) cycles\<close>
 
 end
