@@ -13,4 +13,3 @@ session TSP = Kruskal +
     DFS_Phase
   document_files
     root.tex
-    root.bib
