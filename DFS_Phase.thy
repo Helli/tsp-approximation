@@ -212,6 +212,10 @@ context cycc_invar begin
     
 end
 
+definition \<open>circuit_finderT_spec T n \<equiv> do {
+ASSERT (node_in_graph w T n);
+SPEC (\<lambda>ns. is_hamiltonian_circuit)}\<close>
+
 text \<open>The same for the total correct variant:\<close>
 definition "cyc_checkerT_spec G \<equiv> do {
   ASSERT (graph G \<and> finite (graph_defs.reachable G));

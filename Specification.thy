@@ -1081,7 +1081,7 @@ proof -
     by (smt * ** assms(2) comp_def distinct_tl edge_weight_sum_list is_hamiltonian_circuit_OPT is_hamiltonian_circuit_distinct_edges order_trans)
 qed
 
-proposition
+proposition algo_sketch_correct:
   assumes \<open>2 \<le> card V\<close>
   shows \<open>algo_sketch \<le> twoApprox\<close>
   unfolding algo_sketch_def apply refine_vcg apply auto
