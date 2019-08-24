@@ -891,8 +891,8 @@ qed
 
 subsection \<open>SPEC\<close>
 
-abbreviation twoApprox where
-  \<open>twoApprox \<equiv> SPEC (\<lambda>T. is_hamiltonian_circuit T \<and> cost T \<le> OPTWEIGHT + OPTWEIGHT)\<close>
+abbreviation two_approximation where
+  \<open>two_approximation \<equiv> SPEC (\<lambda>T. is_hamiltonian_circuit T \<and> cost T \<le> OPTWEIGHT + OPTWEIGHT)\<close>
 
 definition algo_sketch where \<open>algo_sketch =
 do {
@@ -1083,7 +1083,7 @@ qed
 
 proposition algo_sketch_correct:
   assumes \<open>2 \<le> card V\<close>
-  shows \<open>algo_sketch \<le> twoApprox\<close>
+  shows \<open>algo_sketch \<le> two_approximation\<close>
   unfolding algo_sketch_def apply refine_vcg apply auto
 proof goal_cases
   case (1 MST pretour Tour)
