@@ -5,6 +5,8 @@ theory Specification
     Graph_Definition_Impl
 begin
 
+subsection \<open>Rule Collection\<close>
+
 lemma sum_of_parts(*rm*): \<open>\<lparr>nodes= nodes G, edges=edges G\<rparr> = G\<close>
   by simp
 
