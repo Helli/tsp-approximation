@@ -1114,7 +1114,7 @@ proof (induction ns arbitrary: n)
   case Nil
   show ?case
     apply (rule ex1I[of _ \<open>[(n, dist n lst, lst)]\<close>])
-    using Nil by (auto simp: rtl label_is_weight label_is_weight')
+    using Nil by (auto simp: edge_exists label_is_weight label_is_weight')
 next
   case (Cons n' ns)
   then have ex1: \<open>\<exists>!ps. map fst ps = n' # ns \<and> is_path_undir G n' ps lst\<close>
@@ -1125,7 +1125,7 @@ next
     by (metis ex1)
   show ?case
     apply (rule ex1I[of _ \<open>(n, dist n n', n') # ps\<close>])
-    using Cons.prems(1) Cons.prems(2) ps rtl apply simp
+    using Cons.prems(1) Cons.prems(2) ps edge_exists apply simp
     by (auto simp: label_is_weight label_is_weight' others)
 qed
 
