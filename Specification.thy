@@ -659,7 +659,7 @@ locale complete_finite_weighted_graph = finite_weighted_graph + fixes weight
   assumes complete: \<open>(v,w,v') \<in> E \<longleftrightarrow> v\<noteq>v' \<and> \<comment> \<open>rm\<close> v\<in>V \<and> v'\<in>V \<and> weight v v' = w\<close>
 begin
 
-lemma rtl: \<open>v\<in>V \<Longrightarrow> v'\<in>V \<Longrightarrow> v\<noteq>v' \<Longrightarrow> (v,weight v v',v') \<in> E\<close>
+lemma edge_exists: \<open>v\<in>V \<Longrightarrow> v'\<in>V \<Longrightarrow> v\<noteq>v' \<Longrightarrow> (v,weight v v',v') \<in> E\<close>
   using complete by blast
 
 lemma nodes_neq: \<open>(v,w,v') \<in> E \<Longrightarrow> v\<noteq>v'\<close>
