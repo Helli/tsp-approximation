@@ -904,10 +904,10 @@ do {
   RETURN Tour
 }\<close>
 
-lemma (in valid_graph) neuland: \<open>is_simple_undir2 ((x,w,y)#ps) \<Longrightarrow> x\<noteq>y\<close>
+lemma (in valid_graph) is_simple_undir2_nodes_neq: \<open>is_simple_undir2 ((x,w,y)#ps) \<Longrightarrow> x\<noteq>y\<close>
   unfolding is_simple_undir2_def by (cases ps) auto
 
-lemma (in valid_graph) neuland': \<open>is_simple_undir2 ((x,w,y)#ps) \<Longrightarrow> x \<notin> adj_vertices ps\<close>
+lemma (in valid_graph) is_simple_undir2_adj_vertices: \<open>is_simple_undir2 ((x,w,y)#ps) \<Longrightarrow> x \<notin> adj_vertices ps\<close>
   using is_simple_undir2_step by blast
 
 lemma (in valid_graph) is_simple_undir2_adj_vertices_Cons:
@@ -967,9 +967,9 @@ proof (induction ps)
   then obtain v w v' where e[simp]: \<open>e=(v,w,v')\<close>
     by (cases e) (simp add: is_simple_undir2_def)
   have ne: \<open>v \<noteq> v'\<close>
-    using Cons.prems neuland by auto
-  have ne': \<open>v \<notin> adj_vertices ps\<close> \<comment> \<open>fixme: unused. also @{thm neuland'}\<close>
-    using Cons.prems neuland' by auto
+    using Cons.prems is_simple_undir2_nodes_neq by auto
+  have ne': \<open>v \<notin> adj_vertices ps\<close> \<comment> \<open>fixme: unused. also @{thm is_simple_undir2_adj_vertices}\<close>
+    using Cons.prems is_simple_undir2_adj_vertices by auto
   from Cons interpret grove: forest \<open>\<lparr>nodes = V, edges = set ps\<rparr>\<close>
     using is_simple_undir2_step by force
   have \<open>\<lparr>nodes = V, edges = set (e#ps)\<rparr> = add_edge v w v' \<lparr>nodes = V, edges = set ps\<rparr>\<close>
@@ -988,7 +988,7 @@ proof (induction ps)
   next
     case False
     then show ?thesis
-      by (metis Cons.prems e is_simple_undir2_step neuland tmp')
+      by (metis Cons.prems e ne is_simple_undir2_step tmp')
   qed subgoal
   proof (cases \<open>ps = []\<close>)
     case True
