@@ -881,7 +881,6 @@ lemma OPT_sanity:
   assumes \<open>2 \<le> card V\<close>
   shows \<open>cost OPT = OPTWEIGHT\<close>
 proof -
-  note finitely_many_hamiltonian_circuits
   have ***: \<open>OPTWEIGHT = (LEAST w. \<exists>ps. is_hamiltonian_circuit ps \<and> cost ps = w)\<close>
     unfolding OPTWEIGHT_def apply (rule Least_Min[symmetric])
      apply auto using finitely_many_hamiltonian_circuits apply force
