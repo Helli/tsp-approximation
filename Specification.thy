@@ -108,7 +108,7 @@ lemma (in valid_graph) valid_graph_symhull: \<open>valid_graph \<lparr>nodes = V
   apply unfold_locales apply auto using E_valid by (auto simp: symhull_def)
 
 lemma (in valid_graph) valid_unMultigraph_symhull:
-  assumes no_id[simp]:\<open>\<And>v w.(v,w,v) \<notin> E\<close>
+  assumes no_id[simp]:\<open>\<forall>v w.(v,w,v) \<notin> E\<close>
   shows \<open>valid_unMultigraph \<lparr>nodes = V, edges = symhull E\<rparr>\<close>
   apply unfold_locales
      apply (auto simp: symhull_def)
