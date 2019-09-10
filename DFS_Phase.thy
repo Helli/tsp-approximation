@@ -211,7 +211,7 @@ context cycc_invar begin
 *)
     
 end
-
+(*
 definition \<open>circuit_finderT_spec T n \<equiv> do {
 ASSERT (node_in_graph w T n);
 SPEC (\<lambda>ns. is_hamiltonian_circuit)}\<close>
@@ -463,5 +463,5 @@ begin
 thm cyc_checker_codeT_correct[OF dgraph.graph_axioms]
 
 end
-
+*)
 end
