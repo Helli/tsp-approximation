@@ -107,7 +107,7 @@ corollary supergraph_symhull: \<open>subgraph \<lparr>nodes=V, edges=E\<rparr> \
 lemma (in valid_graph) valid_graph_symhull: \<open>valid_graph \<lparr>nodes = V, edges = symhull E\<rparr>\<close>
   apply unfold_locales apply auto using E_valid by (auto simp: symhull_def)
 
-lemma (in valid_graph) valid_unMultigraph_symhull:
+lemma (in valid_graph) valid_unMultigraph_symhull:\<comment> \<open>included\<close>
   assumes no_id[simp]:\<open>\<forall>v w.(v,w,v) \<notin> E\<close>
   shows \<open>valid_unMultigraph \<lparr>nodes = V, edges = symhull E\<rparr>\<close>
   apply unfold_locales
@@ -161,7 +161,7 @@ lemma maximally_connected_symhull:
 lemma subgraph_trans: \<open>subgraph G H \<Longrightarrow> subgraph H I \<Longrightarrow> subgraph G I\<close>
   by (auto simp: subgraph_def) \<comment> \<open>Maybe interpret \<^class>\<open>order_bot\<close>?\<close>
 
-lemma spanning_forest_symhull:
+lemma spanning_forest_symhull:\<comment> \<open>included\<close>
   \<open>spanning_forest F \<lparr>nodes=V, edges = E\<rparr> \<Longrightarrow> spanning_forest F \<lparr>nodes=V, edges = symhull E\<rparr>\<close>
   unfolding spanning_forest_def
   using maximally_connected_symhull subgraph_trans supergraph_symhull by fastforce
@@ -305,7 +305,7 @@ lemma (in valid_unMultigraph) spanning_forest_mirror_single:
     using that by (metis (no_types, lifting) corres delete_edge_preserve_subgraph graph.select_convs(2) insert_Diff insert_subset subgraph_def valid_graph.add_edge_preserve_subgraph valid_graph_axioms)
 qed
 
-lemma (in finite_weighted_graph) spanning_forest_symhull_preimage:
+lemma (in finite_weighted_graph) spanning_forest_symhull_preimage:\<comment> \<open>included\<close>
   assumes no_id[simp]:\<open>\<And>v w.(v,w,v) \<notin> E\<close>
   assumes \<open>spanning_forest \<lparr>nodes=V, edges=F\<rparr> \<lparr>nodes=V, edges=symhull E\<rparr>\<close>
   shows \<open>\<exists>F'. spanning_forest \<lparr>nodes=V, edges=F'\<rparr> \<lparr>nodes=V, edges=E\<rparr>
@@ -390,9 +390,10 @@ lemma (in finite_weighted_graph) minimum_spanning_forest_symhull_edge_weight:
   using assms
   by (meson antisym minimum_spanning_forest_def optimal_forest_def optimal_forest_symhull optimal_forest_symhull_preimage)
 
-lemma (in finite_weighted_graph) minimum_spanning_tree_symhull_edge_weight:
+lemma (in finite_weighted_graph) minimum_spanning_tree_symhull_edge_weight:\<comment> \<open>included\<close>
   assumes \<open>\<And>v w.(v,w,v) \<notin> E\<close>
-  assumes \<open>minimum_spanning_tree T \<lparr>nodes=V, edges=E\<rparr>\<close> \<open>minimum_spanning_tree T' \<lparr>nodes=V, edges = symhull E\<rparr>\<close>
+  assumes \<open>minimum_spanning_tree T \<lparr>nodes=V, edges=E\<rparr>\<close>
+    and \<open>minimum_spanning_tree T' \<lparr>nodes=V, edges = symhull E\<rparr>\<close>
   shows \<open>edge_weight T = edge_weight T'\<close>
   using assms minimum_spanning_forest_symhull_edge_weight[unfolded minimum_spanning_forest_def]
   unfolding minimum_spanning_tree_def spanning_tree_def spanning_forest_def tree_def forest_def
@@ -404,7 +405,7 @@ lemma (in finite_weighted_graph) spanning_tree_impl_connected:
   shows \<open>connected_graph G\<close>
   using assms spanning_tree_def subgraph_impl_connected tree_def by blast
 
-lemma (in finite_weighted_graph) minimum_spanning_tree_symhull:
+lemma (in finite_weighted_graph) minimum_spanning_tree_symhull:\<comment> \<open>included\<close>
   assumes \<open>\<And>v w.(v,w,v) \<notin> E\<close>
   assumes \<open>minimum_spanning_tree F G\<close>
   shows \<open>minimum_spanning_tree F \<lparr>nodes=V, edges = symhull E\<rparr>\<close>
