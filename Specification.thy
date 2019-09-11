@@ -899,7 +899,6 @@ abbreviation two_approximation where
 definition algo_sketch where \<open>algo_sketch =
 do {
   MST \<leftarrow> SPEC (\<lambda>E'. minimum_spanning_tree (ind E') G);
-  let v0 = (SOME v. v \<in> MST);
   pretour \<leftarrow> SPEC (\<lambda>pT. int_vertices pT = nodes G \<and> cost pT \<le> set_cost MST + set_cost MST);
   Tour \<leftarrow> SPEC (\<lambda>T. is_hamiltonian_circuit T \<and> cost T \<le> cost pretour);
   RETURN Tour
