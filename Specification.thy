@@ -1083,7 +1083,7 @@ proof -
 qed
 
 proposition algo_sketch_correct:
-  assumes \<open>2 \<le> card V\<close>
+  assumes \<open>1 < card V\<close>
   shows \<open>algo_sketch \<le> two_approximation\<close>
   unfolding algo_sketch_def apply refine_vcg apply auto
 proof goal_cases
@@ -1092,7 +1092,7 @@ proof goal_cases
   also have \<open>sum_list (map (fst \<circ> snd) pretour) \<le> 2 * set_cost MST\<close>
     by (fact 1(3))
   also have \<open>\<dots> \<le> 2 * OPTWEIGHT\<close>
-    by (simp add: 1(1) add_mono assms minimum_spanning_tree_le_OPTWEIGHT)
+    using "1"(1) assms complete_finite_metric_graph.minimum_spanning_tree_le_OPTWEIGHT complete_finite_metric_graph_axioms by fastforce
   finally show ?case .
 qed
 
