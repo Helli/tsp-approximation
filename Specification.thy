@@ -416,66 +416,6 @@ lemma (in finite_weighted_graph) minimum_spanning_tree_symhull:\<comment> \<open
       subgraph_impl_connected valid_graph_axioms valid_graph_symhull)
 
 
-subsection \<open>Matroid Interpretation\<close>
-
-context finite_weighted_graph \<comment> \<open>first usage in the AFP\<close>
-begin \<comment> \<open>@{class weight} might be too special, and @{thm valid_graph_axioms} unneeded\<close>
-
-interpretation m?: weighted_matroid E subforest \<open>\<lambda>(_,w,_). w\<close>
-  by (simp add: s.weighted_matroid_axioms)
-
-end
-
-context Kruskal_interface
-begin
-lemmas k0 = kruskal0_refine minWeightBasis_refine
-lemma k0_spec: \<open>kruskal0 \<le> SPEC MSF\<close>
-  using k0 unfolding nres_rel_def by auto
-end
-thm Kruskal_interface.kruskal0_def
-context finite_weighted_graph
-begin
-
-find_theorems name: MSF_eq
-thm s.k0_spec[unfolded MSF_eq]
-thm s.kruskal0_def
-thm s.kruskal0_def[simplified]
-thm spanning_forest_eq
-thm MSF_eq
-
-end
-
-locale finite_weighted_connected_graph = finite_weighted_graph + connected_graph
-begin
-
-lemma kruskal0_MST: \<open>s.kruskal0 \<le> SPEC (\<lambda>E'. minimum_spanning_tree (ind E') G)\<close>
-proof -
-  have \<open>minimum_spanning_tree F G\<close> if \<open>minimum_spanning_forest F G\<close> for F
-    by (simp add: connected_graph_axioms minimum_spanning_forest_impl_tree2 that)
-  with SPEC_cons_rule[OF s.k0_spec[unfolded MSF_eq] this] show ?thesis
-    by (simp add: sum_of_parts)
-qed
-
-end
-
-locale finite_weighted_connected_loopfree_graph = finite_weighted_connected_graph +
-  assumes no_loops: \<open>\<And>v w.(v,w,v) \<notin> E\<close>
-begin
-
-lemma kruskal0_MST': \<open>s.kruskal0 \<le> SPEC (\<lambda>E'. minimum_spanning_tree (ind E') \<lparr>nodes=V, edges = symhull E\<rparr>)\<close>
-  using kruskal0_MST
-proof -
-  have \<open>SPEC (\<lambda>E'. minimum_spanning_tree (ind E') G) \<le> SPEC (\<lambda>E'. minimum_spanning_tree (ind E') \<lparr>nodes=V, edges = symhull E\<rparr>)\<close>
-    using minimum_spanning_tree_symhull no_loops by force
-  with SPEC_trans kruskal0_MST show ?thesis
-    by blast
-qed
-
-sublocale symhull: valid_unMultigraph \<open>ind (symhull E)\<close>
-  by (simp add: no_loops valid_unMultigraph_symhull)
-
-end
-
 subsection \<open>Hamiltonian Circuits\<close>
 
 fun adj_vertices where
@@ -612,6 +552,67 @@ lemma is_hamiltonian_circuit_kon_circuit: \<open>kon_graph.is_hamiltonian_circui
   apply (auto simp: kon_circuit_def kon_path_def)
            apply (auto simp: kon_graph_def)
   done
+
+subsection \<open>Matroid Interpretation\<close>
+
+context finite_weighted_graph \<comment> \<open>first usage in the AFP\<close>
+begin \<comment> \<open>@{class weight} might be too special, and @{thm valid_graph_axioms} unneeded\<close>
+
+interpretation m?: weighted_matroid E subforest \<open>\<lambda>(_,w,_). w\<close>
+  by (simp add: s.weighted_matroid_axioms)
+
+end
+
+context Kruskal_interface
+begin
+lemmas k0 = kruskal0_refine minWeightBasis_refine
+lemma k0_spec: \<open>kruskal0 \<le> SPEC MSF\<close>
+  using k0 unfolding nres_rel_def by auto
+end
+thm Kruskal_interface.kruskal0_def
+context finite_weighted_graph
+begin
+
+find_theorems name: MSF_eq
+thm s.k0_spec[unfolded MSF_eq]
+thm s.kruskal0_def
+thm s.kruskal0_def[simplified]
+thm spanning_forest_eq
+thm MSF_eq
+
+end
+
+locale finite_weighted_connected_graph = finite_weighted_graph + connected_graph
+begin
+
+lemma kruskal0_MST: \<open>s.kruskal0 \<le> SPEC (\<lambda>E'. minimum_spanning_tree (ind E') G)\<close>
+proof -
+  have \<open>minimum_spanning_tree F G\<close> if \<open>minimum_spanning_forest F G\<close> for F
+    by (simp add: connected_graph_axioms minimum_spanning_forest_impl_tree2 that)
+  with SPEC_cons_rule[OF s.k0_spec[unfolded MSF_eq] this] show ?thesis
+    by (simp add: sum_of_parts)
+qed
+
+end
+
+locale finite_weighted_connected_loopfree_graph = finite_weighted_connected_graph +
+  assumes no_loops: \<open>\<And>v w.(v,w,v) \<notin> E\<close>
+begin
+
+lemma kruskal0_MST': \<open>s.kruskal0 \<le> SPEC (\<lambda>E'. minimum_spanning_tree (ind E') \<lparr>nodes=V, edges = symhull E\<rparr>)\<close>
+  using kruskal0_MST
+proof -
+  have \<open>SPEC (\<lambda>E'. minimum_spanning_tree (ind E') G) \<le> SPEC (\<lambda>E'. minimum_spanning_tree (ind E') \<lparr>nodes=V, edges = symhull E\<rparr>)\<close>
+    using minimum_spanning_tree_symhull no_loops by force
+  with SPEC_trans kruskal0_MST show ?thesis
+    by blast
+qed
+
+sublocale symhull: valid_unMultigraph \<open>ind (symhull E)\<close>
+  by (simp add: no_loops valid_unMultigraph_symhull)
+
+end
+
 
 subsection \<open>Tours and Costs\<close>
 
