@@ -4,7 +4,6 @@ session TSP = Kruskal +
       maybe refer to thesis.\<close>
   options [document=pdf, document_output="output"]
   sessions
-    Koenigsberg_Friendship
     DFS_Framework
   theories [document=false]
     Graph_Definition_Impl

@@ -1,7 +1,6 @@
 section \<open>Specification\<close>
 theory Specification
   imports
-    Koenigsberg_Friendship.KoenigsbergBridge
     Graph_Definition_Impl
 begin
 
@@ -81,8 +80,6 @@ qed
 lemma forest_empty: \<open>forest \<lparr>nodes = V, edges = {}\<rparr>\<close>
   by unfold_locales simp_all
 
-subsection \<open>Spanning Forests for Graphs of Type @{locale valid_unMultigraph}\<close>
-
 subsubsection \<open>Undirected Hull\<close> \<comment> \<open>or rather: symmetric hull\<close>
 
 lemma is_path_undir_mono:
@@ -106,29 +103,6 @@ corollary supergraph_symhull: \<open>subgraph \<lparr>nodes=V, edges=E\<rparr> \
 
 lemma (in valid_graph) valid_graph_symhull: \<open>valid_graph \<lparr>nodes = V, edges = symhull E\<rparr>\<close>
   apply unfold_locales apply auto using E_valid by (auto simp: symhull_def)
-
-lemma (in valid_graph) valid_unMultigraph_symhull:\<comment> \<open>included\<close>
-  assumes no_id[simp]:\<open>\<forall>v w.(v,w,v) \<notin> E\<close>
-  shows \<open>valid_unMultigraph \<lparr>nodes = V, edges = symhull E\<rparr>\<close>
-  apply unfold_locales
-     apply (auto simp: symhull_def)
-  using E_validD by blast+
-
-lemma (in valid_graph) symhull_hull:
-  assumes no_id:\<open>\<And>v w.(v,w,v) \<notin> E\<close>
-  shows \<open>symhull E = (\<lambda>E'. valid_unMultigraph \<lparr>nodes=V, edges=E'\<rparr>) hull E\<close>
-  apply (simp add: symhull_def)
-  apply (rule hull_unique[symmetric])
-    apply auto
-   apply (metis no_id symhull_def valid_unMultigraph_symhull)
-  proof goal_cases
-    case (1 t' v1 w v2)
-    then have \<open>(v2, w, v1) \<in> t'\<close>
-      by blast
-    with 1(2) have \<open>(v1, w, v2) \<in> t'\<close>
-      using valid_unMultigraph.corres by fastforce
-    then show ?case.
-  qed
 
 lemma symhull_altdef: \<open>symhull E = E \<union> (\<lambda>(v1, w, v2). (v2, w, v1)) ` E\<close>
   unfolding symhull_def by force
@@ -281,140 +255,18 @@ proof unfold_locales
     by blast
 qed
 
-lemma (in valid_unMultigraph) spanning_forest_mirror_single:
-  assumes \<open>spanning_forest \<lparr>nodes=V, edges=F\<rparr> G\<close> and \<open>(u,w,v)\<in>F\<close>
-  shows \<open>spanning_forest (mirror_edge u w v \<lparr>nodes=V, edges=F\<rparr>) G\<close>
-  using assms apply (simp add: spanning_forest_def)
-  apply auto
-  proof -
-  show forest: \<open>forest (mirror_edge u w v \<lparr>nodes = V, edges = F\<rparr>)\<close>
-    if \<open>(u, w, v) \<in> F\<close> and \<open>forest \<lparr>nodes = V, edges = F\<rparr>\<close>
-    using that by (simp add: forest.mirror_single_forest)
-  show \<open>maximally_connected (mirror_edge u w v \<lparr>nodes = V, edges = F\<rparr>) G\<close>
-    if \<open>(u, w, v) \<in> F\<close>
-      and \<open>forest \<lparr>nodes = V, edges = F\<rparr>\<close>
-      and \<open>maximally_connected \<lparr>nodes = V, edges = F\<rparr> G\<close>
-      and \<open>subgraph \<lparr>nodes = V, edges = F\<rparr> G\<close>
-    using that
-    by (smt forest add_edge_maximally_connected add_edge_preserve_subgraph corres edges_add_edge forest.forest_add_edge forest.no_dups graph.select_convs(2) insert_iff insert_subset nodes_delete_edge subgraph_def swap_delete_add_edge valid_graph.E_validD(1) valid_graph.add_delete_edge valid_graph.delete_edge_maximally_connected valid_graph.valid_subgraph valid_graph_axioms)
-  show \<open>subgraph (mirror_edge u w v \<lparr>nodes = V, edges = F\<rparr>) G\<close>
-    if \<open>(u, w, v) \<in> F\<close>
-      and \<open>forest \<lparr>nodes = V, edges = F\<rparr>\<close>
-      and \<open>maximally_connected \<lparr>nodes = V, edges = F\<rparr> G\<close>
-      and \<open>subgraph \<lparr>nodes = V, edges = F\<rparr> G\<close>
-    using that by (metis (no_types, lifting) corres delete_edge_preserve_subgraph graph.select_convs(2) insert_Diff insert_subset subgraph_def valid_graph.add_edge_preserve_subgraph valid_graph_axioms)
-qed
-
-lemma (in finite_weighted_graph) spanning_forest_symhull_preimage:\<comment> \<open>included\<close>
-  assumes no_id[simp]:\<open>\<And>v w.(v,w,v) \<notin> E\<close>
-  assumes \<open>spanning_forest \<lparr>nodes=V, edges=F\<rparr> \<lparr>nodes=V, edges=symhull E\<rparr>\<close>
-  shows \<open>\<exists>F'. spanning_forest \<lparr>nodes=V, edges=F'\<rparr> \<lparr>nodes=V, edges=E\<rparr>
-    \<and> edge_weight \<lparr>nodes=V, edges=F'\<rparr> = edge_weight \<lparr>nodes=V, edges=F\<rparr>\<close>
-  using assms
-proof (induction \<open>F - E\<close> arbitrary: F rule: infinite_finite_induct)
-  case infinite
-  have \<open>finite F\<close>
-    by (metis finite_weighted_graph_symhull finite_graph.finite_E finite_weighted_graph.axioms graph.select_convs(2) infinite.prems(2) infinite_super spanning_forest_def subgraph_def)
-  with infinite show ?case
-    by blast
-next
-  case empty
-  then have \<open>subgraph \<lparr>nodes=V, edges=F\<rparr> \<lparr>nodes=V, edges=E\<rparr>\<close>
-    using subgraph_def by fastforce
-  then have \<open>spanning_forest \<lparr>nodes=V, edges=F\<rparr> \<lparr>nodes=V, edges=E\<rparr>\<close>
-    by (meson empty.prems maximally_connected_antimono spanning_forest_def subset_eq_symhull)
-  then show ?case
-    by blast
-next
-  case (insert e I)
-  then obtain u w v where x: \<open>e=(u,w,v)\<close>
-    by (cases e) blast
-  have F_in_symhull: \<open>F \<subseteq> symhull E\<close>
-    by (metis graph.select_convs(2) insert.prems(2) spanning_forest_def subgraph_def)
-  have f1: \<open>(u, w, v) \<notin> E\<close>
-    using insert.hyps(4) x by blast
-  have \<open>(u, w, v) \<in> symhull E\<close>
-    by (metis Diff_subset \<open>F \<subseteq> symhull E\<close> insert.hyps(4) insertI1 subset_eq x)
-  then have \<open>\<exists>a b aa. (u, w, v) = (a, b, aa) \<and> ((a, b, aa) \<in> E \<or> (aa, b, a) \<in> E)\<close>
-    by (simp add: symhull_def)
-  then have *: \<open>(v,w,u)\<in>E\<close> and **: \<open>e\<notin>E\<close> and ***: \<open>e\<in>F\<close>
-      apply (simp add: f1)
-    apply (simp add: f1 x)
-    using insert.hyps(4) by auto
-  with \<open>e \<in> F\<close> have \<open>(v,w,u) \<notin> F\<close>
-    using forest.no_dups insert.prems spanning_forest_def x by fastforce
-  then have I: \<open>I = edges (mirror_edge u w v \<lparr>nodes=V, edges=F\<rparr>) - E\<close>
-    by (metis (no_types, lifting) Diff_insert Diff_insert2 Diff_insert_absorb * edges_add_edge edges_delete_edge graph.select_convs(2) insert.hyps(2) insert.hyps(4) insert_Diff1 x)
-  have \<open>forest \<lparr>nodes=V, edges=F\<rparr>\<close>
-    using insert.prems spanning_forest_def by blast
-  have \<open>valid_unMultigraph \<lparr>nodes = V, edges = symhull E\<rparr>\<close>
-    by (simp add: valid_unMultigraph_symhull)
-  then have \<open>spanning_forest (mirror_edge u w v \<lparr>nodes = V, edges = F\<rparr>) \<lparr>nodes = V, edges = symhull E\<rparr>\<close>
-    using *** insert.prems(2) valid_unMultigraph.spanning_forest_mirror_single x by fastforce
-  then obtain F' where
-    \<open>spanning_forest \<lparr>nodes = V, edges = F'\<rparr> \<lparr>nodes = V, edges = E\<rparr> \<and>
-     edge_weight \<lparr>nodes = V, edges = F'\<rparr> = edge_weight (mirror_edge u w v \<lparr>nodes = V, edges = F\<rparr>)\<close>
-    by (metis (no_types, lifting) * insert.hyps(3)[OF I] add_edge_ind delete_edge_def edges_add_edge edges_delete_edge graph.select_convs(1) no_id)
-  then show ?case apply(intro exI[where x=\<open>F'\<close>])
-     apply safe
-      apply simp+ unfolding x apply (rule mirror_single_edge_weight)
-    using *** x apply blast
-    using \<open>(v, w, u) \<notin> F\<close> by blast
-qed
-
 lemma edge_weight_same: \<open>edge_weight \<lparr>nodes=V,edges=E\<rparr> = edge_weight \<lparr>nodes=V',edges=E\<rparr>\<close>
   unfolding edge_weight_def by fastforce
-
-lemma (in finite_weighted_graph) optimal_forest_symhull:
-  assumes \<open>\<And>v w.(v,w,v) \<notin> E\<close>
-  assumes \<open>optimal_forest F \<lparr>nodes=V, edges=E\<rparr>\<close>
-  shows \<open>optimal_forest F \<lparr>nodes=V, edges = symhull E\<rparr>\<close>
-  using assms unfolding optimal_forest_def
-  by (smt graph.cases graph.select_convs(1) spanning_forest_def spanning_forest_symhull_preimage subgraph_def subgraph_node subgraph_trans subsetI)
-
-lemma (in finite_weighted_graph) minimum_spanning_forest_symhull:
-  assumes \<open>\<And>v w.(v,w,v) \<notin> E\<close>
-  assumes \<open>minimum_spanning_forest F \<lparr>nodes=V, edges=E\<rparr>\<close>
-  shows \<open>minimum_spanning_forest F \<lparr>nodes=V, edges = symhull E\<rparr>\<close>
-  using assms by (simp add: minimum_spanning_forest_def optimal_forest_symhull spanning_forest_symhull)
 
 lemma (in finite_weighted_graph) optimal_forest_symhull_preimage:
   assumes \<open>optimal_forest F \<lparr>nodes=V, edges = symhull E\<rparr>\<close>
   shows \<open>optimal_forest F \<lparr>nodes=V, edges=E\<rparr>\<close>
   using assms by (simp add: optimal_forest_def spanning_forest_symhull)
 
-lemma (in finite_weighted_graph) minimum_spanning_forest_symhull_edge_weight:
-  assumes \<open>\<And>v w.(v,w,v) \<notin> E\<close>
-  assumes \<open>minimum_spanning_forest F \<lparr>nodes=V, edges=E\<rparr>\<close> \<open>minimum_spanning_forest F' \<lparr>nodes=V, edges = symhull E\<rparr>\<close>
-  shows \<open>edge_weight F = edge_weight F'\<close>
-  using assms
-  by (meson antisym minimum_spanning_forest_def optimal_forest_def optimal_forest_symhull optimal_forest_symhull_preimage)
-
-lemma (in finite_weighted_graph) minimum_spanning_tree_symhull_edge_weight:\<comment> \<open>included\<close>
-  assumes \<open>\<And>v w.(v,w,v) \<notin> E\<close>
-  assumes \<open>minimum_spanning_tree T \<lparr>nodes=V, edges=E\<rparr>\<close>
-    and \<open>minimum_spanning_tree T' \<lparr>nodes=V, edges = symhull E\<rparr>\<close>
-  shows \<open>edge_weight T = edge_weight T'\<close>
-  using assms minimum_spanning_forest_symhull_edge_weight[unfolded minimum_spanning_forest_def]
-  unfolding minimum_spanning_tree_def spanning_tree_def spanning_forest_def tree_def forest_def
-  optimal_tree_def apply auto
-  by (meson connected_graph.maximally_connected_impl_connected forest.axioms(2) optimal_forest_def spanning_forest_def vE valid_graph.connected_impl_maximally_connected valid_graph.subgraph_impl_connected valid_graph.valid_subgraph valid_graph_symhull)
-
 lemma (in finite_weighted_graph) spanning_tree_impl_connected:
   assumes \<open>spanning_tree F G\<close>
   shows \<open>connected_graph G\<close>
   using assms spanning_tree_def subgraph_impl_connected tree_def by blast
-
-lemma (in finite_weighted_graph) minimum_spanning_tree_symhull:\<comment> \<open>included\<close>
-  assumes \<open>\<And>v w.(v,w,v) \<notin> E\<close>
-  assumes \<open>minimum_spanning_tree F G\<close>
-  shows \<open>minimum_spanning_tree F \<lparr>nodes=V, edges = symhull E\<rparr>\<close>
-  using assms unfolding minimum_spanning_tree_def minimum_spanning_forest_def
-  by (metis connected_graph.maximally_connected_impl_connected minimum_spanning_forest_def
-      minimum_spanning_forest_symhull optimal_forest_def optimal_tree_def spanning_forest_def
-      spanning_tree_def sum_of_parts tree_def valid_graph.connected_impl_maximally_connected
-      subgraph_impl_connected valid_graph_axioms valid_graph_symhull)
-
 
 subsection \<open>Hamiltonian Circuits\<close>
 
@@ -528,31 +380,6 @@ lemma (in valid_graph) is_hamiltonian_circuit_empty: \<open>is_hamiltonian_circu
 term \<open>valid_graph.is_path\<close>
 find_theorems \<open>valid_graph.is_path\<close>
 
-text \<open>Reuse @{const kon_graph}, but interpreted differently: Between to-do and to-do, there are
-  four edges, two of which have the same label.\<close>
-
-definition \<open>kon_path = [(a,ab1,b),(b,bd1,d),(d,cd1,c)]\<close>
-
-lemma is_simple_path_kon_path: \<open>kon_graph.is_simple_undir2 kon_path\<close>
-  unfolding kon_graph.is_simple_undir2_def by (simp add: kon_path_def) (simp add: kon_graph_def)
-
-lemma is_hamiltonian_path_kon_path: \<open>kon_graph.is_hamiltonian_path kon_path\<close>
-  apply (simp add: kon_graph.is_hamiltonian_path_def is_simple_path_kon_path)
-  apply (simp add: kon_path_def kon_graph.is_trace_def)
-  apply eval
-  done
-
-definition \<open>kon_circuit = kon_path @ [(c,ac2,a)]\<close>
-
-lemma is_simple_path_kon_circuit: \<open>kon_graph.is_simple_undir kon_circuit\<close>
-  by (simp add: kon_circuit_def kon_path_def) (simp add: kon_graph_def)
-
-lemma is_hamiltonian_circuit_kon_circuit: \<open>kon_graph.is_hamiltonian_circuit kon_circuit\<close>
-  unfolding kon_graph.is_hamiltonian_circuit_def
-  apply (auto simp: kon_circuit_def kon_path_def)
-           apply (auto simp: kon_graph_def)
-  done
-
 subsection \<open>Matroid Interpretation\<close>
 
 context finite_weighted_graph \<comment> \<open>first usage in the AFP\<close>
@@ -598,18 +425,6 @@ end
 locale finite_weighted_connected_loopfree_graph = finite_weighted_connected_graph +
   assumes no_loops: \<open>\<And>v w.(v,w,v) \<notin> E\<close>
 begin
-
-lemma kruskal0_MST': \<open>s.kruskal0 \<le> SPEC (\<lambda>E'. minimum_spanning_tree (ind E') \<lparr>nodes=V, edges = symhull E\<rparr>)\<close>
-  using kruskal0_MST
-proof -
-  have \<open>SPEC (\<lambda>E'. minimum_spanning_tree (ind E') G) \<le> SPEC (\<lambda>E'. minimum_spanning_tree (ind E') \<lparr>nodes=V, edges = symhull E\<rparr>)\<close>
-    using minimum_spanning_tree_symhull no_loops by force
-  with SPEC_trans kruskal0_MST show ?thesis
-    by blast
-qed
-
-sublocale symhull: valid_unMultigraph \<open>ind (symhull E)\<close>
-  by (simp add: no_loops valid_unMultigraph_symhull)
 
 end
 
@@ -726,11 +541,6 @@ lemma (in valid_graph) is_simple_undir2_step:
 lemma (in valid_graph) finite_adj_vertices:
   \<open>finite (adj_vertices ps)\<close>
   by (cases ps) simp_all
-
-lemma (in valid_graph) hamiltonian_impl_finiteV:
-  \<open>is_hamiltonian_path ps \<Longrightarrow> finite V\<close>
-  unfolding is_hamiltonian_path_def is_trace_def
-  by (metis finite.emptyI kon_graph.finite_adj_vertices)
 
 lemma (in valid_graph) is_cycle_rotate1:
   assumes \<open>is_cycle (e#ps)\<close>
@@ -1073,8 +883,6 @@ proof -
      apply (simp add: assms(2) hamiltonian_path_is_tree)
     unfolding subgraph_def apply auto
     by (metis Nitpick.size_list_simp(2) One_nat_def Suc_1 Suc_leD Suc_n_not_le_n \<open>2 \<le> length OPT\<close> assms(2) is_hamiltonian_circuit_OPT in_set_tlD is_cycle.elims(2) is_path_undir_edges_symhull subsetD is_hamiltonian_circuit_def)
-  have **: \<open>set_cost F \<le> set_cost F'\<close> if \<open>spanning_tree (ind F') (ind (symhull E))\<close> for F'
-    by (meson assms(1) complete minimum_spanning_tree_symhull minimum_spanning_tree_def optimal_tree_def that)
   have \<open>cost (tl OPT) \<le> cost OPT\<close>
     apply (cases OPT) using OPT by simp_all
   also have \<open>\<dots> \<le> OPTWEIGHT\<close>
