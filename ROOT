@@ -1,7 +1,6 @@
 session TSP = Kruskal +
   description
-    \<open>to-do: use cases (also hamiltonian cycles for grid graphs, cf. lawler p.60/61?);
-      maybe refer to thesis.\<close>
+    \<open>to-do: use cases (also hamiltonian cycles for grid graphs, cf. lawler p.60/61?)\<close>
   options [document=pdf, document_output="output"]
   sessions
     Koenigsberg_Friendship
