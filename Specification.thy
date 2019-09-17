@@ -858,7 +858,7 @@ lemma zero_le_weight: \<open>e \<in> E \<Longrightarrow> 0 \<le> fst (snd e)\<cl
   by (metis label_is_weight prod.collapse zero_le_dist)
 
 lemma minimum_spanning_tree_le_OPTWEIGHT:
-  assumes \<open>minimum_spanning_tree (ind F) G\<close>
+  assumes \<open>minimum_spanning_tree (ind F) (ind (symhull E))\<close>
   assumes \<open>2 \<le> card V\<close>
   shows \<open>set_cost F \<le> OPTWEIGHT\<close>
 proof -
@@ -881,6 +881,8 @@ proof -
      apply (simp add: assms(2) hamiltonian_path_is_tree)
     unfolding subgraph_def apply auto
     by (metis Nitpick.size_list_simp(2) One_nat_def Suc_1 Suc_leD Suc_n_not_le_n \<open>2 \<le> length OPT\<close> assms(2) is_hamiltonian_circuit_OPT in_set_tlD is_cycle.elims(2) is_path_undir_edges_symhull subsetD is_hamiltonian_circuit_def)
+  have **: \<open>set_cost F \<le> set_cost F'\<close> if \<open>spanning_tree (ind F') (ind (symhull E))\<close> for F'
+    using assms(1) minimum_spanning_tree_def optimal_tree_def that by blast
   have \<open>cost (tl OPT) \<le> cost OPT\<close>
     apply (cases OPT) using OPT by simp_all
   also have \<open>\<dots> \<le> OPTWEIGHT\<close>
