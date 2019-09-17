@@ -127,10 +127,8 @@ corollary nodes_connected_symhull:
   by (meson is_path_undir_symhull)
 
 lemma maximally_connected_symhull:
-  \<open>maximally_connected H G \<Longrightarrow> maximally_connected H (G\<lparr>edges:=symhull (edges G)\<rparr>)\<close>
-  apply (simp add: maximally_connected_def)
-  using nodes_connected_symhull
-  by (metis graph.cases graph.select_convs(2) graph.update_convs(2))
+  \<open>maximally_connected H G \<Longrightarrow> maximally_connected H \<lparr>nodes = nodes G, edges = symhull (edges G)\<rparr>\<close>
+  unfolding maximally_connected_def by (metis graph.select_convs(1) is_path_undir_symhull sum_of_parts)
 
 lemma subgraph_trans: \<open>subgraph G H \<Longrightarrow> subgraph H I \<Longrightarrow> subgraph G I\<close>
   by (auto simp: subgraph_def) \<comment> \<open>Maybe interpret \<^class>\<open>order_bot\<close>?\<close>
