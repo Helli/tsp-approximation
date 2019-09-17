@@ -707,7 +707,7 @@ abbreviation two_approximation where
 
 definition algo_sketch where \<open>algo_sketch =
 do {
-  MST \<leftarrow> SPEC (\<lambda>E'. minimum_spanning_tree (ind E') G);
+  MST \<leftarrow> SPEC (\<lambda>E'. minimum_spanning_tree (ind E') (G \<comment> \<open>it might save some steps to replace this with \<^term>\<open>ind (symhull E)\<close>\<close>));
   pretour \<leftarrow> SPEC (\<lambda>pT. int_vertices pT = nodes G \<and> cost pT \<le> set_cost MST + set_cost MST);
   Tour \<leftarrow> SPEC (\<lambda>T. is_hamiltonian_circuit T \<and> cost T \<le> cost pretour);
   RETURN Tour
@@ -897,11 +897,17 @@ proposition algo_sketch_correct:
   unfolding algo_sketch_def apply refine_vcg apply auto
 proof goal_cases
   case (1 MST pretour Tour)
+  then have *: \<open>minimum_spanning_tree (ind MST) (ind (symhull E))\<close>
+    by (smt complete_finite_metric_graph_axioms complete_finite_metric_graph_def
+        complete_finite_weighted_graph_axioms_def complete_finite_weighted_graph_def
+        dual_order.trans graph.select_convs(1) graph.select_convs(2) label_is_weight' mem_Collect_eq
+        minimum_spanning_tree_def optimal_tree_def spanning_tree_def subgraph_def subsetI
+        subset_eq_symhull symhull_def)
   note 1(5)
   also have \<open>sum_list (map (fst \<circ> snd) pretour) \<le> 2 * set_cost MST\<close>
     by (fact 1(3))
   also have \<open>\<dots> \<le> 2 * OPTWEIGHT\<close>
-    using "1"(1) assms complete_finite_metric_graph.minimum_spanning_tree_le_OPTWEIGHT complete_finite_metric_graph_axioms by fastforce
+    using * assms minimum_spanning_tree_le_OPTWEIGHT by auto
   finally show ?case .
 qed
 
