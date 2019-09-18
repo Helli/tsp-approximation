@@ -468,9 +468,13 @@ lemma (in valid_graph) is_trace_snoc:
 
 definition (in valid_graph) is_hamiltonian_path where \<comment> \<open>or \<open>simple trace\<close>\<close>
   \<open>is_hamiltonian_path ps \<longleftrightarrow> is_trace ps \<and> is_simple_undir2 ps\<close>
+txt \<open>Just like for \<^const>\<open>is_path_undir\<close>, the following does not hold:\<close>
+lemma (in valid_graph) \<open>is_hamiltonian_path ps \<Longrightarrow> set ps \<subseteq> E\<close> try oops
 
 definition (in valid_graph) is_hamiltonian_circuit where
   \<open>is_hamiltonian_circuit ps \<longleftrightarrow> int_vertices ps = V \<and> is_cycle ps\<close>
+txt \<open>Just like for \<^const>\<open>is_path_undir\<close>, the following does not hold:\<close>
+lemma (in valid_graph) \<open>is_hamiltonian_circuit ps \<Longrightarrow> set ps \<subseteq> E\<close> try oops
 
 lemma (in valid_graph) is_hamiltonian_circuit_int_vertices:
   \<open>is_hamiltonian_circuit ps \<Longrightarrow> int_vertices ps = V\<close>
