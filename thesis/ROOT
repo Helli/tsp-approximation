@@ -1,7 +1,0 @@
-session thesis = TSP +
-  options [document = pdf, document_output = "output"]
-  theories
-    Thesis
-  document_files
-    root.tex
-    root.bib
