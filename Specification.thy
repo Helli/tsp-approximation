@@ -468,7 +468,7 @@ locale complete_finite_weighted_graph = finite_weighted_graph + fixes weight
   assumes edge_unique: \<open>(v,w,v') \<in> E \<Longrightarrow> weight v v' = w\<close>
     and edge_exists: \<open>v\<in>V \<Longrightarrow> v'\<in>V \<Longrightarrow> v\<noteq>v' \<Longrightarrow> (v,weight v v',v') \<in> E\<close>
 
-lemma \<open>nodes x \<noteq> {} \<Longrightarrow> edges x \<noteq> {} \<Longrightarrow> \<not>complete_finite_weighted_graph x y\<close> try oops
+lemma \<open>card (nodes G) > 1 \<Longrightarrow> edges G \<noteq> {} \<Longrightarrow> \<not>complete_finite_weighted_graph G weight\<close> try oops
 
 context finite_weighted_graph
 begin
