@@ -12,7 +12,7 @@ locale node_in_complete_graph = complete_finite_weighted_graph G for G::\<open>(
 begin
 
 definition G' where
-  \<open>G' = \<lparr>g_V = V, g_E = {(v,v'). \<exists>w. (v,w,v') \<in> E}, g_V0 = {v}\<rparr>\<close>
+  \<open>G' = \<lparr>g_V = V, g_E = {(v,v'). (\<exists>w.(v,w,v')\<in>E) \<or> (\<exists>w.(v',w,v)\<in>E)}, g_V0 = {v}\<rparr>\<close>
 sublocale dgraph: graph G'
   by standard (auto simp: G'_def E_validD v_in_V)
 
