@@ -11,28 +11,19 @@ locale node_in_complete_graph = complete_finite_weighted_graph G for G::\<open>(
   assumes v_in_V: \<open>v \<in> V\<close>
 begin
 
-sublocale dgraph: graph \<open>\<lparr>g_V = V, g_E = {(v,v'). \<exists>w. (v,w,v') \<in> E}, g_V0 = {v}\<rparr>\<close>
-  by standard (auto simp: E_validD v_in_V)
+definition G' where
+  \<open>G' = \<lparr>g_V = V, g_E = {(v,v'). \<exists>w. (v,w,v') \<in> E}, g_V0 = {v}\<rparr>\<close>
+sublocale dgraph: graph G'
+  by standard (auto simp: G'_def E_validD v_in_V)
+
+lemma \<open>finite dgraph.reachable\<close>
+  oops
 
 end
 
-text \<open>
-  This example presents a simple cyclicity checker: 
-    Given a directed graph with start nodes, decide whether it's reachable 
-    part is cyclic.
-
-  The example tries to be a tutorial on using the DFS framework, 
-  explaining every required step in detail.
-
-  We define two versions of the algorithm, a partial correct one assuming 
-  only a finitely branching graph, and a total correct one assuming finitely 
-  many reachable nodes.
-\<close>
-
 subsection \<open>Framework Instantiation\<close>
-text \<open> Define a state, based on the DFS-state. 
-  In our case, we just add a break-flag.
-\<close>
+text \<open> Define a state, based on the DFS-state.\<close>
+
 record 'v cycc_state = "'v state" +
   break :: \<open>'v list\<close>
 
@@ -59,16 +50,6 @@ lemmas cycc_params_simp[simp] =
   gen_parameterization.simps[mk_record_simp, OF cycc_params_def[simplified]]
 
 interpretation cycc: param_DFS_defs where param=cycc_params for G .
-
-(*
-text \<open>We now can define our cyclicity checker. 
-  The partially correct version asserts a finitely branching graph:\<close>
-definition "cyc_checker G \<equiv> do {
-  ASSERT (fb_graph G);
-  s \<leftarrow> cycc.it_dfs TYPE('a) G;
-  RETURN (break s)
-}"
-*)
 
 text \<open>The total correct variant asserts finitely many reachable nodes.\<close>
 definition "cyc_checkerT G \<equiv> do {
