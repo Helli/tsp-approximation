@@ -420,12 +420,6 @@ qed
 
 end
 
-locale finite_weighted_connected_loopfree_graph = finite_weighted_connected_graph +
-  assumes no_loops: \<open>\<And>v w.(v,w,v) \<notin> E\<close>
-begin
-
-end
-
 
 subsection \<open>Tours and Costs\<close>
 
@@ -471,19 +465,8 @@ end
 subsection \<open>Complete Graphs\<close>
 
 locale complete_finite_weighted_graph = finite_weighted_graph + fixes weight
-  assumes complete: \<open>(v,w,v') \<in> E \<longleftrightarrow> v\<noteq>v' \<and> \<comment> \<open>rm\<close> v\<in>V \<and> v'\<in>V \<and> weight v v' = w\<close>
-begin
-
-lemma edge_exists: \<open>v\<in>V \<Longrightarrow> v'\<in>V \<Longrightarrow> v\<noteq>v' \<Longrightarrow> (v,weight v v',v') \<in> E\<close>
-  using complete by blast
-
-lemma nodes_neq: \<open>(v,w,v') \<in> E \<Longrightarrow> v\<noteq>v'\<close>
-  by (simp add: complete)
-
-lemma label_is_weight: \<open>(v,w,v') \<in> E \<Longrightarrow> w = weight v v'\<close>
-  by (simp add: complete)
-
-end
+  assumes edge_unique: \<open>(v,w,v') \<in> E \<Longrightarrow> weight v v' = w\<close>
+    and edge_exists: \<open>v\<in>V \<Longrightarrow> v'\<in>V \<Longrightarrow> v\<noteq>v' \<Longrightarrow> (v,weight v v',v') \<in> E\<close>
 
 lemma \<open>nodes x \<noteq> {} \<Longrightarrow> edges x \<noteq> {} \<Longrightarrow> \<not>complete_finite_weighted_graph x y\<close> try oops
 
@@ -576,18 +559,17 @@ context complete_finite_weighted_graph
 begin
 
 sublocale finite_weighted_connected_graph \<comment> \<open>rm?\<close>
-  by unfold_locales (metis complete is_path_undir.simps(1) is_path_undir_simps(2))
+  by unfold_locales (metis edge_exists is_path_undir.simps(1) is_path_undir_simps(2))
 
 lemma complete': \<open>v1\<in>V \<Longrightarrow> v2\<in>V \<Longrightarrow> v1\<noteq>v2 \<Longrightarrow> (\<exists>w. (v1,w,v2)\<in>E) \<or> (\<exists>w. (v2,w,v1)\<in>E)\<close>
-  using complete by blast
+  using edge_exists by blast
 
 lemma complete_finite_weighted_graph_delete_node:
   \<open>complete_finite_weighted_graph (delete_node v G) weight\<close>
   apply intro_locales
     apply (simp add: valid_graph_axioms)
    apply unfold_locales unfolding delete_node_def
-    apply auto
-  using complete by blast+
+    by (auto simp: edge_unique edge_exists)
 
 lemma ex_hamiltonian_circuit:
   assumes \<open>2 \<le> card V\<close> \<open>v\<in>V\<close>
@@ -602,7 +584,7 @@ proof (induction \<open>card V\<close> arbitrary: v G rule: nat_induct_at_least[
   then have v': \<open>v' \<in> G.V\<close>
     by blast+
   with GV base(2) obtain w where w: \<open>(v,w,v') \<in> G.E \<or> (v',w,v) \<in> G.E\<close>
-    using G.complete by blast
+    using G.edge_exists by blast
   show ?case
     apply (rule exI[of _ \<open>[(v,w,v'),(v',w,v)]\<close>])
     apply (auto simp: G.is_hamiltonian_circuit_def base v' GV w)
@@ -619,7 +601,7 @@ next
   from nG'(2) obtain v' where v: \<open>v'\<in>G'.V\<close>
     using Suc.hyps(1) by fastforce
   with \<open>v \<in> G.V\<close> obtain w where w: \<open>(v,w,v') \<in> G.E \<or> (v',w,v) \<in> G.E\<close>
-    unfolding nG' using G.complete by fast
+    unfolding nG' using G.edge_exists by auto
   from Suc.hyps(2)[OF n v G'.complete_finite_weighted_graph_axioms]
   obtain ps' where ps': \<open>G'.is_hamiltonian_circuit ps' \<and> fst (hd ps') = v'\<close> by blast
   have G': \<open>int_vertices ps' = G'.V\<close> \<open>G'.is_simple_undir ps'\<close> \<open>fst (hd ps') = v'\<close> \<open>snd (snd (last ps')) = v'\<close>
@@ -636,7 +618,7 @@ next
     using *(2) G.valid_graph_axioms apply fastforce
     using \<open>v \<notin> int_vertices ps'\<close> ps'' by auto
   with *(1) obtain w1 where **: \<open>(v,w1,v1) \<in> G.E \<or> (v1,w1,v) \<in> G.E\<close>
-    by (metis G'(2) G'.E_validD(1) G'.E_validD(2) G'.is_simple_undir_step(1) G.complete Suc.prems(1) \<open>v \<notin> int_vertices ps'\<close> ps'')
+    by (metis G'(2) G'.E_validD(2) G'.finite_graph_axioms G'.is_simple_undir_step(1) G.complete' Suc.prems(1) \<open>v \<notin> int_vertices ps'\<close> finite_graph_def ps'' valid_graph.E_validD(1))
   let ?ps = \<open>(v',w,v)#(v,w1,v1)#ps''\<close>
   from Suc have non_empty: \<open>ps'' \<noteq> []\<close>
     by (metis G'.valid_graph_axioms Nitpick.size_list_simp(2) One_nat_def Suc_1 Suc_n_not_le_n n neq_Nil_conv ps' ps'' tl_Nil valid_graph.is_hamiltonian_circuit_length)
@@ -852,10 +834,10 @@ locale complete_finite_metric_graph = complete_finite_weighted_graph G dist for 
 begin
 
 lemma label_is_weight': \<open>(v,w,v') \<in> E \<Longrightarrow> w = dist v' v\<close>
-  by (simp add: dist_commute label_is_weight)
+  by (simp add: dist_commute edge_unique)
 
 lemma zero_le_weight: \<open>e \<in> E \<Longrightarrow> 0 \<le> fst (snd e)\<close>
-  by (metis label_is_weight prod.collapse zero_le_dist)
+  by (metis label_is_weight' prod.collapse zero_le_dist)
 
 lemma minimum_spanning_tree_le_OPTWEIGHT:
   assumes \<open>minimum_spanning_tree (ind F) (ind (symhull E))\<close>
@@ -864,7 +846,7 @@ lemma minimum_spanning_tree_le_OPTWEIGHT:
 proof -
   have OPT: \<open>2 \<le> length OPT\<close> \<open>0 \<le> fst (snd (hd OPT))\<close>
     apply (simp add: assms(2) is_hamiltonian_circuit_OPT is_hamiltonian_circuit_length)
-    by (smt Nitpick.size_list_simp(2) Suc_1 assms(2) is_cycle.elims(2) is_hamiltonian_circuit_OPT is_path_undir.simps(2) label_is_weight list.sel(1) not_less_eq_eq prod.collapse valid_graph.is_hamiltonian_circuit_def valid_graph.is_hamiltonian_circuit_length valid_graph_axioms zero_le_dist zero_order(1))
+    by (smt Nitpick.size_list_simp(2) One_nat_def Suc_1 Suc_leD Suc_n_not_le_n assms(2) fst_conv is_cycle.elims(2) is_hamiltonian_circuit_OPT is_path_undir.simps(2) list.sel(1) prod.collapse snd_conv is_hamiltonian_circuit_def is_hamiltonian_circuit_length zero_le_weight)
   moreover have \<open>snd (snd (last OPT)) = fst (hd OPT)\<close>
     by (metis (no_types, hide_lams) Nitpick.size_list_simp(2) Suc_1 assms(2) is_hamiltonian_circuit_OPT list.sel(1) neq_Nil_conv not_less_eq_eq prod.collapse is_cycle_last_eq_first is_hamiltonian_circuit_def is_hamiltonian_circuit_length zero_order(1))
   moreover have \<open>tl OPT \<noteq> []\<close>
@@ -898,11 +880,7 @@ proposition algo_sketch_correct:
 proof goal_cases
   case (1 MST pretour Tour)
   then have *: \<open>minimum_spanning_tree (ind MST) (ind (symhull E))\<close>
-    by (smt complete_finite_metric_graph_axioms complete_finite_metric_graph_def
-        complete_finite_weighted_graph_axioms_def complete_finite_weighted_graph_def
-        dual_order.trans graph.select_convs(1) graph.select_convs(2) label_is_weight' mem_Collect_eq
-        minimum_spanning_tree_def optimal_tree_def spanning_tree_def subgraph_def subsetI
-        subset_eq_symhull symhull_def)
+    by (smt antisym edge_exists label_is_weight' mem_Collect_eq subsetI subset_eq_symhull sum_of_parts symhull_def E_validD)
   note 1(5)
   also have \<open>sum_list (map (fst \<circ> snd) pretour) \<le> 2 * set_cost MST\<close>
     by (fact 1(3))
@@ -928,7 +906,7 @@ proof (induction ns arbitrary: n)
   case Nil
   show ?case
     apply (rule ex1I[of _ \<open>[(n, dist n lst, lst)]\<close>])
-    using Nil by (auto simp: edge_exists label_is_weight label_is_weight')
+    using Nil by (auto simp: edge_exists edge_unique label_is_weight')
 next
   case (Cons n' ns)
   then have ex1: \<open>\<exists>!ps. map fst ps = n' # ns \<and> is_path_undir G n' ps lst\<close>
@@ -940,7 +918,7 @@ next
   show ?case
     apply (rule ex1I[of _ \<open>(n, dist n n', n') # ps\<close>])
     using Cons.prems(1) Cons.prems(2) ps edge_exists apply simp
-    by (auto simp: label_is_weight label_is_weight' others)
+    by (auto simp: edge_unique label_is_weight' others)
 qed
 
 lemma the_path_empty: \<open>map fst (the_path [] v) = []\<close>
@@ -959,8 +937,8 @@ proof -
 qed
 
 lemma is_cycle_last:
-  \<open>is_cycle (p#ps) \<Longrightarrow> snd (snd (last (p#ps))) \<noteq> last (map fst (p#ps))\<close>
-  by (smt complete fst_conv hd_last_singletonI is_cycle.elims(2) is_path_undir_last is_path_undir_simps(2) last_ConsL list.sel(1) list.sel(3) list.simps(3) list.simps(9) map_is_Nil_conv prod.collapse) 
+  \<open>ps \<noteq> [] \<Longrightarrow> is_cycle (p#ps) \<Longrightarrow> snd (snd (last (p#ps))) \<noteq> last (map fst (p#ps))\<close>
+  by (metis (no_types, hide_lams) last_in_set Nil_is_map_conv distinct.simps(2) is_cycle_distinct is_cycle_last_eq_first last.simps list.simps(9) prod.exhaust_sel)
 
 lemma ex1_the_path:
   assumes \<open>is_path_undir G v ps v'\<close>
