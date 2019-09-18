@@ -1113,6 +1113,4 @@ lemma manhattan: \<open>nat\<bar>c-a\<bar> \<le> nat\<bar>b-a\<bar> + nat\<bar>c
 subsection \<open>Euclidean Distance, Rounded Up\<close>
   \<comment> \<open>attempt only if too much time at the end\<close>
 
-text \<open>dummy citation: @{cite lawler}.\<close>
-
 end
