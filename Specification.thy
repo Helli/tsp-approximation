@@ -6,7 +6,7 @@ begin
 
 subsection \<open>Rule Collection\<close>
 
-lemma sum_of_parts(*rm*): \<open>\<lparr>nodes= nodes G, edges=edges G\<rparr> = G\<close>
+lemma sum_of_parts(*rm*): \<open>\<lparr>nodes = nodes G, edges = edges G\<rparr> = G\<close>
   by simp
 
 lemma triple_of_parts: \<open>(fst e, fst (snd e), snd (snd e)) = e\<close>
@@ -258,8 +258,8 @@ lemma edge_weight_same: \<open>edge_weight \<lparr>nodes=V,edges=E\<rparr> = edg
 
 lemma (in finite_weighted_graph) optimal_forest_symhull_preimage:
   assumes \<open>optimal_forest F \<lparr>nodes=V, edges = symhull E\<rparr>\<close>
-  shows \<open>optimal_forest F \<lparr>nodes=V, edges=E\<rparr>\<close>
-  using assms by (simp add: optimal_forest_def spanning_forest_symhull)
+  shows \<open>optimal_forest F G\<close>
+  using assms by (simp add: optimal_forest_def spanning_forest_symhull sum_of_parts)
 
 lemma (in finite_weighted_graph) spanning_tree_impl_connected:
   assumes \<open>spanning_tree F G\<close>
