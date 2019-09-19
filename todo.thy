@@ -4,7 +4,6 @@ begin
 \<comment> \<open>Change the extended state to store the (pre)tour @{type list} instead of a @{type bool}...\<close>
 
 section \<open>Thesis\<close>
-\<comment> \<open>SMS notes\<close>
 
 \<comment> \<open>go from the abstract to concrete, also within the sections/components\<close>
 \<comment> \<open>getting more detailed along the way.\<close>
