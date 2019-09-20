@@ -6,20 +6,40 @@ theory DFS_Phase
     DFS_Framework.Impl_Rev_Array_Stack
 begin
 
-locale node_in_complete_graph = complete_finite_weighted_graph G for G::\<open>('v::{hashable},'w::weight) graph\<close> +
-  fixes v::\<open>'v::{hashable}\<close>
+locale node_and_MST_in_graph =
+  complete_finite_weighted_graph G +
+  T: tree T
+  for G::\<open>('v::hashable,'w::weight) graph\<close> and T::\<open>('v,'w) graph\<close> +
+  fixes v::\<open>'v::hashable\<close>
   assumes v_in_V: \<open>v \<in> V\<close>
+  and mst: \<open>minimum_spanning_tree T G\<close>
 begin
 
-definition G' where
-  \<open>G' = \<lparr>g_V = V, g_E = {(v,v'). (\<exists>w.(v,w,v')\<in>E) \<or> (\<exists>w.(v',w,v)\<in>E)}, g_V0 = {v}\<rparr>\<close>
-sublocale dgraph: graph G'
-  by standard (auto simp: G'_def E_validD v_in_V)
+lemma n_in_TV_iff: \<open>n \<in> T.V \<longleftrightarrow> n \<in> V\<close>
+  using mst[unfolded minimum_spanning_tree_def spanning_tree_def]
+  by (meson subgraph_node)
 
-lemma \<open>finite dgraph.reachable\<close>
+lemma v_in_TV: \<open>v \<in> T.V\<close>
+  using n_in_TV_iff v_in_V by blast
+
+definition T' where
+  \<open>T' = \<lparr>g_V = V, g_E = {(v,v'). (\<exists>w.(v,w,v')\<in>T.E) \<or> (\<exists>w.(v',w,v)\<in>T.E)}, g_V0 = {v}\<rparr>\<close>
+sublocale dTgraph: graph T'
+  apply standard
+  apply (auto simp: T'_def E_validD v_in_TV v_in_V)
+  using T.E_validD n_in_TV_iff by blast+
+
+lemma finite_dgraph: \<open>finite dTgraph.reachable\<close>
   oops
 
 end
+
+lemma node_and_MST_in_graph:
+  assumes \<open>complete_finite_weighted_graph G weight\<close>
+  and mst: \<open>minimum_spanning_tree T G\<close>
+  and \<open>v \<in> V\<close>
+  shows \<open>node_and_MST_in_graph weight G T v\<close>
+  oops
 
 subsection \<open>Framework Instantiation\<close>
 text \<open> Define a state, based on the DFS-state.\<close>
@@ -53,6 +73,7 @@ interpretation cycc: param_DFS_defs where param=cycc_params for G .
 
 text \<open>The total correct variant asserts finitely many reachable nodes.\<close>
 definition "cyc_checkerT G \<equiv> do {
+  \<comment> \<open>replace by \<^prop>\<open>node_and_MST_in_graph weight G T v\<close>\<close>
   ASSERT (graph G \<and> finite (graph_defs.reachable G));
   s \<leftarrow> cycc.it_dfsT TYPE('a) G;
   RETURN (break s)
