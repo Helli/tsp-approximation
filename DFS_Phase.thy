@@ -7,10 +7,11 @@ theory DFS_Phase
 begin
 
 locale node_and_MST_in_graph =
-  complete_finite_weighted_graph G +
+  complete_finite_weighted_graph G weight +
   T: tree T
-  for G::\<open>('v::hashable,'w::weight) graph\<close> and T::\<open>('v,'w) graph\<close> +
-  fixes v::\<open>'v::hashable\<close>
+  for G::\<open>('v,'w::weight) graph\<close> and weight
+  and T::\<open>('v,'w) graph\<close> +
+  fixes v::\<open>'v\<close>
   assumes v_in_V: \<open>v \<in> V\<close>
   and mst: \<open>minimum_spanning_tree T G\<close>
 begin
@@ -34,13 +35,20 @@ lemma finite_dTgraph: \<open>finite dTgraph.reachable\<close>
 
 end
 
-lemma node_and_MST_in_graph:
+txt \<open>more robust variant in case of additional type constraints in \<^locale>\<open>node_and_MST_in_graph\<close>'s def:\<close>
+lemma node_and_MST_in_graphI:
   assumes \<open>complete_finite_weighted_graph G weight\<close>
   and \<open>minimum_spanning_tree T G\<close>
   and \<open>v \<in> nodes G\<close>
-shows \<open>node_and_MST_in_graph weight G T v\<close>
+  shows \<open>node_and_MST_in_graph G weight T v\<close>
   using assms
-  by (simp add: minimum_spanning_tree_def node_and_MST_in_graph.intro node_and_MST_in_graph_axioms_def spanning_tree_def)
+  by (simp add: minimum_spanning_tree_def node_and_MST_in_graph_axioms_def node_and_MST_in_graph_def spanning_tree_def)
+
+lemma (in complete_finite_weighted_graph) node_and_MST_in_graphI:
+  assumes \<open>minimum_spanning_tree T G\<close> and \<open>v \<in> nodes G\<close>
+  shows \<open>node_and_MST_in_graph G weight T v\<close>
+  using assms
+  by (simp add: complete_finite_weighted_graph_axioms minimum_spanning_tree_def node_and_MST_in_graph.intro node_and_MST_in_graph_axioms_def spanning_tree_def)
 
 subsection \<open>Framework Instantiation\<close>
 text \<open> Define a state, based on the DFS-state.\<close>
