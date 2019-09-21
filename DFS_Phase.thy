@@ -36,10 +36,11 @@ end
 
 lemma node_and_MST_in_graph:
   assumes \<open>complete_finite_weighted_graph G weight\<close>
-  and mst: \<open>minimum_spanning_tree T G\<close>
-  and \<open>v \<in> V\<close>
-  shows \<open>node_and_MST_in_graph weight G T v\<close>
-  oops
+  and \<open>minimum_spanning_tree T G\<close>
+  and \<open>v \<in> nodes G\<close>
+shows \<open>node_and_MST_in_graph weight G T v\<close>
+  using assms
+  by (simp add: minimum_spanning_tree_def node_and_MST_in_graph.intro node_and_MST_in_graph_axioms_def spanning_tree_def)
 
 subsection \<open>Framework Instantiation\<close>
 text \<open> Define a state, based on the DFS-state.\<close>
