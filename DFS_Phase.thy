@@ -29,8 +29,8 @@ sublocale dTgraph: graph T'
   apply (auto simp: T'_def E_validD v_in_TV v_in_V)
   using T.E_validD n_in_TV_iff by blast+
 
-lemma finite_dgraph: \<open>finite dTgraph.reachable\<close>
-  oops
+lemma finite_dTgraph: \<open>finite dTgraph.reachable\<close>
+  unfolding T'_def using dTgraph.finite_E by (simp add: T'_def)
 
 end
 
