@@ -6,33 +6,53 @@ theory DFS_Phase
     DFS_Framework.Impl_Rev_Array_Stack
 begin
 
-locale node_in_complete_graph = complete_finite_weighted_graph G for G::\<open>('v::{hashable},'w::weight) graph\<close> +
-  fixes v::\<open>'v::{hashable}\<close>
+locale node_and_MST_in_graph =
+  complete_finite_weighted_graph G weight +
+  T: tree T
+  for G::\<open>('v,'w::weight) graph\<close> and weight
+  and T::\<open>('v,'w) graph\<close> +
+  fixes v::\<open>'v\<close>
   assumes v_in_V: \<open>v \<in> V\<close>
+  and mst: \<open>minimum_spanning_tree T G\<close>
 begin
 
-sublocale dgraph: graph \<open>\<lparr>g_V = V, g_E = {(v,v'). \<exists>w. (v,w,v') \<in> E}, g_V0 = {v}\<rparr>\<close>
-  by standard (auto simp: E_validD v_in_V)
+lemma n_in_TV_iff: \<open>n \<in> T.V \<longleftrightarrow> n \<in> V\<close>
+  using mst[unfolded minimum_spanning_tree_def spanning_tree_def]
+  by (meson subgraph_node)
+
+lemma v_in_TV: \<open>v \<in> T.V\<close>
+  using n_in_TV_iff v_in_V by blast
+
+definition T' where
+  \<open>T' = \<lparr>g_V = V, g_E = {(v,v'). (\<exists>w.(v,w,v')\<in>T.E) \<or> (\<exists>w.(v',w,v)\<in>T.E)}, g_V0 = {v}\<rparr>\<close>
+sublocale dTgraph: graph T'
+  apply standard
+  apply (auto simp: T'_def E_validD v_in_TV v_in_V)
+  using T.E_validD n_in_TV_iff by blast+
+
+lemma finite_dTgraph: \<open>finite dTgraph.reachable\<close>
+  unfolding T'_def using dTgraph.finite_E by (simp add: T'_def)
 
 end
 
-text \<open>
-  This example presents a simple cyclicity checker: 
-    Given a directed graph with start nodes, decide whether it's reachable 
-    part is cyclic.
+lemma (in complete_finite_weighted_graph) node_and_MST_in_graphI:
+  assumes \<open>minimum_spanning_tree T G\<close> and \<open>v \<in> nodes G\<close>
+  shows \<open>node_and_MST_in_graph G weight T v\<close>
+  using assms
+  by (simp add: complete_finite_weighted_graph_axioms minimum_spanning_tree_def node_and_MST_in_graph.intro node_and_MST_in_graph_axioms_def spanning_tree_def)
 
-  The example tries to be a tutorial on using the DFS framework, 
-  explaining every required step in detail.
-
-  We define two versions of the algorithm, a partial correct one assuming 
-  only a finitely branching graph, and a total correct one assuming finitely 
-  many reachable nodes.
-\<close>
+txt \<open>more robust variant in case of additional type constraints in \<^locale>\<open>node_and_MST_in_graph\<close>'s def:\<close>
+lemma node_and_MST_in_graphI:
+  assumes \<open>complete_finite_weighted_graph G weight\<close>
+  and \<open>minimum_spanning_tree T G\<close>
+  and \<open>v \<in> nodes G\<close>
+  shows \<open>node_and_MST_in_graph G weight T v\<close>
+  using assms
+  by (simp add: minimum_spanning_tree_def node_and_MST_in_graph_axioms_def node_and_MST_in_graph_def spanning_tree_def)
 
 subsection \<open>Framework Instantiation\<close>
-text \<open> Define a state, based on the DFS-state. 
-  In our case, we just add a break-flag.
-\<close>
+text \<open> Define a state, based on the DFS-state.\<close>
+
 record 'v cycc_state = "'v state" +
   break :: \<open>'v list\<close>
 
@@ -53,27 +73,18 @@ text \<open>
 definition cycc_params :: "('v,('v,unit) cycc_state_ext) parameterization"
 where "cycc_params \<equiv> dflt_parametrization state.more 
   (RETURN \<lparr> break = [] \<rparr>) \<lparr>
-  on_back_edge := \<lambda>_ _ _. RETURN \<lparr> break = [] \<rparr>,
-  is_break := \<lambda>s. break s = [] \<rparr>"
+  on_discover := \<lambda>_ n s. RETURN \<lparr>break = break s @ [n]\<rparr>
+  \<^cancel>\<open>,on_back_edge := \<lambda>_ _ . RETURN o state.more,\<close>
+  \<^cancel>\<open>is_break := \<lambda>s. break s = []\<close> \<rparr>"
 lemmas cycc_params_simp[simp] = 
   gen_parameterization.simps[mk_record_simp, OF cycc_params_def[simplified]]
 
 interpretation cycc: param_DFS_defs where param=cycc_params for G .
 
-(*
-text \<open>We now can define our cyclicity checker. 
-  The partially correct version asserts a finitely branching graph:\<close>
-definition "cyc_checker G \<equiv> do {
-  ASSERT (fb_graph G);
-  s \<leftarrow> cycc.it_dfs TYPE('a) G;
-  RETURN (break s)
-}"
-*)
-
 text \<open>The total correct variant asserts finitely many reachable nodes.\<close>
-definition "cyc_checkerT G \<equiv> do {
-  ASSERT (graph G \<and> finite (graph_defs.reachable G));
-  s \<leftarrow> cycc.it_dfsT TYPE('a) G;
+definition "cyc_checkerT G weight T v \<equiv> do {
+  ASSERT (node_and_MST_in_graph G weight T v);
+  s \<leftarrow> cycc.it_dfsT TYPE(unit) (node_and_MST_in_graph.T' G T v);
   RETURN (break s)
 }"
 

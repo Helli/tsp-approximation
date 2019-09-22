@@ -3,7 +3,6 @@ session TSP = Kruskal +
     \<open>to-do: use cases (also hamiltonian cycles for grid graphs, cf. lawler p.60/61?)\<close>
   options [document=pdf, document_output="output"]
   sessions
-    Koenigsberg_Friendship
     DFS_Framework
   theories [document=false]
     Graph_Definition_Impl
