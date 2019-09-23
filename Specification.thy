@@ -897,10 +897,15 @@ qed
 subsubsection \<open>Conversion Between Path Representations\<close>
 
 text \<open>Node lists to edge lists. (The reverse is just \<^term>\<open>map fst\<close>)\<close>
-definition the_path where
+definition (in valid_graph) the_path where
   \<open>the_path nodelist lst = (case nodelist of
     [] \<Rightarrow> [] |
     n # ns \<Rightarrow> THE ps. map fst ps = nodelist \<and> is_path_undir G n ps lst)\<close>
+
+fun (in valid_graph) tour where \<comment> \<open>a counterpart to \<^const>\<open>is_hamiltonian_circuit\<close> in the world of node lists\<close>
+  \<open>tour [] \<longleftrightarrow> True\<close> |
+  \<open>tour [n] \<longleftrightarrow> n \<in> V\<close> \<comment> \<open>no need to check for a loop here\<close> |
+  \<open>tour ns \<longleftrightarrow> is_hamiltonian_circuit (the_path ns (hd ns))\<close>
 
 lemma ex1_edge_path: \<comment> \<open>In the general \<open>weight\<close> setting, commutativity would miss...\<close>
   assumes \<open>distinct (n#ns)\<close> \<comment> \<open>inequality of neighbouring nodes suffices...\<close>
