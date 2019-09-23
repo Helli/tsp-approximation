@@ -902,10 +902,10 @@ definition (in valid_graph) the_path where
     [] \<Rightarrow> [] |
     n # ns \<Rightarrow> THE ps. map fst ps = nodelist \<and> is_path_undir G n ps lst)\<close>
 
-fun (in valid_graph) tour where \<comment> \<open>a counterpart to \<^const>\<open>is_hamiltonian_circuit\<close> in the world of node lists\<close>
+fun (in valid_graph) tour where \<comment> \<open>a node list counterpart to \<^const>\<open>is_hamiltonian_circuit\<close>\<close>
   \<open>tour [] \<longleftrightarrow> True\<close> |
   \<open>tour [n] \<longleftrightarrow> n \<in> V\<close> \<comment> \<open>no need to check for a loop here\<close> |
-  \<open>tour ns \<longleftrightarrow> is_hamiltonian_circuit (the_path ns (hd ns))\<close>
+  \<open>tour (n#ns) \<longleftrightarrow> is_hamiltonian_circuit (the_path (n#ns) n)\<close>
 
 lemma ex1_edge_path: \<comment> \<open>In the general \<open>weight\<close> setting, commutativity would miss...\<close>
   assumes \<open>distinct (n#ns)\<close> \<comment> \<open>inequality of neighbouring nodes suffices...\<close>
