@@ -30,8 +30,14 @@ sublocale dTgraph: graph T'
   apply (auto simp: T'_def E_validD v_in_TV v_in_V)
   using T.E_validD n_in_TV_iff by blast+
 
-lemma finite_dTgraph: \<open>finite dTgraph.reachable\<close>
+lemma finite_dTgraph_reachable: \<open>finite dTgraph.reachable\<close>
   unfolding T'_def using dTgraph.finite_E by (simp add: T'_def)
+
+lemma finite_dTgraph_V0: \<open>finite dTgraph.V0\<close>
+  by (simp add: dTgraph.finite_V0 finite_dTgraph_reachable)
+
+lemma reachable_finite: \<open>\<And>v. v \<in> dTgraph.reachable \<Longrightarrow> finite (dTgraph.E `` {v})\<close>
+  by (simp add: dTgraph.fb_graphI_fr fb_graph.finitely_branching finite_dTgraph_reachable)
 
 end
 
@@ -88,8 +94,7 @@ definition "cyc_checkerT G weight T v \<equiv> do {
   RETURN (break s)
 }"
 
-
-text \<open>
+\<^cancel>\<open>text \<open>
   Next, we define a locale for the cyclicity checker's
   precondition and invariant, by specializing the \<open>param_DFS\<close> locale.\<close>
 locale cycc = param_DFS G cycc_params for G :: "('v, 'more) graph_rec_scheme"
@@ -99,8 +104,18 @@ begin
     the DFS-scheme \<close>
   sublocale DFS G cycc_params
     apply unfold_locales
-    apply (simp_all add: cycc_params_def)
+    apply simp_all
     done
+
+  thm it_dfs_correct  \<comment> \<open>Partial correctness\<close>
+  thm it_dfsT_correct \<comment> \<open>Total correctness if set of reachable states is finite\<close> 
+end\<close>
+context node_and_MST_in_graph begin
+sublocale DFS T' cycc_params
+  apply unfold_locales
+         apply simp_all
+   apply (fact finite_dTgraph_V0)
+  by (fact reachable_finite)
 
   thm it_dfs_correct  \<comment> \<open>Partial correctness\<close>
   thm it_dfsT_correct \<comment> \<open>Total correctness if set of reachable states is finite\<close> 
@@ -158,6 +173,9 @@ context cycc_invar begin
 
     We use this example to illustrate the general proof scheme:
     \<close>
+
+lemma (in cycc) \<open>is_invar (\<lambda>s. valid_graph.tour (break s))\<close>
+
 (*
   lemma (in cycc) i_brk_eq_back: "is_invar (\<lambda>s. break s = [] \<longleftrightarrow> back_edges s \<noteq> {})"
   proof (induct rule: establish_invarI)
