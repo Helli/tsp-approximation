@@ -121,31 +121,16 @@ sublocale DFS T' cycc_params
   thm it_dfsT_correct \<comment> \<open>Total correctness if set of reachable states is finite\<close> 
 end
 
-lemma cyccI: 
-  assumes "fb_graph G" 
-  shows "cycc G"
-proof -
-  interpret fb_graph G by fact
-  show ?thesis by unfold_locales
-qed
-
-lemma cyccI': 
-  assumes "graph G" 
-  and FR: "finite (graph_defs.reachable G)"
-  shows "cycc G"
-proof -
-  interpret graph G by fact
-  from FR interpret fb_graph G by (rule fb_graphI_fr)
-  show ?thesis by unfold_locales
-qed
-
 
 text \<open>Next, we specialize the @{term DFS_invar} locale to our parameterization.
   This locale contains all proven invariants. When proving new invariants,
   this locale is available as assumption, thus allowing us to re-use already 
   proven invariants.
 \<close>
-locale cycc_invar = DFS_invar where param = cycc_params + cycc
+locale cycc_invar = dTgraph: DFS_invar
+  where param = cycc_params
+    and G = \<open>node_and_MST_in_graph.T' G T v\<close> +
+  node_and_MST_in_graph
 
 text \<open> The lemmas to establish invariants only provide the \<open>DFS_invar\<close> locale.
   This lemma is used to convert it into the \<open>cycc_invar\<close> locale.
@@ -174,7 +159,7 @@ context cycc_invar begin
     We use this example to illustrate the general proof scheme:
     \<close>
 
-lemma (in cycc) \<open>is_invar (\<lambda>s. valid_graph.tour (break s))\<close>
+lemma (in node_and_MST_in_graph) \<open>is_invar (\<lambda>s. tour (break s))\<close>
 
 (*
   lemma (in cycc) i_brk_eq_back: "is_invar (\<lambda>s. break s = [] \<longleftrightarrow> back_edges s \<noteq> {})"
