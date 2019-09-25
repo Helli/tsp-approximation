@@ -136,11 +136,11 @@ text \<open> The lemmas to establish invariants only provide the \<open>DFS_inva
   This lemma is used to convert it into the \<open>cycc_invar\<close> locale.
 \<close>
 lemma cycc_invar_eq[simp]:
-  shows "DFS_invar G cycc_params s \<longleftrightarrow> cycc_invar G s" 
+  shows "DFS_invar (node_and_MST_in_graph.T' G T v) cycc_params s \<longleftrightarrow> cycc_invar s G weight T v"
 proof
-  assume "DFS_invar G cycc_params s"
-  interpret DFS_invar G cycc_params s by fact
-  show "cycc_invar G s" by unfold_locales
+  assume "DFS_invar (node_and_MST_in_graph.T' G T v) cycc_params s"
+  interpret DFS_invar "(node_and_MST_in_graph.T' G T v)" cycc_params s by fact
+  show "cycc_invar s G weight T v" by unfold_locales
 next
   assume "cycc_invar G s"
   then interpret cycc_invar G s .
