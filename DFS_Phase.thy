@@ -24,8 +24,8 @@ lemma v_in_TV: \<open>v \<in> T.V\<close>
   using n_in_TV_iff v_in_V by blast
 
 definition T' where
-  \<open>T' = \<lparr>g_V = V, g_E = {(v,v'). (\<exists>w.(v,w,v')\<in>T.E) \<or> (\<exists>w.(v',w,v)\<in>T.E)}, g_V0 = {v}\<rparr>\<close>
-sublocale dTgraph: graph T'
+  \<open>T' asdf = \<lparr>g_V = V, g_E = {(v,v'). (\<exists>w.(v,w,v')\<in>T.E) \<or> (\<exists>w.(v',w,v)\<in>T.E)}, g_V0 = {v},\<dots>=asdf\<rparr>\<close>
+sublocale dTgraph: graph "(T' ())"
   apply standard
   apply (auto simp: T'_def E_validD v_in_TV v_in_V)
   using T.E_validD n_in_TV_iff by blast+
@@ -90,7 +90,7 @@ interpretation cycc: param_DFS_defs where param=cycc_params for G .
 text \<open>The total correct variant asserts finitely many reachable nodes.\<close>
 definition "cyc_checkerT G weight T v \<equiv> do {
   ASSERT (node_and_MST_in_graph G weight T v);
-  s \<leftarrow> cycc.it_dfsT TYPE(unit) (node_and_MST_in_graph.T' G T v);
+  s \<leftarrow> cycc.it_dfsT TYPE('a) (node_and_MST_in_graph.T' G T v (undefined::'a));
   RETURN (break s)
 }"
 
@@ -111,7 +111,7 @@ begin
   thm it_dfsT_correct \<comment> \<open>Total correctness if set of reachable states is finite\<close> 
 end\<close>
 context node_and_MST_in_graph begin
-sublocale DFS T' cycc_params
+sublocale DFS "T' ()" cycc_params
   apply unfold_locales
          apply simp_all
    apply (fact finite_dTgraph_V0)
@@ -129,14 +129,15 @@ text \<open>Next, we specialize the @{term DFS_invar} locale to our parameteriza
 \<close>
 locale cycc_invar = dTgraph: DFS_invar
   where param = cycc_params
-    and G = \<open>node_and_MST_in_graph.T' G T v\<close> +
+    and G = \<open>node_and_MST_in_graph.T' G T v ()\<close> +
   node_and_MST_in_graph
 
 text \<open> The lemmas to establish invariants only provide the \<open>DFS_invar\<close> locale.
   This lemma is used to convert it into the \<open>cycc_invar\<close> locale.
 \<close>
-lemma cycc_invar_eq[simp]:
-  shows "DFS_invar (node_and_MST_in_graph.T' G T v) cycc_params s \<longleftrightarrow> cycc_invar s G weight T v"
+lemma (in node_and_MST_in_graph) cycc_invar_eq[simp]:
+  assumes \<open>DFS_invar (node_and_MST_in_graph.T' G T v ()) cycc_params s\<close>
+  shows "cycc_invar s G weight T v"
 proof
   assume "DFS_invar (node_and_MST_in_graph.T' G T v) cycc_params s"
   interpret DFS_invar "(node_and_MST_in_graph.T' G T v)" cycc_params s by fact
@@ -145,7 +146,7 @@ next
   assume "cycc_invar G s"
   then interpret cycc_invar G s .
   show "DFS_invar G cycc_params s" by unfold_locales
-qed
+qed*)
 
 subsection \<open>Correctness Proof\<close>
 text \<open> We now enter the \<open>cycc_invar\<close> locale, and show correctness of 
@@ -154,12 +155,32 @@ text \<open> We now enter the \<open>cycc_invar\<close> locale, and show correct
 context cycc_invar begin
   text \<open>We show that we break if and only if there are back edges. 
     This is straightforward from our parameterization, and we can use the 
-    @{thm [source] establish_invarI} rule provided by the DFS framework.
+    @{thm [source] dTgraph.establish_invarI} rule provided by the DFS framework.
 
     We use this example to illustrate the general proof scheme:
     \<close>
 
-lemma (in node_and_MST_in_graph) \<open>is_invar (\<lambda>s. tour (break s))\<close>
+lemma (in node_and_MST_in_graph) \<open>is_invar (\<lambda>s. tour (break s))\<close> 
+proof (induct rule: establish_invarI)
+case init
+then show ?case sorry
+next
+  case (new_root s s' v0)
+  then show ?case by (simp_all cong: break_more_cong)
+next
+  case (finish s s' u)
+  then show ?case by (simp_all cong: break_more_cong)
+next
+  case (cross_edge s s' u v)
+  then show ?case by (simp_all cong: break_more_cong)
+next
+  case (back_edge s s' u v)
+  then show ?case by (simp_all cong: break_more_cong)
+next
+  case (discover s s' u v)
+  then show ?case sorry
+qed
+ 
 
 (*
   lemma (in cycc) i_brk_eq_back: "is_invar (\<lambda>s. break s = [] \<longleftrightarrow> back_edges s \<noteq> {})"
