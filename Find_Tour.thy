@@ -28,7 +28,7 @@ lemma [simp]: "s\<lparr> state.more := \<lparr> ppath = foo \<rparr> \<rparr> = 
   by (cases s) simp
 
 definition fp0_params :: "'v fp0_param"
-where "fp0_params \<equiv> dflt_parametrization state.more 
+where "fp0_params \<equiv> dflt_parametrization state.more
   (RETURN \<lparr> ppath = [] \<rparr>) \<lparr>
   on_discover := \<lambda>_ n s. RETURN \<lparr>ppath = ppath s @ [n]\<rparr>
   \<^cancel>\<open>,on_back_edge := \<lambda>_ _ . RETURN o state.more,\<close>
@@ -37,11 +37,11 @@ where "fp0_params \<equiv> dflt_parametrization state.more
 lemmas fp0_params_simp[simp] =
   gen_parameterization.simps[mk_record_simp, OF fp0_params_def[simplified]]
 
-interpretation fp0: param_DFS_defs where param = fp0_params
+interpretation fp0: param_DFS_defs where param = "fp0_params"
   for G P .
 
-locale fp0 = param_DFS G "fp0_params P"
-  for G and P :: "'v \<Rightarrow> bool"
+locale fp0 = param_DFS G "fp0_params"
+  for G
 begin
 
   lemma [simp]: 
@@ -52,7 +52,7 @@ begin
     "ppath (s\<lparr>state.more := state.more s'\<rparr>) = ppath s'"
     by (cases s, cases s') auto
 
-  sublocale DFS where param = "fp0_params P"
+  sublocale DFS where param = "fp0_params"
     by unfold_locales simp_all
 
 end
@@ -60,8 +60,8 @@ end
 lemma fp0I: assumes "fb_graph G" shows "fp0 G"
 proof - interpret fb_graph G by fact show ?thesis by unfold_locales qed
 
-locale fp0_invar = fp0 + 
-  DFS_invar where param = "fp0_params P"
+locale fp0_invar = fp0 +
+  DFS_invar where param = "fp0_params"
 
 lemma fp0_invar_eq[simp]: 
   "DFS_invar G (fp0_params P) = fp0_invar G P"
