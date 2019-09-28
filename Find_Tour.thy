@@ -64,17 +64,17 @@ locale fp0_invar = fp0 +
   DFS_invar where param = "fp0_params"
 
 lemma fp0_invar_eq[simp]: 
-  "DFS_invar G (fp0_params P) = fp0_invar G P"
+  "DFS_invar G fp0_params = fp0_invar G"
 proof (intro ext iffI)
   fix s
-  assume "DFS_invar G (fp0_params P) s"
-  interpret DFS_invar G "fp0_params P" s by fact
-  show "fp0_invar G P s" by unfold_locales
+  assume "DFS_invar G fp0_params s"
+  interpret DFS_invar G "fp0_params" s by fact
+  show "fp0_invar G s" by unfold_locales
 next
   fix s
-  assume "fp0_invar G P s"
-  interpret fp0_invar G P s by fact
-  show "DFS_invar G (fp0_params P) s" by unfold_locales
+  assume "fp0_invar G s"
+  interpret fp0_invar G s by fact
+  show "DFS_invar G fp0_params s" by unfold_locales
 qed
 
 context fp0 begin
