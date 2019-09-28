@@ -20,33 +20,24 @@ text \<open>
 
 subsection \<open>Including empty Path\<close>
 record 'v fp0_state = "'v state" +
-  ppath :: "('v list \<times> 'v) option"
+  ppath :: "'v list"
 
 type_synonym 'v fp0_param = "('v, ('v,unit) fp0_state_ext) parameterization"
 
 lemma [simp]: "s\<lparr> state.more := \<lparr> ppath = foo \<rparr> \<rparr> = s \<lparr> ppath := foo \<rparr>"
   by (cases s) simp
 
-abbreviation "no_path \<equiv> \<lparr> ppath = None \<rparr>"
-abbreviation "a_path p v \<equiv> \<lparr> ppath = Some (p,v) \<rparr>"
+definition fp0_params :: "'v fp0_param"
+where "fp0_params \<equiv> dflt_parametrization state.more 
+  (RETURN \<lparr> ppath = [] \<rparr>) \<lparr>
+  on_discover := \<lambda>_ n s. RETURN \<lparr>ppath = ppath s @ [n]\<rparr>
+  \<^cancel>\<open>,on_back_edge := \<lambda>_ _ . RETURN o state.more,\<close>
+  \<^cancel>\<open>is_break := \<lambda>s. break s = []\<close> \<rparr>"
 
-definition fp0_params :: "('v \<Rightarrow> bool) \<Rightarrow> 'v fp0_param"
-  where "fp0_params P \<equiv> \<lparr>
-  on_init = RETURN no_path,
-  on_new_root = \<lambda>v0 s. if P v0 then RETURN (a_path [] v0) else RETURN no_path,
-  on_discover = \<lambda>u v s. if P v 
-                   then \<comment> \<open>\<open>v\<close> is already on the stack, so we need to pop it again\<close>
-                      RETURN (a_path (rev (tl (stack s))) v) 
-                   else RETURN no_path,
-  on_finish = \<lambda>u s. RETURN (state.more s),
-  on_back_edge = \<lambda>u v s. RETURN (state.more s),
-  on_cross_edge = \<lambda>u v s. RETURN (state.more s),
-  is_break = \<lambda>s. ppath s \<noteq> None \<rparr>"
+lemmas fp0_params_simp[simp] =
+  gen_parameterization.simps[mk_record_simp, OF fp0_params_def[simplified]]
 
-lemmas fp0_params_simps[simp] 
-  = gen_parameterization.simps[mk_record_simp, OF fp0_params_def]
-
-interpretation fp0: param_DFS_defs where param = "fp0_params P"
+interpretation fp0: param_DFS_defs where param = fp0_params
   for G P .
 
 locale fp0 = param_DFS G "fp0_params P"
