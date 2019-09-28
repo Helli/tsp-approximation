@@ -8,6 +8,6 @@ session TSP = Kruskal +
     Graph_Definition_Impl
   theories
     Specification
-    DFS_Phase
+    Find_Tour
   document_files
     root.tex

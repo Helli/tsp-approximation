@@ -1,7 +1,7 @@
 section \<open>Finding a Path between Nodes\<close>
 theory Find_Tour
 imports
-  CAVA_Automata.Digraph_Impl
+  CAVA_Automata.Digraph
   Specification
   DFS_Framework.DFS_Framework
 begin
