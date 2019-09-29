@@ -40,7 +40,8 @@ lemmas fp0_params_simp[simp] =
 interpretation fp0: param_DFS_defs where param = "fp0_params"
   for G P .
 
-locale fp0 = param_DFS G "fp0_params"
+locale fp0 = param_DFS
+  where G = G and param = "fp0_params"
   for G
 begin
 
@@ -78,6 +79,8 @@ next
 qed
 
 context fp0 begin
+
+lemma (in node_and_MST_in_graph) \<open>is_invar (\<lambda>s. tour (break s))\<close>
 
   lemma i_no_path_no_P_discovered:
     "is_invar (\<lambda>s. ppath s = None \<longrightarrow> dom (discovered s) \<inter> Collect P = {})"
