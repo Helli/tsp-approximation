@@ -37,13 +37,66 @@ where "fp0_params \<equiv> dflt_parametrization state.more
 lemmas fp0_params_simp[simp] =
   gen_parameterization.simps[mk_record_simp, OF fp0_params_def[simplified]]
 
-interpretation fp0: param_DFS_defs where param = "fp0_params"
-  for G P .
-
-locale fp0 = param_DFS
-  where G = G and param = "fp0_params"
-  for G
+locale node_and_MST_in_graph =
+  complete_finite_weighted_graph G weight +
+  T: tree T
+  for G::\<open>('v,'w::weight) graph\<close> and weight
+  and T::\<open>('v,'w) graph\<close> +
+  fixes v::\<open>'v\<close>
+  assumes v_in_V: \<open>v \<in> V\<close>
+  and mst: \<open>minimum_spanning_tree T G\<close>
 begin
+
+lemma n_in_TV_iff: \<open>n \<in> T.V \<longleftrightarrow> n \<in> V\<close>
+  using mst[unfolded minimum_spanning_tree_def spanning_tree_def]
+  by (meson subgraph_node)
+
+lemma v_in_TV: \<open>v \<in> T.V\<close>
+  using n_in_TV_iff v_in_V by blast
+
+lemma subgraphTG: \<open>subgraph T G\<close>
+  using minimum_spanning_tree_def mst spanning_tree_def by blast
+
+lemma finiteTE: \<open>finite T.E\<close>
+  using finite_E finite_subset subgraphTG subgraph_def by blast
+
+lemma finiteTV: \<open>finite T.V\<close>
+  by (metis s.finiteV subgraphTG subgraph_def)
+
+lemma finite01: \<open>finite {(va,w,v'). (va, w, v') \<in> T.E}\<close>
+  using finiteTE by force
+
+lemma finite02: \<open>finite {(w,v'). (va, w, v') \<in> T.E}\<close>
+  using finiteTE by (metis succ_def succ_finite)
+
+lemma finite03: \<open>finite {(w,v')| w v'. (va, w, v') \<in> T.E}\<close>
+  using finite02 by auto
+
+lemma finite04: \<open>{v'. \<exists>w. (va, w, v') \<in> T.E} \<subseteq> T.V\<close>
+  using T.E_validD(2) by blast
+
+lemma finite05: \<open>finite {v'. \<exists>w. (va, w, v') \<in> T.E}\<close>
+  using finite04 finiteTV infinite_super by blast
+
+definition T' where
+  \<open>T' = \<lparr>g_V = V, g_E = {(v,v'). (\<exists>w.(v,w,v')\<in>T.E) \<or> (\<exists>w.(v',w,v)\<in>T.E)}, g_V0 = {v}\<rparr>\<close>
+sublocale dfs: DFS T' fp0_params
+  apply standard
+  apply (auto simp: T'_def E_validD v_in_TV v_in_V)
+  using T.E_validD(1) n_in_TV_iff apply blast
+  using T.E_validD(2) n_in_TV_iff apply blast
+  using T.E_validD(2) n_in_TV_iff apply blast
+  using T.E_validD(1) n_in_TV_iff apply blast
+  apply (simp add: finite05)
+
+lemma finite_dTgraph_reachable: \<open>finite dfs.reachable\<close>
+  unfolding T'_def using dTgraph.finite_E by (simp add: T'_def)
+
+lemma finite_dTgraph_V0: \<open>finite dTgraph.V0\<close>
+  by (simp add: dTgraph.finite_V0 finite_dTgraph_reachable)
+
+lemma reachable_finite: \<open>\<And>v. v \<in> dTgraph.reachable \<Longrightarrow> finite (dTgraph.E `` {v})\<close>
+  by (simp add: dTgraph.fb_graphI_fr fb_graph.finitely_branching finite_dTgraph_reachable)
 
   lemma [simp]: 
     "ppath (empty_state \<lparr>ppath = e\<rparr>) = e"
@@ -53,6 +106,12 @@ begin
     "ppath (s\<lparr>state.more := state.more s'\<rparr>) = ppath s'"
     by (cases s, cases s') auto
 
+(* This was above the simp lemmas, but isn't it superseded anyway by the sublocale statement?
+locale fp0 = param_DFS
+  where G = G and param = "fp0_params"
+  for G
+begin
+*)
   sublocale DFS where param = "fp0_params"
     by unfold_locales simp_all
 
