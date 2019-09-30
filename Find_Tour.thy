@@ -120,8 +120,10 @@ begin
 
 end
 
-lemma fp0I: assumes "fb_graph G" shows "fp0 G"
-proof - interpret fb_graph G by fact show ?thesis by unfold_locales qed
+lemma dfsI:
+  assumes \<open>node_and_MST_in_graph G weight T v\<close>
+  shows \<open>DFS (node_and_MST_in_graph.T' G T v) fp0_params\<close>
+proof - interpret node_and_MST_in_graph G weight T v by fact show ?thesis by unfold_locales qed
 
 locale fp0_invar = fp0 +
   DFS_invar where param = "fp0_params"
