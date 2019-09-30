@@ -95,18 +95,15 @@ sublocale dfs: DFS T' fp0_params
   using T.E_validD(1) n_in_TV_iff apply blast
   by (simp_all add: finite05 finite05' T.E_valid)
 
-lemma finite_dTgraph_reachable: \<open>finite dfs.reachable\<close>
-  unfolding T'_def using dTgraph.finite_E by (simp add: T'_def)
+lemma finite_dfsgraph_reachable: \<open>finite dfs.reachable\<close>
+  using dfs.finite_E by (simp add: T'_def)
 
-lemma finite_dTgraph_V0: \<open>finite dTgraph.V0\<close>
-  by (simp add: dTgraph.finite_V0 finite_dTgraph_reachable)
-
-lemma reachable_finite: \<open>\<And>v. v \<in> dTgraph.reachable \<Longrightarrow> finite (dTgraph.E `` {v})\<close>
-  by (simp add: dTgraph.fb_graphI_fr fb_graph.finitely_branching finite_dTgraph_reachable)
+lemma finite_dfsgraph_V0: \<open>finite dfs.V0\<close>
+  by blast
 
   lemma [simp]: 
-    "ppath (empty_state \<lparr>ppath = e\<rparr>) = e"
-    by (simp add: empty_state_def)
+    "ppath (dfs.empty_state \<lparr>ppath = e\<rparr>) = e"
+    by (simp add: dfs.empty_state_def)
 
   lemma [simp]: 
     "ppath (s\<lparr>state.more := state.more s'\<rparr>) = ppath s'"
@@ -117,9 +114,9 @@ locale fp0 = param_DFS
   where G = G and param = "fp0_params"
   for G
 begin
-*)
+*)(*
   sublocale DFS where param = "fp0_params"
-    by unfold_locales simp_all
+    by unfold_locales simp_all*)
 
 end
 
