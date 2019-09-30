@@ -121,25 +121,33 @@ begin
 end
 
 lemma dfsI:
-  assumes \<open>node_and_MST_in_graph G weight T v\<close>
-  shows \<open>DFS (node_and_MST_in_graph.T' G T v) fp0_params\<close>
-proof - interpret node_and_MST_in_graph G weight T v by fact show ?thesis by unfold_locales qed
+  assumes \<open>node_and_MST_in_graph G weight T v\<^sub>0\<close>
+  shows \<open>DFS (node_and_MST_in_graph.T' G T v\<^sub>0) fp0_params\<close>
+proof - interpret node_and_MST_in_graph G weight T v\<^sub>0 by fact show ?thesis by unfold_locales qed
 
-locale fp0_invar = fp0 +
-  DFS_invar where param = "fp0_params"
+locale fp0_invar = node_and_MST_in_graph +
+  DFS_invar where G = T' and param = "fp0_params"
 
-lemma fp0_invar_eq[simp]: 
-  "DFS_invar G fp0_params = fp0_invar G"
-proof (intro ext iffI)
+lemma fp0_invar_intro[intro]:
+  assumes "DFS_invar (node_and_MST_in_graph.T' G T v\<^sub>0) fp0_params s"
+    and "node_and_MST_in_graph G weight T v\<^sub>0"
+  shows "fp0_invar G weight T v\<^sub>0 s"
+  using assms
+proof -
+  assume "DFS_invar (node_and_MST_in_graph.T' G T v\<^sub>0) fp0_params s"
+  interpret DFS_invar \<open>node_and_MST_in_graph.T' G T v\<^sub>0\<close> "fp0_params" s by fact
+  assume \<open>node_and_MST_in_graph G weight T v\<^sub>0\<close>
+  interpret tmp: node_and_MST_in_graph G weight T v\<^sub>0 by fact
+  show ?thesis by unfold_locales
+qed
+
+lemma fp0_invar_2_DFS:
+  \<open>fp0_invar G weight T v\<^sub>0 s \<Longrightarrow> DFS_invar (node_and_MST_in_graph.T' G T v\<^sub>0) fp0_params s\<close>
+proof -
   fix s
-  assume "DFS_invar G fp0_params s"
-  interpret DFS_invar G "fp0_params" s by fact
-  show "fp0_invar G s" by unfold_locales
-next
-  fix s
-  assume "fp0_invar G s"
-  interpret fp0_invar G s by fact
-  show "DFS_invar G fp0_params s" by unfold_locales
+  assume "fp0_invar G weight T v\<^sub>0 s"
+  interpret fp0_invar G weight T v\<^sub>0 s by fact
+  show "DFS_invar (node_and_MST_in_graph.T' G T v\<^sub>0) fp0_params s" by unfold_locales
 qed
 
 context fp0 begin
