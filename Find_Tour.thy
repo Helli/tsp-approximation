@@ -42,8 +42,8 @@ locale node_and_MST_in_graph =
   T: tree T
   for G::\<open>('v,'w::weight) graph\<close> and weight
   and T::\<open>('v,'w) graph\<close> +
-  fixes v::\<open>'v\<close>
-  assumes v_in_V: \<open>v \<in> V\<close>
+  fixes v\<^sub>0::\<open>'v\<close>
+  assumes v_in_V: \<open>v\<^sub>0 \<in> V\<close>
   and mst: \<open>minimum_spanning_tree T G\<close>
 begin
 
@@ -51,7 +51,7 @@ lemma n_in_TV_iff: \<open>n \<in> T.V \<longleftrightarrow> n \<in> V\<close>
   using mst[unfolded minimum_spanning_tree_def spanning_tree_def]
   by (meson subgraph_node)
 
-lemma v_in_TV: \<open>v \<in> T.V\<close>
+lemma v_in_TV: \<open>v\<^sub>0 \<in> T.V\<close>
   using n_in_TV_iff v_in_V by blast
 
 lemma subgraphTG: \<open>subgraph T G\<close>
@@ -66,20 +66,26 @@ lemma finiteTV: \<open>finite T.V\<close>
 lemma finite01: \<open>finite {(va,w,v'). (va, w, v') \<in> T.E}\<close>
   using finiteTE by force
 
-lemma finite02: \<open>finite {(w,v'). (va, w, v') \<in> T.E}\<close>
+lemma finite02: \<open>finite {(w,v'). (v, w, v') \<in> T.E}\<close>
   using finiteTE by (metis succ_def succ_finite)
 
-lemma finite03: \<open>finite {(w,v')| w v'. (va, w, v') \<in> T.E}\<close>
+lemma finite03: \<open>finite {(w,v')| w v'. (v, w, v') \<in> T.E}\<close>
   using finite02 by auto
 
-lemma finite04: \<open>{v'. \<exists>w. (va, w, v') \<in> T.E} \<subseteq> T.V\<close>
+lemma finite04: \<open>{v'. \<exists>w. (v, w, v') \<in> T.E} \<subseteq> T.V\<close>
   using T.E_validD(2) by blast
 
-lemma finite05: \<open>finite {v'. \<exists>w. (va, w, v') \<in> T.E}\<close>
+lemma finite04': \<open>{v'. \<exists>w. (v', w, v) \<in> T.E} \<subseteq> T.V\<close>
+  using T.E_validD(1) by blast
+
+lemma finite05: \<open>finite {v'. \<exists>w. (v, w, v') \<in> T.E}\<close>
   using finite04 finiteTV infinite_super by blast
 
+lemma finite05': \<open>finite {v'. \<exists>w. (v', w, v) \<in> T.E}\<close>
+  using finite04' finiteTV finite_subset by blast
+
 definition T' where
-  \<open>T' = \<lparr>g_V = V, g_E = {(v,v'). (\<exists>w.(v,w,v')\<in>T.E) \<or> (\<exists>w.(v',w,v)\<in>T.E)}, g_V0 = {v}\<rparr>\<close>
+  \<open>T' = \<lparr>g_V = V, g_E = {(v,v'). (\<exists>w.(v,w,v')\<in>T.E) \<or> (\<exists>w.(v',w,v)\<in>T.E)}, g_V0 = {v\<^sub>0}\<rparr>\<close>
 sublocale dfs: DFS T' fp0_params
   apply standard
   apply (auto simp: T'_def E_validD v_in_TV v_in_V)
@@ -87,7 +93,7 @@ sublocale dfs: DFS T' fp0_params
   using T.E_validD(2) n_in_TV_iff apply blast
   using T.E_validD(2) n_in_TV_iff apply blast
   using T.E_validD(1) n_in_TV_iff apply blast
-  apply (simp add: finite05)
+  by (simp_all add: finite05 finite05' T.E_valid)
 
 lemma finite_dTgraph_reachable: \<open>finite dfs.reachable\<close>
   unfolding T'_def using dTgraph.finite_E by (simp add: T'_def)
