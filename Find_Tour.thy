@@ -157,10 +157,22 @@ lemma (in valid_graph) valid_graph_ind': \<open>valid_graph (ind' V')\<close>
 
 lemma (in complete_finite_weighted_graph) subgraph_complete:
   \<open>V' \<subseteq> V \<Longrightarrow> complete_finite_weighted_graph (ind' V') weight\<close>
-  apply unfold_locales apply auto
-  using finite_V infinite_super apply blast
-  using edge_unique apply blast
-  by (simp add: edge_exists subsetD)
+proof unfold_locales
+  assume \<open>V' \<subseteq> V\<close>
+  then show "finite (nodes \<lparr>nodes = V', edges = E \<inter> V' \<times> UNIV \<times> V'\<rparr>)"
+    by (simp add: finite_subset)
+  fix v w v'
+  assume \<open>(v, w, v') \<in> edges \<lparr>nodes = V', edges = E \<inter> V' \<times> UNIV \<times> V'\<rparr>\<close>
+  then show "weight v v' = w"
+    using edge_unique by auto
+qed (auto simp: edge_exists subsetD)
+
+lemma (in complete_finite_weighted_graph) complete_graph_delete_node:
+  \<open>v \<in> V \<Longrightarrow> complete_finite_weighted_graph (delete_node v G) weight\<close>
+  apply intro_locales
+  apply (simp add: valid_graph_axioms)
+  using complete_finite_weighted_graph.axioms(1) complete_finite_weighted_graph_delete_node finite_graph.axioms(2) finite_weighted_graph_def apply blast
+  using complete_finite_weighted_graph_def complete_finite_weighted_graph_delete_node by blast
 
 context node_and_MST_in_graph begin
 
