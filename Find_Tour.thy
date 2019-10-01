@@ -161,10 +161,22 @@ lemma \<open>dfs.is_invar (\<lambda>s. valid_graph.tour (ind' (dom (discovered s
 proof (induct rule: dfs.establish_invarI)
   case (discover s s' u v) then interpret fp0_invar where s=s
     using node_and_MST_in_graph_axioms by blast
+  from discover have ne: "stack s \<noteq> []" by simp
   from discover have vnis: "v\<notin>set (stack s)" using stack_discovered by auto
-  have discovered': \<open>dom (discovered s') = insert v (dom (discovered s))\<close>
+  have discovered'[simp]: \<open>dom (discovered s') = insert v (dom (discovered s))\<close>
     using discover[unfolded dfs.discover_def] by auto
-  from discover show ?case apply auto sorry
+  have ppath': \<open>ppath s' = ppath s\<close>
+    using discover[unfolded dfs.discover_def] by auto
+  have a: \<open>on_discover fp0_params u v s' \<le> SPEC (\<lambda>r. r = \<lparr>ppath = ppath s' @ [v]\<rparr>)\<close>
+    by simp
+  then have b: \<open>on_discover fp0_params u v s' \<le>\<^sub>n SPEC (\<lambda>r. r = \<lparr>ppath = ppath s' @ [v]\<rparr>)\<close>
+    using leof_lift by blast
+  have c: \<open>on_discover fp0_params u v s' \<le> SPEC (\<lambda>r. r = \<lparr>ppath = ppath s @ [v]\<rparr>)\<close>
+    by (simp add: ppath')
+  then have d: \<open>on_discover fp0_params u v s' \<le>\<^sub>n SPEC (\<lambda>r. r = \<lparr>ppath = ppath s @ [v]\<rparr>)\<close>
+    using leof_lift by blast
+  from a b c d show ?case apply auto
+  with discover show ?case apply simp unfolding on_discover_def apply simp apply auto sorry
 qed auto
 
   lemma i_no_path_no_P_discovered:
