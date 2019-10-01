@@ -150,13 +150,18 @@ proof -
   show "DFS_invar (node_and_MST_in_graph.T' G T v\<^sub>0) fp0_params s" by unfold_locales
 qed
 
+abbreviation (in valid_graph) \<open>ind' V' \<equiv> \<lparr>nodes=V', edges = E \<inter> V'\<times>UNIV\<times>V'\<rparr>\<close>
+
+lemma (in valid_graph) valid_graph_ind': \<open>valid_graph (ind' V')\<close>
+  by standard auto
+
 context node_and_MST_in_graph begin
 
-lemma \<open>dfs.is_invar (\<lambda>s. tour (ppath s))\<close>
+lemma \<open>dfs.is_invar (\<lambda>s. valid_graph.tour (ind' {v. dfs.is_discovered v s}) (ppath s))\<close>
 proof (induct rule: dfs.establish_invarI)
   case (discover s s' u v) then interpret fp0_invar where s=s
     using node_and_MST_in_graph_axioms by blast
-  then show ?case sorry
+  from discover show ?case apply auto sorry
 qed auto
 
   lemma i_no_path_no_P_discovered:
