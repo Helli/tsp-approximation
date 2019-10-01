@@ -87,7 +87,7 @@ lemma finite05': \<open>finite {v'. \<exists>w. (v', w, v) \<in> T.E}\<close>
 definition T' where
   \<open>T' = \<lparr>g_V = V, g_E = {(v,v'). (\<exists>w.(v,w,v')\<in>T.E) \<or> (\<exists>w.(v',w,v)\<in>T.E)}, g_V0 = {v\<^sub>0}\<rparr>\<close>
 sublocale dfs: DFS T' fp0_params
-  apply standard
+  apply unfold_locales
   apply (auto simp: T'_def E_validD v_in_TV v_in_V)
   using T.E_validD(1) n_in_TV_iff apply blast
   using T.E_validD(2) n_in_TV_iff apply blast
@@ -153,7 +153,14 @@ qed
 abbreviation (in valid_graph) \<open>ind' V' \<equiv> \<lparr>nodes=V', edges = E \<inter> V'\<times>UNIV\<times>V'\<rparr>\<close>
 
 lemma (in valid_graph) valid_graph_ind': \<open>valid_graph (ind' V')\<close>
-  by standard auto
+  by unfold_locales auto
+
+lemma (in complete_finite_weighted_graph) subgraph_complete:
+  \<open>V' \<subseteq> V \<Longrightarrow> complete_finite_weighted_graph (ind' V') weight\<close>
+  apply unfold_locales apply auto
+  using finite_V infinite_super apply blast
+  using edge_unique apply blast
+  by (simp add: edge_exists subsetD)
 
 context node_and_MST_in_graph begin
 
