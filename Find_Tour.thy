@@ -157,10 +157,13 @@ lemma (in valid_graph) valid_graph_ind': \<open>valid_graph (ind' V')\<close>
 
 context node_and_MST_in_graph begin
 
-lemma \<open>dfs.is_invar (\<lambda>s. valid_graph.tour (ind' {v. dfs.is_discovered v s}) (ppath s))\<close>
+lemma \<open>dfs.is_invar (\<lambda>s. valid_graph.tour (ind' (dom (discovered s))) (ppath s))\<close>
 proof (induct rule: dfs.establish_invarI)
   case (discover s s' u v) then interpret fp0_invar where s=s
     using node_and_MST_in_graph_axioms by blast
+  from discover have vnis: "v\<notin>set (stack s)" using stack_discovered by auto
+  have discovered': \<open>dom (discovered s') = insert v (dom (discovered s))\<close>
+    using discover[unfolded dfs.discover_def] by auto
   from discover show ?case apply auto sorry
 qed auto
 
