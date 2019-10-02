@@ -188,7 +188,7 @@ next
 qed auto
 lemmas (in fp0_invar) stack_sane = i_stack_sane[THEN make_invar_thm, rule_format]
 
-lemma i_discovered_sane: \<open>dfs.is_invar (\<lambda>s. dom (discovered s) \<subseteq> dfs.V)\<close>
+lemma i_discovered_sane: \<open>dfs.is_invar (\<lambda>s. dom (discovered s) \<subseteq> V)\<close>
 proof (induction rule: dfs.establish_invarI)
   case (discover s s' u v) then interpret fp0_invar where s=s
     using node_and_MST_in_graph_axioms by blast
@@ -201,13 +201,14 @@ lemma \<open>dfs.is_invar (\<lambda>s. valid_graph.tour (ind' (dom (discovered s
 proof (induction rule: dfs.establish_invarI)
   case (discover s s' u v) then interpret fp0_invar where s=s
     using node_and_MST_in_graph_axioms by blast
-  have \<open>complete_finite_weighted_graph (ind' (dom (discovered s))) weight\<close>
-    apply (rule subgraph_complete)
-    apply auto
+  interpret s: complete_finite_weighted_graph \<open>ind' (dom (discovered s))\<close> weight
+    by (fact subgraph_complete[OF discovered_sane])
   from discover have ne: "stack s \<noteq> []" by simp
   from discover have vnis: "v\<notin>set (stack s)" using stack_discovered by auto
   have discovered'[simp]: \<open>dom (discovered s') = insert v (dom (discovered s))\<close>
     using discover[unfolded dfs.discover_def] by auto
+  interpret s': complete_finite_weighted_graph \<open>ind' (insert v (dom (discovered s)))\<close> weight
+    using discover snd_pending_sane discovered_sane by (auto intro!: subgraph_complete)
   have ppath': \<open>ppath s' = ppath s\<close>
     using discover[unfolded dfs.discover_def] by auto
   have a: \<open>on_discover fp0_params u v s' \<le> SPEC (\<lambda>r. r = \<lparr>ppath = ppath s' @ [v]\<rparr>)\<close>
