@@ -219,6 +219,31 @@ proof (induction rule: dfs.establish_invarI)
     by (simp add: ppath')
   then have d: \<open>on_discover fp0_params u v s' \<le>\<^sub>n SPEC (\<lambda>r. r = \<lparr>ppath = ppath s @ [v]\<rparr>)\<close>
     using leof_lift by blast
+  have \<open>s'.tour (ppath s @ [v])\<close>
+  proof (cases \<open>ppath s\<close>)
+    case (Cons p ps)
+    show ?thesis
+    proof (cases ps)
+      case Nil
+      then have s_tour: \<open>s.tour [p]\<close>
+        using discover(2) Cons by argo
+      then have s'V: \<open>s'.V = {p,v}\<close> \<open>insert v (dom (discovered s)) = {p, v}\<close>
+        by force+
+      have pv: \<open>p \<in> V\<close> \<open>v \<in> V\<close> \<open>v \<noteq> p\<close>
+        using s.tour_set_V[OF s_tour] discovered_sane apply fastforce
+        using discover snd_pending_sane apply fast
+        by (metis Un_empty discover(6,9) discovered_eq_finished_un_stack insert_absorb insert_absorb2 insert_ident insert_not_empty s'V(2) set_empty2)
+      have \<open>s'.the_path [p, v] p = [(p,weight p v,v),(v,weight v p,p)]\<close>
+        sorry
+      then show ?thesis using edge_exists pv apply (auto simp: Cons Nil)
+    next
+      case (Cons a list)
+      then show ?thesis sorry
+    qed auto
+      term valid_graph.tour term the_path
+  qed auto
+    thm valid_graph.tour.cases
+    unfolding T'_def
   from a b c d show ?case apply auto
   with discover show ?case apply simp unfolding on_discover_def apply simp apply auto sorry
 qed auto
