@@ -38,10 +38,10 @@ lemmas fp0_params_simp[simp] =
   gen_parameterization.simps[mk_record_simp, OF fp0_params_def[simplified]]
 
 locale node_and_MST_in_graph =
-  complete_finite_weighted_graph G weight +
+  complete_finite_metric_graph G +
   T: tree T
-  for G::\<open>('v,'w::weight) graph\<close> and weight
-  and T::\<open>('v,'w) graph\<close> +
+  for G::\<open>('v::metric_space,real) graph\<close>
+  and T::\<open>('v,real) graph\<close> +
   fixes v\<^sub>0::\<open>'v\<close>
   assumes v_in_V: \<open>v\<^sub>0 \<in> V\<close>
   and mst: \<open>minimum_spanning_tree T G\<close>
@@ -124,32 +124,32 @@ begin
 end
 
 lemma dfsI:
-  assumes \<open>node_and_MST_in_graph G weight T v\<^sub>0\<close>
+  assumes \<open>node_and_MST_in_graph G T v\<^sub>0\<close>
   shows \<open>DFS (node_and_MST_in_graph.T' G T v\<^sub>0) fp0_params\<close>
-proof - interpret node_and_MST_in_graph G weight T v\<^sub>0 by fact show ?thesis by unfold_locales qed
+proof - interpret node_and_MST_in_graph G T v\<^sub>0 by fact show ?thesis by unfold_locales qed
 
 locale fp0_invar = node_and_MST_in_graph +
   DFS_invar where G = T' and param = "fp0_params"
 
 lemma fp0_invar_intro[intro]:
   assumes "DFS_invar (node_and_MST_in_graph.T' G T v\<^sub>0) fp0_params s"
-    and "node_and_MST_in_graph G weight T v\<^sub>0"
-  shows "fp0_invar G weight T v\<^sub>0 s"
+    and "node_and_MST_in_graph G T v\<^sub>0"
+  shows "fp0_invar G T v\<^sub>0 s"
   using assms
 proof -
   assume "DFS_invar (node_and_MST_in_graph.T' G T v\<^sub>0) fp0_params s"
   interpret DFS_invar \<open>node_and_MST_in_graph.T' G T v\<^sub>0\<close> "fp0_params" s by fact
-  assume \<open>node_and_MST_in_graph G weight T v\<^sub>0\<close>
-  interpret tmp: node_and_MST_in_graph G weight T v\<^sub>0 by fact
+  assume \<open>node_and_MST_in_graph G T v\<^sub>0\<close>
+  interpret tmp: node_and_MST_in_graph G T v\<^sub>0 by fact
   show ?thesis by unfold_locales
 qed
 
 lemma fp0_invar_2_DFS:
-  \<open>fp0_invar G weight T v\<^sub>0 s \<Longrightarrow> DFS_invar (node_and_MST_in_graph.T' G T v\<^sub>0) fp0_params s\<close>
+  \<open>fp0_invar G T v\<^sub>0 s \<Longrightarrow> DFS_invar (node_and_MST_in_graph.T' G T v\<^sub>0) fp0_params s\<close>
 proof -
   fix s
-  assume "fp0_invar G weight T v\<^sub>0 s"
-  interpret fp0_invar G weight T v\<^sub>0 s by fact
+  assume "fp0_invar G T v\<^sub>0 s"
+  interpret fp0_invar G T v\<^sub>0 s by fact
   show "DFS_invar (node_and_MST_in_graph.T' G T v\<^sub>0) fp0_params s" by unfold_locales
 qed
 
@@ -169,6 +169,10 @@ proof unfold_locales
   then show "weight v v' = w"
     using edge_unique by auto
 qed (auto simp: edge_exists subsetD)
+
+lemma (in complete_finite_metric_graph) subgraph_complete_metric:
+  \<open>V' \<subseteq> V \<Longrightarrow> complete_finite_metric_graph (ind' V')\<close>
+  unfolding complete_finite_metric_graph_def by (simp add: subgraph_complete)
 
 context node_and_MST_in_graph begin
 
@@ -201,14 +205,14 @@ lemma \<open>dfs.is_invar (\<lambda>s. valid_graph.tour (ind' (dom (discovered s
 proof (induction rule: dfs.establish_invarI)
   case (discover s s' u v) then interpret fp0_invar where s=s
     using node_and_MST_in_graph_axioms by blast
-  interpret s: complete_finite_weighted_graph \<open>ind' (dom (discovered s))\<close> weight
-    by (fact subgraph_complete[OF discovered_sane])
+  interpret s: complete_finite_metric_graph \<open>ind' (dom (discovered s))\<close>
+    by (fact subgraph_complete_metric[OF discovered_sane])
   from discover have ne: "stack s \<noteq> []" by simp
   from discover have vnis: "v\<notin>set (stack s)" using stack_discovered by auto
   have discovered'[simp]: \<open>dom (discovered s') = insert v (dom (discovered s))\<close>
     using discover[unfolded dfs.discover_def] by auto
-  interpret s': complete_finite_weighted_graph \<open>ind' (insert v (dom (discovered s)))\<close> weight
-    using discover snd_pending_sane discovered_sane by (auto intro!: subgraph_complete)
+  interpret s': complete_finite_metric_graph \<open>ind' (insert v (dom (discovered s)))\<close>
+    using discover snd_pending_sane discovered_sane by (auto intro!: subgraph_complete_metric)
   have ppath': \<open>ppath s' = ppath s\<close>
     using discover[unfolded dfs.discover_def] by auto
   have a: \<open>on_discover fp0_params u v s' \<le> SPEC (\<lambda>r. r = \<lparr>ppath = ppath s' @ [v]\<rparr>)\<close>
@@ -233,20 +237,10 @@ proof (induction rule: dfs.establish_invarI)
         using s.tour_set_V[OF s_tour] discovered_sane apply fastforce
         using discover snd_pending_sane apply fast
         by (metis Un_empty discover(6,9) discovered_eq_finished_un_stack insert_absorb insert_absorb2 insert_ident insert_not_empty s'V(2) set_empty2)
-      have \<open>s'.the_path [p, v] p = [(p,weight p v,v),(v,weight v p,p)]\<close>
+      have \<open>s'.the_path [p, v] p = [(p,dist p v,v),(v,dist v p,p)]\<close>
         sorry
       then show ?thesis using edge_exists pv apply (auto simp: Cons Nil)
-    next
-      case (Cons a list)
-      then show ?thesis sorry
-    qed auto
-      term valid_graph.tour term the_path
-  qed auto
-    thm valid_graph.tour.cases
-    unfolding T'_def
-  from a b c d show ?case apply auto
-  with discover show ?case apply simp unfolding on_discover_def apply simp apply auto sorry
-qed auto
+        oops
 
   lemma i_no_path_no_P_discovered:
     "is_invar (\<lambda>s. ppath s = None \<longrightarrow> dom (discovered s) \<inter> Collect P = {})"
