@@ -903,8 +903,8 @@ definition (in valid_graph) the_path where
     n # ns \<Rightarrow> THE ps. map fst ps = nodelist \<and> is_path_undir G n ps lst)\<close>
 
 fun (in valid_graph) tour where \<comment> \<open>a node list counterpart to \<^const>\<open>is_hamiltonian_circuit\<close>\<close>
-  \<open>tour [] \<longleftrightarrow> True\<close> |
-  \<open>tour [n] \<longleftrightarrow> n \<in> V\<close> \<comment> \<open>no need to check for a loop here\<close> |
+  \<open>tour [] \<longleftrightarrow> V = {}\<close> |
+  \<open>tour [n] \<longleftrightarrow> V = {n}\<close> \<comment> \<open>no need to check for a loop here\<close> |
   \<open>tour (n#ns) \<longleftrightarrow> is_hamiltonian_circuit (the_path (n#ns) n)\<close>
 
 lemma ex1_edge_path: \<comment> \<open>In the general \<open>weight\<close> setting, commutativity would miss...\<close>
