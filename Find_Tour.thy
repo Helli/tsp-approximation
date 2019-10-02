@@ -172,29 +172,33 @@ qed (auto simp: edge_exists subsetD)
 
 context node_and_MST_in_graph begin
 
-lemma snd_pending_sane: \<open>dfs.is_invar (\<lambda>s. snd ` (pending s) \<subseteq> V)\<close>
-  apply (induction rule: dfs.establish_invarI)
-       apply auto
-  using dfs.E_ss apply auto[1]
-  using dfs.E_ss dfsV_V by blast
+lemma i_snd_pending_sane: \<open>dfs.is_invar (\<lambda>s. snd ` (pending s) \<subseteq> V)\<close>
+  by (induction rule: dfs.establish_invarI) (use dfs.E_ss in auto)
+lemmas (in fp0_invar) snd_pending_sane = i_snd_pending_sane[THEN make_invar_thm, rule_format]
 
-lemma stack_sane: \<open>dfs.is_invar (\<lambda>s. set (stack s) \<subseteq> V)\<close>
-  apply (induction rule: dfs.establish_invarI)
-       apply auto
-   apply (meson in_hd_or_tl_conv subset_iff)
-  unfolding dfs.discover_def apply auto
-  using snd_pending_sane by (meson DFS_invar.make_invar_thm img_snd subset_iff)
+lemma i_stack_sane: \<open>dfs.is_invar (\<lambda>s. set (stack s) \<subseteq> V)\<close>
+proof (induction rule: dfs.establish_invarI)
+  case (finish s s' u)
+  then show ?case
+    by auto (meson in_hd_or_tl_conv subset_iff)
+next
+  case (discover s s' u v)
+  then show ?case unfolding dfs.discover_def
+    by auto (use i_snd_pending_sane in \<open>meson DFS_invar.make_invar_thm img_snd subset_iff\<close>)
+qed auto
+lemmas (in fp0_invar) stack_sane = i_stack_sane[THEN make_invar_thm, rule_format]
 
-lemma discovered_sane: \<open>dfs.is_invar (\<lambda>s. dom (discovered s) \<subseteq> dfs.V)\<close>
+lemma i_discovered_sane: \<open>dfs.is_invar (\<lambda>s. dom (discovered s) \<subseteq> dfs.V)\<close>
 proof (induction rule: dfs.establish_invarI)
   case (discover s s' u v) then interpret fp0_invar where s=s
     using node_and_MST_in_graph_axioms by blast
-  show ?case using discover unfolding dfs.discover_def unfolding T'_def apply auto
-    using snd_pending_sane[THEN make_invar_thm, rule_format] by blast
+  show ?case using discover unfolding dfs.discover_def
+    by (auto simp: T'_def) (use snd_pending_sane in blast)
 qed auto
+lemmas (in fp0_invar) discovered_sane = i_discovered_sane[THEN make_invar_thm, rule_format]
 
 lemma \<open>dfs.is_invar (\<lambda>s. valid_graph.tour (ind' (dom (discovered s))) (ppath s))\<close>
-proof (induct rule: dfs.establish_invarI)
+proof (induction rule: dfs.establish_invarI)
   case (discover s s' u v) then interpret fp0_invar where s=s
     using node_and_MST_in_graph_axioms by blast
   have \<open>complete_finite_weighted_graph (ind' (dom (discovered s))) weight\<close>
