@@ -86,7 +86,7 @@ lemma finite05': \<open>finite {v'. \<exists>w. (v', w, v) \<in> T.E}\<close>
 
 definition T' where
   \<open>T' = \<lparr>g_V = V, g_E = {(v,v'). (\<exists>w.(v,w,v')\<in>T.E) \<or> (\<exists>w.(v',w,v)\<in>T.E)}, g_V0 = {v\<^sub>0}\<rparr>\<close>
-sublocale dfs: DFS T' fp0_params
+sublocale dfs: DFS T' fp0_params \<comment> \<open>to-do: try without qualifier\<close>
   apply unfold_locales
   apply (auto simp: T'_def E_validD v_in_TV v_in_V)
   using T.E_validD(1) n_in_TV_iff apply blast
@@ -95,11 +95,14 @@ sublocale dfs: DFS T' fp0_params
   using T.E_validD(1) n_in_TV_iff apply blast
   by (simp_all add: finite05 finite05' T.E_valid)
 
+lemma dfsV_V[simp]: \<open>dfs.V = V\<close>
+  by (simp add: T'_def)
+
+lemma start_nodes_are_nodes[simp]: "v \<in> dfs.V0 \<Longrightarrow> v \<in> V"
+  by (simp add: T'_def v_in_V)
+
 lemma finite_dfsgraph_reachable: \<open>finite dfs.reachable\<close>
   using dfs.finite_E by (simp add: T'_def)
-
-lemma finite_dfsgraph_V0: \<open>finite dfs.V0\<close>
-  by blast
 
   lemma [simp]: 
     "ppath (dfs.empty_state \<lparr>ppath = e\<rparr>) = e"
@@ -176,10 +179,34 @@ lemma (in complete_finite_weighted_graph) complete_graph_delete_node:
 
 context node_and_MST_in_graph begin
 
+lemma snd_pending_sane: \<open>dfs.is_invar (\<lambda>s. snd ` (pending s) \<subseteq> V)\<close>
+  apply (induction rule: dfs.establish_invarI)
+       apply auto
+  using dfs.E_ss apply auto[1]
+  using dfs.E_ss dfsV_V by blast
+
+lemma stack_sane: \<open>dfs.is_invar (\<lambda>s. set (stack s) \<subseteq> V)\<close>
+  apply (induction rule: dfs.establish_invarI)
+       apply auto
+   apply (meson in_hd_or_tl_conv subset_iff)
+  unfolding dfs.discover_def apply auto
+  using snd_pending_sane by (meson DFS_invar.make_invar_thm img_snd subset_iff)
+
+lemma discovered_sane: \<open>dfs.is_invar (\<lambda>s. dom (discovered s) \<subseteq> dfs.V)\<close>
+proof (induction rule: dfs.establish_invarI)
+  case (discover s s' u v) then interpret fp0_invar where s=s
+    using node_and_MST_in_graph_axioms by blast
+  show ?case using discover unfolding dfs.discover_def unfolding T'_def apply auto
+    using snd_pending_sane[THEN make_invar_thm, rule_format] by blast
+qed auto
+
 lemma \<open>dfs.is_invar (\<lambda>s. valid_graph.tour (ind' (dom (discovered s))) (ppath s))\<close>
 proof (induct rule: dfs.establish_invarI)
   case (discover s s' u v) then interpret fp0_invar where s=s
     using node_and_MST_in_graph_axioms by blast
+  have \<open>complete_finite_weighted_graph (ind' (dom (discovered s))) weight\<close>
+    apply (rule subgraph_complete)
+    apply auto
   from discover have ne: "stack s \<noteq> []" by simp
   from discover have vnis: "v\<notin>set (stack s)" using stack_discovered by auto
   have discovered'[simp]: \<open>dom (discovered s') = insert v (dom (discovered s))\<close>
