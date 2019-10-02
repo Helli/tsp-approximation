@@ -905,7 +905,19 @@ definition (in valid_graph) the_path where
 fun (in valid_graph) tour where \<comment> \<open>a node list counterpart to \<^const>\<open>is_hamiltonian_circuit\<close>\<close>
   \<open>tour [] \<longleftrightarrow> V = {}\<close> |
   \<open>tour [n] \<longleftrightarrow> V = {n}\<close> \<comment> \<open>no need to check for a loop here\<close> |
-  \<open>tour (n#ns) \<longleftrightarrow> is_hamiltonian_circuit (the_path (n#ns) n)\<close>
+  \<open>tour (n#ns) \<longleftrightarrow> (let path = the_path (n#ns) n in
+    map fst path = n#ns \<and> is_path_undir G n path n \<comment> \<open>check that it is what we want it to be\<close>
+    \<and> is_hamiltonian_circuit path)\<close>
+
+lemma (in valid_graph) tour_set_V: \<open>tour ps \<Longrightarrow> set ps = V\<close>
+  apply (cases ps) apply simp_all
+  apply (case_tac list) apply simp_all
+  by (metis int_vertices_def is_hamiltonian_circuit_int_vertices list.set(2))
+
+lemma (in valid_graph) tour_distinct: \<open>tour ps \<Longrightarrow> distinct ps\<close>
+  apply (cases ps) apply simp_all
+  apply (case_tac list) apply simp_all
+  by (metis distinct.simps(2) is_cycle_distinct is_hamiltonian_circuit_is_cycle list.set_intros)
 
 lemma ex1_edge_path: \<comment> \<open>In the general \<open>weight\<close> setting, commutativity would miss...\<close>
   assumes \<open>distinct (n#ns)\<close> \<comment> \<open>inequality of neighbouring nodes suffices...\<close>
