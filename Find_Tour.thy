@@ -170,13 +170,6 @@ proof unfold_locales
     using edge_unique by auto
 qed (auto simp: edge_exists subsetD)
 
-lemma (in complete_finite_weighted_graph) complete_graph_delete_node:
-  \<open>v \<in> V \<Longrightarrow> complete_finite_weighted_graph (delete_node v G) weight\<close>
-  apply intro_locales
-  apply (simp add: valid_graph_axioms)
-  using complete_finite_weighted_graph.axioms(1) complete_finite_weighted_graph_delete_node finite_graph.axioms(2) finite_weighted_graph_def apply blast
-  using complete_finite_weighted_graph_def complete_finite_weighted_graph_delete_node by blast
-
 context node_and_MST_in_graph begin
 
 lemma snd_pending_sane: \<open>dfs.is_invar (\<lambda>s. snd ` (pending s) \<subseteq> V)\<close>
