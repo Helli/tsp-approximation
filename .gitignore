@@ -2,3 +2,11 @@
 output/*
 thesis/output/*
 p137-lammich.pdf
+slides/slides.aux
+slides/slides.log
+slides/slides.nav
+slides/slides.out
+slides/slides.pdf
+slides/slides.snm
+slides/slides.synctex.gz
+slides/slides.toc
