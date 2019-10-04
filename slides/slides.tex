@@ -1,0 +1,313 @@
+\documentclass[%handout,
+	sans,
+	12pt,
+	%slidescentered,% center text on slide
+	%draft,			% compile as draft version
+	%notes,			% include nodes in slides
+	%compress		% compress navigation bar
+]{beamer}
+
+\beamertemplatenavigationsymbolsempty
+
+\usetheme{default}
+\usecolortheme{orchid}
+\setbeamertemplate{frametitle}
+{
+    \vspace*{1.5em}\insertframetitle\vspace*{-1.5em}
+}
+\setbeamertemplate{footline}[frame number]
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8x]{inputenc}
+
+\usepackage{mathpazo}
+\usepackage[british]{babel}
+\usepackage{csquotes}
+
+\newcommand{\high}[1]{{\usebeamercolor[fg]{structure} #1}}
+\newcommand{\bad}[1]{\textcolor{red}{#1}}
+\newcommand{\gray}[1]{\textcolor{darkgray}{#1}}
+\newcommand{\black}[1]{\textcolor{black}{#1}}
+
+\usepackage{amsmath,amssymb}
+\usepackage{upgreek}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{colortbl}
+\usepackage{url}
+\usepackage{setspace}
+\usepackage{wrapfig}
+\usepackage{tabularx}
+\usepackage{xspace}
+\usepackage{mathpartir}
+
+\usepackage{tikz}
+\usetikzlibrary{trees, positioning}
+\usetikzlibrary{shapes.geometric}
+
+
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\QQ}{\mathbb{Q}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\CC}{\mathbb{C}}
+\renewcommand{\epsilon}{\varepsilon}
+\renewcommand{\phi}{\varphi}
+\def\braces#1{[#1]}
+\newcommand{\wrt}{w.\,r.\,t.\xspace}
+\newcommand{\eg}{e.\,g.\xspace}
+\newcommand{\ie}{i.\,e.\xspace}
+\DeclareMathOperator\caret{\char`\^}
+
+\newcommand{\hastype}{\,:\,}
+\newcommand{\cons}{::}
+\newcommand{\corrto}{\overset{\scriptscriptstyle\wedge}{=}}
+\newcommand{\listapp}{\mathbin{@}}
+\newcommand{\listnil}{[\hskip0.3mm]}
+\newcommand{\listnth}{\mathbin{!}}
+\newcommand{\expectation}{\text{\upshape E}}
+
+\usepackage{manfnt}
+\newenvironment{danger}{\medbreak\noindent\hangindent=2pc\hangafter=-2%
+  \clubpenalty=10000%
+  \hbox to0pt{\hskip-\hangindent\hskip0.25em\raisebox{-0.25em}[0pt][0pt]{\dbend}\hfill}\small\ignorespaces}%
+  {\medbreak\par}
+  %\raisebox{-1.05em}[0pt][0pt]{\Huge\hskip.15em \stixdanger}
+
+\newcommand{\etAl}{\textit{et al.}\xspace}
+
+%\definecolor{mybg}{rgb}{0.9,0.9,0.9}
+\definecolor{mybg}{rgb}{1,1,1}
+\setbeamercolor{background canvas}{bg=mybg}
+
+\title{Verification of an Approximation Algorithm for the Metric Travelling Salesperson Problem \vspace*{-0.5em}}
+\author{\normalsize Fabian Hellauer}
+\institute[]{\footnotesize Technische Universität München}
+\date{\footnotesize16 Oktober 2019}
+
+\begin{document}
+
+\maketitle
+
+\begin{frame}
+\begin{center}
+\includegraphics[width=5cm]{isabelle.pdf}
+\end{center}
+\end{frame}
+
+\tableofcontents	%to-do: remove
+
+\newcommand{\pivot}[1]{{\color{red}#1}}
+\newcommand{\ltpiv}[1]{{\color{blue}#1}}
+\newcommand{\gtpiv}[1]{{\color{olive}#1}}
+
+\section{Verification of Mathematics}%to-do: change to "algorithms", but maybe mention that Mathematics can be precondition
+\begin{frame}{Verification of Mathematics}%in particular widely accepted Mathematics like Linear Algebra
+Reasons:
+\begin{itemize}
+	\item to obtain a basis for more useful results\pause
+	%as a computer scientist, I mainly think of algorithms and their correctness
+	\item to find mistakes\pause
+	\item to prove that verification %of a handfull of pages
+	is feasible (when using modern tools)
+	%this could be motivation to do more math theories, because it removes the need for experts to get them accepted.
+\end{itemize}
+\end{frame}
+
+
+\section{Tool assistance}
+\begin{frame}{Tool assistance}% how Isabelle helps in verifying
+Isabelle enforces great precision, but also helps:
+\begin{itemize}
+	\item automatic proofs for simple lemmas\pause %rather: for *trivial* statements
+	\item information about the proof state, e.g.\ pending sub-proofs
+	%at any point in a proof. (example: induction over natural numbers).
+	%And once again, simple sub-goals can be solved automatically.
+\end{itemize}
+\end{frame}
+
+\section{HOL-Algebra}
+\begin{frame}
+\begin{center}
+\huge\high{Algebraic Structures in HOL-Algebra}%Isabelle's library of abstract algebra, where groups and rings are defined
+\end{center}
+\end{frame}
+
+\subsection{Motivational Example}
+\begin{frame}{Motivational Example}
+	Why use HOL-Algebra?\pause
+	
+	\high{To formalise Galois theory!}\pause
+	\begin{theorem}
+		\upshape
+		The polynomial $x^5 − x − 1$ has no root described by an expression of integers, $n$th roots and basic arithmetic operations.
+	\end{theorem}\pause% we are interested in the field of rationals + the roots
+	% type would depend on the constants. This is not possible in this logic.
+	% One could model one particular type (the supertype), for different constants one would have to start again.
+	% There is no quanitification over types
+	\bad{I won't get that far!}
+\end{frame}
+
+\section{Field Extensions}
+\begin{frame}
+\begin{center}
+	\huge\high{Field Extensions}
+\end{center}
+\end{frame}
+
+\begin{frame}
+
+A \emph{field extension} $L/K$ is a field $(\mkern-3mu\mid\mkern-6mu L,\otimes,1,\oplus,0\mkern-6mu\mid\mkern-3mu)$ where $K$ is a subset of $L$ and $(\mkern-3mu\mid\mkern-6mu K,\otimes,1,\oplus,0\mkern-6mu\mid\mkern-3mu)$ is again a field.
+\begin{itemize}
+\item $K/K$, $[K:K] = 1$\pause
+%problem for a formalisation: K is often identified with its carrier set
+\item $\RR/\QQ$, $[\RR:\QQ]=\infty$\pause
+\item $\QQ(\sqrt{3})/\QQ$, $[\QQ(\sqrt{3}):\QQ] = 2$ %Field extensions like these are interesting when doing Galois theory.
+\end{itemize}
+\end{frame}
+
+\section{Results} % what I contributed
+
+\subsection{Vector Spaces}
+\begin{frame}{Vector Spaces}\pause
+$U \subseteq V$ is a \emph{subspace} iff it is a vector space with $V$'s operations.
+%over the same field
+\begin{theorem}
+\upshape
+Let $U \subseteq V$ be a subspace. Then:
+\begin{itemize}
+	\item $dim_K(U) \le dim_K(V)$.
+	\item If $dim_K(U)=dim_K(V) < \infty$, then $U = V$.
+\end{itemize} %needed basis extension theorem. As you see, many lemmas I needed were missing.
+\end{theorem}\pause
+\begin{theorem}
+\upshape
+Let $n := dim_K(V) < \infty$. Then $V \cong K^n$.
+% Note that the map is not explicitely given.
+\end{theorem}
+\end{frame}
+
+\subsection{Classification of simple algebraic extensions}
+\subsubsection{Minimal Polynomial}
+\begin{frame}{Minimal Polynomial}%We are in a context where we have fixed L/K and some α∈L
+\textbf{definition} \textit{irr} \textbf{where}\\
+\hskip1em\textit{irr = (ARG-MIN degree p.}\\
+\hskip2em\textit{p ∈ carrier P ∧ monic p ∧ Eval p = $\textbf{0}_L$)}\pause%isabelle does not help in determining "L"
+\\[4mm]
+\textbf{context}\\
+\hskip1em\textbf{assumes} \textit{algebraic}\\%explain algebraic
+\textbf{begin}\\[2mm]\pause
+
+(...38 lines later)\\[2mm]
+\textbf{lemma} \textit{irr ∈ carrier P} \textbf{and} \textit{monic irr} \textbf{and} \textit{Eval irr = $\textbf{0}_L$}\\\pause
+\textbf{and} \textit{irr ≠ \textbf{0}}\\\pause
+\textbf{and} \textit{degree irr > 0}\pause
+\\[3mm]
+Uniqueness of the minimal polynomial takes another 180 lines. %But this is part of an actual proof, so this to be expected
+%We keep that "algebraic" assumption for a bit...
+\end{frame}
+
+\begin{frame}{Minimal Polynomial II}
+Next up:\\\pause
+\textbf{lemma} \textit{ring-irreducible irr}\\\pause
+\high{The library helps with the proof:}\hskip1em\pause :-)\\\pause%happened rarely
+\hskip1em\textit{Eval} is a homomorphism $P → L$.\\\pause
+\hskip1em$(irr)$ is the preimage of $\{\textbf{0}\}$ under $Eval$.\\\pause %The set of elements which Eval maps to zero
+%Do I need to explain (irr)?
+%other library facts tell us that (0) is a primeideal and ↓
+\hskip1em Thus, $(irr)$ is a prime ideal.\\[4mm]\pause % The claim follows
+(...)\\[4mm]\pause%Some other transformations
+\begin{theorem}
+	$P/(irr) \cong K(\alpha)$%If \alpha is algebraic
+\end{theorem}%overall close to 400 lines because I had to define algebraic first
+%There is actually quite a bit about such quotient structures
+\end{frame}
+
+\section{Problems}
+\begin{frame}{Problems}\pause
+\begin{itemize}
+	\item missing lemmas, missing definitions\pause %that's how I got to do vectorspace proofs
+	\item Bases are sets.\\\pause
+	\bad{Sets do not have an ordering}
+	\item Coefficients are functions.\\\pause
+	\bad{need to prove membership in the correct function set at \emph{every} step.}
+\end{itemize}
+\end{frame}
+
+\subsection{Encoding}
+\begin{frame}{Encoding of $\infty$}%relevant?
+Can we use type \emph{nat} for the degree of field extensions?\pause
+\begin{itemize}
+\item The degree is a vector space dimension.\pause%these *can* be zero (iff zvs)
+\item However, it is always $\ge 1$.\pause
+\item Thus, this encoding strips no information:\\%It could be adapted easily to use extended natural numbers
+\textbf{definition} \textit{degree} \textbf{where}\\
+\hskip1em\textit{degree = (if finite then vs.dim else 0)}
+\end{itemize}
+\end{frame}
+
+\section{Example Instantiation}
+
+\begin{frame}{Example Instantiation}%An easy lemma as example
+An explicit description of simple extensions: %at least *more* explicit, still using set comprehension
+%I have proven this, in fact also used it in the previous proof at the end, just skipped over it.
+\[K(\alpha) = \{f(\alpha)/g(\alpha) | f,g \in P, g(\alpha) ≠ \textbf{$0_L$}\}\]\pause
+An instance of this:\\
+\[\RR(i) = \CC\]\pause
+\textbf{definition} \textit{complex-field = (carrier = (UNIV\hastype complex set), monoid.mult = (*), one = 1, zero = 0, add = (+))}
+\end{frame}
+
+\begin{frame}
+
+\textbf{lemma} generate\_field\_i\_UNIV:\\
+\hskip1em\textit{generate-field complex-field (insert 𝗂 $\RR$) = UNIV}\\
+\textbf{proof} -\\
+\hskip1em\textbf{interpret} \textit{UP-field-extension complex-field ℝ P 𝗂}\\
+\hskip2em(...)\\
+\hskip1em \textbf{fix} \textit{x :: complex}\\
+\hskip1em \textbf{let} \textit{?f = monom P (Im x) 1 $⊕_P$ monom P (Re x) 0}\\
+\hskip1em \textbf{let} \textit{?g = monom P 1 0}\\[1mm]%no creativity. the term is too large when written like this
+\hskip1em(...)\\[1mm]
+\hskip1em \textbf{have} \textit{x = Eval ?f $\oslash_\text{complex-field}$ Eval ?g ∧ ?f ∈ carrier P\\\hskip2em
+	∧ ?g ∈ carrier P ∧ Eval ?g ≠ $\textbf{0}_\text{complex-field}$}\\[1mm]
+\hskip1em(...)\\[1mm]
+\textbf{qed}% ~30 lines
+
+\end{frame}
+
+\section{Contributions}
+\begin{frame}{Contributions}
+\begin{itemize}
+	\item Vector Spaces: 850 lines, 75 lines preliminaries\pause
+	\item Field Extensions: 820 lines, 100 lines preliminaries\pause%hard to distinguish
+	\item 400 lines in an old development\pause %annoying, mostly about subrings, which were not even defined when I started
+	\item 120 lines example instantiations\pause %to test definitions
+	\item improvements to the "VectorSpace" library\pause
+	\item Documentation: 300 lines (= 10 pages)
+	%everything counted once. About 550 changesets.
+\end{itemize}
+\end{frame}
+
+\section{Conclusion}
+\begin{frame}{Conclusion}
+% partly stolen from Manuel
+\begin{itemize}
+\item Formalisation of textbook algebra is hard work when using Isabelle.\pause%but possible
+\item Proofs get long due to a variety of reasons.\pause
+\item Good libraries can help a lot.\pause\\[6mm] % as seen with the last result
+%(If you don't like what you do, defer it to someone else)
+\end{itemize}
+Interesting project for HOL-Algebra:\\[2mm]
+GaloisCVC by P.\ E.\ de Vilhena, M.\ Baillon and L.\ Paulson (ALEXANDRIA grant)
+%so, I will keep an eye out on what happens to HOL-Algebra.
+%If someone with push access wants to include my material, they can send me questions, I will try and answer them.
+%The documentation is almost finished.
+%Are there questions now?
+\end{frame}
+
+\section{Reference}
+\begin{frame}{Reference}
+	G.\ Kemper. Algebra. German lecture notes, 2018. \url{http://www-m11.ma.tum.de/fileadmin/w00bnb/www/people/kemper/lectureNotes/algebra\_nodates.pdf} 
+\end{frame}
+
+\end{document}
