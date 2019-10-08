@@ -80,7 +80,7 @@
 \definecolor{mybg}{rgb}{1,1,1}
 \setbeamercolor{background canvas}{bg=mybg}
 
-\title{Verification of an Approximation Algorithm for the Metric Travelling Salesperson Problem \vspace*{-0.5em}}
+\title{Verification of an Approximation Algorithm for the Metric Travelling Salesperson Problem}
 \author{\normalsize Fabian Hellauer}
 \institute[]{\footnotesize Technische Universität München}
 \date{\footnotesize16 Oktober 2019}
@@ -107,7 +107,7 @@ Reasons:
 \begin{itemize}
 	\item a basis for reliable software\pause
 	\item find mistakes in algorithm explanations\pause
-	\item prove that verification %of a handfull of pages
+	\item prove that verification %of a handful of pages
 	is feasible (when using modern tools)\pause
 	%this could be motivation to do more math theories, because it removes the need for experts to get them accepted.
 \end{itemize}
@@ -260,24 +260,6 @@ An explicit description of simple extensions: %at least *more* explicit, still u
 An instance of this:\\
 \[\RR(i) = \CC\]\pause
 \textbf{definition} \textit{complex-field = (carrier = (UNIV\hastype complex set), monoid.mult = (*), one = 1, zero = 0, add = (+))}
-\end{frame}
-
-\begin{frame}
-
-\textbf{lemma} generate\_field\_i\_UNIV:\\
-\hskip1em\textit{generate-field complex-field (insert 𝗂 $\RR$) = UNIV}\\
-\textbf{proof} -\\
-\hskip1em\textbf{interpret} \textit{UP-field-extension complex-field ℝ P 𝗂}\\
-\hskip2em(...)\\
-\hskip1em \textbf{fix} \textit{x :: complex}\\
-\hskip1em \textbf{let} \textit{?f = monom P (Im x) 1 $⊕_P$ monom P (Re x) 0}\\
-\hskip1em \textbf{let} \textit{?g = monom P 1 0}\\[1mm]%no creativity. the term is too large when written like this
-\hskip1em(...)\\[1mm]
-\hskip1em \textbf{have} \textit{x = Eval ?f $\oslash_\text{complex-field}$ Eval ?g ∧ ?f ∈ carrier P\\\hskip2em
-	∧ ?g ∈ carrier P ∧ Eval ?g ≠ $\textbf{0}_\text{complex-field}$}\\[1mm]
-\hskip1em(...)\\[1mm]
-\textbf{qed}% ~30 lines
-
 \end{frame}
 
 \section{Contributions}
