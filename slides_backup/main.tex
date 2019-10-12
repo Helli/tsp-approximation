@@ -1,3 +1,21 @@
+%todo: compare to the plan from the meeting:
+%25+5min
+
+%explain in the presentation:
+
+%Approximation algorithms, Hamiltonian circuit? *metric* TSP? 5min
+%{Algorithm! abstract aufzeichnen
+%abstracter code (algo_sketch) zusammen mit spezifikation und "l"
+%mit phases
+%refinement von phase 1
+%und bei 2+3 pläne} 5min
+%Bibliotheken vorstellen, Wahl begründen
+%--> Graphformalisierungen: directed vs. undirected edges in both phases. Welche gibt es alle?
+%edge labels, i.e. a third field besides start node and end node 5min
+%MST lemma zeigen, wieso nicht Graph_Theory? 5min
+%was ist der projektstatus? 5min
+%maybe a slide about the commit count?
+
 \documentclass[%handout,
 	sans,
 	12pt,
@@ -83,7 +101,7 @@
 \title{Verification of an Approximation Algorithm for the Metric Travelling Salesperson Problem}
 \author{\normalsize Fabian Hellauer}
 \institute[]{\footnotesize Technische Universität München}
-\date{\footnotesize16 Oktober 2019}
+\date{\footnotesize16 October 2019}
 
 \begin{document}
 
@@ -101,6 +119,32 @@
 \newcommand{\ltpiv}[1]{{\color{blue}#1}}
 \newcommand{\gtpiv}[1]{{\color{olive}#1}}
 
+\section{Isabelle}
+\begin{frame}{Isabelle}
+    \begin{itemize}
+        \item information about the proof state, e.g.\ pending sub-proofs
+    \end{itemize}
+\end{frame}
+\section{Metric TSP}
+\section{Approximation Algorithms}
+\section{MST Heuristic} %advance the 2-approx-proof during the phases or maybe add another slide?
+    \subsection{MST Generation}
+    \subsection{Tour Search}
+    \subsection{Duplicate Removal}
+    \subsection{Resource Usage Analysis?}%or maybe at the very end?
+\section{Results}
+    \subsection{Algorithm Sketch} %"to see how the specification and algorithm look in the framework"
+    %to-do: how to handle context here?
+    \subsection{Library Connections}
+    \subsection{Simplification of Phase Two?}% not really my work, but something which slowed me down...
+\section{Plans}
+    \subsection{Input Generation} %how to generate input that fulfils the specification
+    %maybe also mention the drilling robot during this slide
+    \subsection{Last Pieces of a DFS Invariant}
+    
+% add draft slide from the meeting
+
+\section{---------old-from-here---------}
 \section{Verification of Algorithms}
 \begin{frame}{Verification of Algorithms}
 Reasons:
@@ -128,7 +172,7 @@ Isabelle enforces great precision, but also helps:
 \end{frame}
 
 \section{Approximation Algorithms}
-% after the graphic: Since we work with undirected graphs, the reverse of a TSP tour is also a TSP tour (I omitted these dulicates in the graphic)
+% after the graphic: Since we work with undirected graphs, the reverse of a TSP tour is also a TSP tour (I omitted these duplicates in the graphic)
 \begin{frame}
 \begin{center}
 \huge\high{Approximation Algorithms}
@@ -137,19 +181,20 @@ Isabelle enforces great precision, but also helps:
 
 \subsection{Approximation Algorithms}
 \begin{frame}{Approximation Algorithms}
-	What are Approximation Algorithms?\pause
+	What are Approximation Algorithms?\pause%to-do: explain based on (metric) TSP
 	\vspace{1em}
 	\includegraphics[width=\linewidth]{OPT_line}
 	%OPT is the performance of an *actual* algorithm, namely the brute-force algorithm that tries all exponentially many node sequences.
 	\vspace{1em}\pause
-	\high{solutions for NP-complete problems in polynomial time!}\pause
+	
+	\high{Good solutions for NP-complete problems in polynomial time!}\pause
 	\begin{theorem}
 		\upshape
 		The polynomial $x^5 − x − 1$ has no root described by an expression of integers, $n$th roots and basic arithmetic operations.
 	\end{theorem}\pause% we are interested in the field of rationals + the roots
 	% type would depend on the constants. This is not possible in this logic.
 	% One could model one particular type (the supertype), for different constants one would have to start again.
-	% There is no quanitification over types
+	% There is no quantification over types
 	\bad{I won't get that far!}
 \end{frame}
 
