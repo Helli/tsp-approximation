@@ -120,11 +120,6 @@
 \newcommand{\gtpiv}[1]{{\color{olive}#1}}
 
 \section{Isabelle}
-\begin{frame}{Isabelle}
-    \begin{itemize}
-        \item information about the proof state, e.g.\ pending sub-proofs
-    \end{itemize}
-\end{frame}
 \section{Metric TSP}
 \section{Approximation Algorithms}
 \section{MST Heuristic} %advance the 2-approx-proof during the phases or maybe add another slide?
@@ -144,59 +139,33 @@
     
 % add draft slide from the meeting
 
-\section{---------old-from-here---------}
+\section{---------slides from here---------}
 \section{Verification of Algorithms}
 \begin{frame}{Verification of Algorithms}
 Reasons:
 \begin{itemize}
 	\item a basis for reliable software\pause
 	\item find mistakes in algorithm explanations\pause
-	\item prove that verification %of a handful of pages
-	is feasible (when using modern tools)\pause
-	%this could be motivation to do more math theories, because it removes the need for experts to get them accepted.
+	\item prove that verification of executable programs
+	is feasible\ % when using a modern tool like
+	 (when using \includegraphics[height=1em]{isabelle.pdf}Isabelle)\pause
 \end{itemize}
 Mathematical results might be a requirement.
 %In this case here, from graph theory.
 \end{frame}
 
-
-\section{Tool assistance}
-\begin{frame}{Tool assistance}% how Isabelle helps in verifying
-Isabelle enforces great precision, but also helps:
-\begin{itemize}
-	\item automatic proofs for simple lemmas\pause %rather: for *trivial* statements
-	\item information about the proof state, e.g.\ pending sub-proofs
-	%at any point in a proof. (example: induction over natural numbers).
-	%And once again, simple sub-goals can be solved automatically.
-\end{itemize}
-\end{frame}
-
 \section{Approximation Algorithms}
-% after the graphic: Since we work with undirected graphs, the reverse of a TSP tour is also a TSP tour (I omitted these duplicates in the graphic)
-\begin{frame}
-\begin{center}
-\huge\high{Approximation Algorithms}
-\end{center}
-\end{frame}
-
-\subsection{Approximation Algorithms}
 \begin{frame}{Approximation Algorithms}
 	What are Approximation Algorithms?\pause%to-do: explain based on (metric) TSP
 	\vspace{1em}
 	\includegraphics[width=\linewidth]{OPT_line}
 	%OPT is the performance of an *actual* algorithm, namely the brute-force algorithm that tries all exponentially many node sequences.
-	\vspace{1em}\pause
+	\vspace{1em}\pause %Since we consider undirected graphs, the reverse of a TSP tour is also a TSP tour (I omitted these duplicates in the graphic)
 	
-	\high{Good solutions for NP-complete problems in polynomial time!}\pause
-	\begin{theorem}
-		\upshape
-		The polynomial $x^5 − x − 1$ has no root described by an expression of integers, $n$th roots and basic arithmetic operations.
-	\end{theorem}\pause% we are interested in the field of rationals + the roots
-	% type would depend on the constants. This is not possible in this logic.
-	% One could model one particular type (the supertype), for different constants one would have to start again.
-	% There is no quantification over types
-	\bad{I won't get that far!}
+	\high{Good solutions for NP-complete problems in polynomial time!}
 \end{frame}
+
+\section{------very old from here------}
 
 \section{Field Extensions}
 \begin{frame}
