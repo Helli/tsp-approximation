@@ -158,6 +158,20 @@ Mathematical results might be a requirement.
 %In this case here, from graph theory.
 \end{frame}
 
+\section{Metric TSP}
+\begin{frame}
+	TSP is the problem of finding a tour of minimal cost within a graph.\\\pause
+	We consider the special case where the nodes form a \textit{metric} with their weights.\\\pause
+	In particular,\pause
+	\begin{itemize}
+		\item \textit{weight} is total
+		% All TSP cities are connected by an edge, in other words we require the graph to be complete.
+		\item $\textit{weight}\ v_1\ v_3\ \leq\ \textit{weight}\ v_1\ v_2\ +\ \textit{weight}\ v_2\ v_3$
+		\item $0\ \leq\ \textit{weight}\ v_1\ v_2$\pause
+	\end{itemize}
+	In such a graph, the cost of a \textit{minimum spanning tree} is a lower bound on the optimal tour cost.
+\end{frame}
+
 \section{Approximation Algorithms}
 \begin{frame}{Approximation Algorithms}
 	What are Approximation Algorithms?\pause%to-do: explain based on (metric) TSP
