@@ -3,7 +3,6 @@
 
 %explain in the presentation:
 
-%Approximation algorithms, Hamiltonian circuit? *metric* TSP? 5min
 %{Algorithm! abstract aufzeichnen
 %abstracter code (algo_sketch) zusammen mit spezifikation und "l"
 %mit phases
@@ -15,6 +14,7 @@
 %MST lemma zeigen, wieso nicht Graph_Theory? 5min
 %was ist der projektstatus? 5min
 %maybe a slide about the commit count?
+%add dfs-sublocale statement to plans. "This is already proven. However, the set membership must be implemented..."
 
 \documentclass[%handout,
 	sans,
@@ -225,7 +225,7 @@ Transform the pretour into a TSP tour:
 %typically we require TSP tours to visits each node exactly once. Our sequence doesn't do that yet.
 \begin{itemize}
 	\item remove duplicate visits, replace them by shortcuts.
-	%That means that when the sequence goes to am already visited node, we instead jump to the next one
+	%That means that when the sequence goes to an already visited node, we instead jump to the next one
 \end{itemize}
 These shortcuts always exist and do not increase the cost. %That is why we require a complete metric graph
 \end{frame}
@@ -251,20 +251,24 @@ overall: $\mathcal{O}(n^2 \log n)$
 \begin{frame}{Algorithm Sketch}%to-do: rename to "Specification"?
 %We have a fixed graph here, OPT depends on it
 \begin{isabelle}
-	SPEC\ {\isacharparenleft}{\isasymlambda}T{\isachardot}\ is{\isacharunderscore}Hamiltonian{\isacharunderscore}circuit\ T\ {\isasymand}\ cost\ T\ {\isasymle}\ OPT\ {\isacharplus}\ OPT{\isacharparenright}{\isacartoucheclose}%explain lack of multiplication
-\end{isabelle}
-is fulfilled by %if the graph ()G) is complete and metric
-\begin{isabelle}
+	\isacommand{definition}\isamarkupfalse%
+	\ two{\isacharunderscore}approx\ \isakeyword{where}\isanewline
+	\ \ {\isacartoucheopen}two{\isacharunderscore}approx\ {\isacharequal}\ SPEC\ {\isacharparenleft}{\isasymlambda}T{\isachardot}\ is{\isacharunderscore}tour\ T\ {\isasymand}\ cost\ T\ {\isasymle}\ OPT\ {\isacharplus}\ OPT{\isacharparenright}{\isacartoucheclose}%explain lack of multiplication
+	\vspace{1mm}\pause
 	\isacommand{definition}\isamarkupfalse%
 	\ algorithm{\isacharunderscore}sketch\ \isakeyword{where}\ {\isacartoucheopen}algorithm{\isacharunderscore}sketch\ {\isacharequal}\isanewline
 	do\ {\isacharbraceleft}\isanewline
 	\ \ MST\ {\isasymleftarrow}\ SPEC\ {\isacharparenleft}{\isasymlambda}E{\isacharprime}{\isachardot}\ minimum{\isacharunderscore}spanning{\isacharunderscore}tree\ {\isacharparenleft}ind\ E{\isacharprime}{\isacharparenright}\ G{\isacharparenright}{\isacharsemicolon}\isanewline
-	\ \ pretour\ {\isasymleftarrow}\ SPEC\ {\isacharparenleft}{\isasymlambda}pT{\isachardot}\ int{\isacharunderscore}vertices\ pT\ {\isacharequal}\ nodes\ G\ {\isasymand}\ cost\ pT\ {\isasymle}\\ \ \ \ \ set{\isacharunderscore}cost\ MST\ {\isacharplus}\ set{\isacharunderscore}cost\ MST{\isacharparenright}{\isacharsemicolon}\isanewline
-	\ \ Tour\ {\isasymleftarrow}\ SPEC\ {\isacharparenleft}{\isasymlambda}T{\isachardot}\ is{\isacharunderscore}Hamiltonian{\isacharunderscore}circuit\ T\ {\isasymand}\ cost\ T\ {\isasymle}\ cost\\ \ \ \ \ pretour{\isacharparenright}{\isacharsemicolon}\isanewline
-	\ \ RETURN\ Tour\isanewline
+	\ \ pretour\ {\isasymleftarrow}\ SPEC\ {\isacharparenleft}{\isasymlambda}pT{\isachardot}\ int{\isacharunderscore}vertices\ pT\ {\isacharequal}\ nodes\ G\\ \ \ \ \ {\isasymand}\ cost\ pT\ {\isasymle}\ set{\isacharunderscore}cost\ MST\ {\isacharplus}\ set{\isacharunderscore}cost\ MST{\isacharparenright}{\isacharsemicolon}\isanewline
+	\ \ tour\ {\isasymleftarrow}\ SPEC\ {\isacharparenleft}{\isasymlambda}T{\isachardot}\ is{\isacharunderscore}tour\ T\ {\isasymand}\ cost\ T\ {\isasymle}\ cost\ pretour{\isacharparenright}{\isacharsemicolon}\isanewline
+	\ \ RETURN\ tour\isanewline
 	{\isacharbraceright}{\isacartoucheclose}
-\end{isabelle}
-if $G$ is a complete finite metric graph.
+\end{isabelle}\pause
+\vspace{-4mm}
+\begin{theorem}
+	\hspace{2.6cm}$\textit{algorithm{\isacharunderscore}sketch} \le \textit{two{\isacharunderscore}approx}$\\
+\upshape if $G$ is a complete finite metric graph.
+\end{theorem}
 \end{frame}
 
 \subsection{Libraries}
