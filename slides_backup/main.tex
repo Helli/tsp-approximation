@@ -202,7 +202,7 @@ Find an edge sequence which\pause
 This sequence is then called a \textit{pretour}.\pause
 
 Its cost is twice the cost of the MST's edges.
-%Which is, as mentioned, less than the cost of an optimal tour.
+%And the MST's edges are, as mentioned, less than the cost of an optimal tour.
 \end{frame}
 
 \subsection{Duplicate Removal}
@@ -220,7 +220,7 @@ These shortcuts always exist and do not increase the cost. %That is why we requi
 \begin{frame}{Resource Usage}
 \begin{itemize}
 	\item MST generation: $\mathcal{O}(|E| \log |E|) = \mathcal{O}(n^2 \log (n^2)) = \mathcal{O}(2(n^2 \log n)) = \mathcal{O}(n^2 \log n)$%We use Kruskal's, which sorts edges by comparisons
-	\item Tour: $\mathcal{O}(n)$ %This is the number of edges in the MST. We discuss later how we can arrange the edges in time linear to this.
+	\item Tour: $\mathcal{O}(n)$ %This is the number of edges in the MST. We discuss later how we can arrange the edges in time linear to this, to-do: Is this actually covered?
 \end{itemize}
 overall: $\mathcal{O}(n^2 \log n)$
 \end{frame}
@@ -228,24 +228,29 @@ overall: $\mathcal{O}(n^2 \log n)$
 \section{Results}
 %What I did in the setting of this algorithm
 \begin{frame}
-\huge\high{Results}
+\begin{center}
+	\huge\high{Results}
+\end{center}
 \end{frame}
 
 \subsection{Algorithm Sketch}
-\begin{frame}{Algorithm Sketch}
+\begin{frame}{Algorithm Sketch}%to-do: rename to "Specification"?
+%We have a fixed graph here, OPT depends on it
 \begin{isabelle}
-	SPEC\ {\isacharparenleft}{\isasymlambda}T{\isachardot}\ is{\isacharunderscore}hamiltonian{\isacharunderscore}circuit\ T\ {\isasymand}\ cost\ T\ {\isasymle}\ OPTWEIGHT\ {\isacharplus}\ OPTWEIGHT{\isacharparenright}{\isacartoucheclose}
+	SPEC\ {\isacharparenleft}{\isasymlambda}T{\isachardot}\ is{\isacharunderscore}Hamiltonian{\isacharunderscore}circuit\ T\ {\isasymand}\ cost\ T\ {\isasymle}\ OPT\ {\isacharplus}\ OPT{\isacharparenright}{\isacartoucheclose}%explain lack of multiplication
 \end{isabelle}
+is fulfilled by %if the graph ()G) is complete and metric
 \begin{isabelle}
 	\isacommand{definition}\isamarkupfalse%
-	\ algo{\isacharunderscore}sketch\ \isakeyword{where}\ {\isacartoucheopen}algo{\isacharunderscore}sketch\ {\isacharequal}\isanewline
+	\ algorithm{\isacharunderscore}sketch\ \isakeyword{where}\ {\isacartoucheopen}algorithm{\isacharunderscore}sketch\ {\isacharequal}\isanewline
 	do\ {\isacharbraceleft}\isanewline
 	\ \ MST\ {\isasymleftarrow}\ SPEC\ {\isacharparenleft}{\isasymlambda}E{\isacharprime}{\isachardot}\ minimum{\isacharunderscore}spanning{\isacharunderscore}tree\ {\isacharparenleft}ind\ E{\isacharprime}{\isacharparenright}\ G{\isacharparenright}{\isacharsemicolon}\isanewline
-	\ \ pretour\ {\isasymleftarrow}\ SPEC\ {\isacharparenleft}{\isasymlambda}pT{\isachardot}\ int{\isacharunderscore}vertices\ pT\ {\isacharequal}\ nodes\ G\ {\isasymand}\ cost\ pT\ {\isasymle}\ set{\isacharunderscore}cost\ MST\ {\isacharplus}\ set{\isacharunderscore}cost\ MST{\isacharparenright}{\isacharsemicolon}\isanewline
-	\ \ Tour\ {\isasymleftarrow}\ SPEC\ {\isacharparenleft}{\isasymlambda}T{\isachardot}\ is{\isacharunderscore}hamiltonian{\isacharunderscore}circuit\ T\ {\isasymand}\ cost\ T\ {\isasymle}\ cost\ pretour{\isacharparenright}{\isacharsemicolon}\isanewline
+	\ \ pretour\ {\isasymleftarrow}\ SPEC\ {\isacharparenleft}{\isasymlambda}pT{\isachardot}\ int{\isacharunderscore}vertices\ pT\ {\isacharequal}\ nodes\ G\ {\isasymand}\ cost\ pT\ {\isasymle}\\ \ \ \ \ set{\isacharunderscore}cost\ MST\ {\isacharplus}\ set{\isacharunderscore}cost\ MST{\isacharparenright}{\isacharsemicolon}\isanewline
+	\ \ Tour\ {\isasymleftarrow}\ SPEC\ {\isacharparenleft}{\isasymlambda}T{\isachardot}\ is{\isacharunderscore}Hamiltonian{\isacharunderscore}circuit\ T\ {\isasymand}\ cost\ T\ {\isasymle}\ cost\\ \ \ \ \ pretour{\isacharparenright}{\isacharsemicolon}\isanewline
 	\ \ RETURN\ Tour\isanewline
 	{\isacharbraceright}{\isacartoucheclose}
 \end{isabelle}
+if $G$ is a complete finite metric graph.
 \end{frame}
 
 \subsection{Libraries}
@@ -258,26 +263,7 @@ overall: $\mathcal{O}(n^2 \log n)$
 \end{enumerate}
 \end{frame}
 
-\section{------very old from here------}
-
-\section{Field Extensions}
-\begin{frame}
-\begin{center}
-	\huge\high{Field Extensions}
-\end{center}
-\end{frame}
-
-\begin{frame}
-
-A \emph{field extension} $L/K$ is a field $(\mkern-3mu\mid\mkern-6mu L,\otimes,1,\oplus,0\mkern-6mu\mid\mkern-3mu)$ where $K$ is a subset of $L$ and $(\mkern-3mu\mid\mkern-6mu K,\otimes,1,\oplus,0\mkern-6mu\mid\mkern-3mu)$ is again a field.
-\begin{itemize}
-\item $K/K$, $[K:K] = 1$\pause
-%problem for a formalisation: K is often identified with its carrier set
-\item $\RR/\QQ$, $[\RR:\QQ]=\infty$\pause
-\item $\QQ(\sqrt{3})/\QQ$, $[\QQ(\sqrt{3}):\QQ] = 2$ %Field extensions like these are interesting when doing Galois theory.
-\end{itemize}
-\end{frame}
-
+\section{------old from here------}
 \section{Results} % what I contributed
 
 \subsection{Vector Spaces}
