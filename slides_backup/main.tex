@@ -240,9 +240,7 @@ overall: $\mathcal{O}(n^2 \log n)$
 	\isacommand{definition}\isamarkupfalse%
 	\ algo{\isacharunderscore}sketch\ \isakeyword{where}\ {\isacartoucheopen}algo{\isacharunderscore}sketch\ {\isacharequal}\isanewline
 	do\ {\isacharbraceleft}\isanewline
-	\ \ MST\ {\isasymleftarrow}\ SPEC\ {\isacharparenleft}{\isasymlambda}E{\isacharprime}{\isachardot}\ minimum{\isacharunderscore}spanning{\isacharunderscore}tree\ {\isacharparenleft}ind\ E{\isacharprime}{\isacharparenright}\ {\isacharparenleft}G\ %
-	\isamarkupcmt{it might save some steps to replace this with \isa{ind\ {\isacharparenleft}symhull\ E{\isacharparenright}}%
-	}{\isacharparenright}{\isacharparenright}{\isacharsemicolon}\isanewline
+	\ \ MST\ {\isasymleftarrow}\ SPEC\ {\isacharparenleft}{\isasymlambda}E{\isacharprime}{\isachardot}\ minimum{\isacharunderscore}spanning{\isacharunderscore}tree\ {\isacharparenleft}ind\ E{\isacharprime}{\isacharparenright}\ G{\isacharparenright}{\isacharsemicolon}\isanewline
 	\ \ pretour\ {\isasymleftarrow}\ SPEC\ {\isacharparenleft}{\isasymlambda}pT{\isachardot}\ int{\isacharunderscore}vertices\ pT\ {\isacharequal}\ nodes\ G\ {\isasymand}\ cost\ pT\ {\isasymle}\ set{\isacharunderscore}cost\ MST\ {\isacharplus}\ set{\isacharunderscore}cost\ MST{\isacharparenright}{\isacharsemicolon}\isanewline
 	\ \ Tour\ {\isasymleftarrow}\ SPEC\ {\isacharparenleft}{\isasymlambda}T{\isachardot}\ is{\isacharunderscore}hamiltonian{\isacharunderscore}circuit\ T\ {\isasymand}\ cost\ T\ {\isasymle}\ cost\ pretour{\isacharparenright}{\isacharsemicolon}\isanewline
 	\ \ RETURN\ Tour\isanewline
