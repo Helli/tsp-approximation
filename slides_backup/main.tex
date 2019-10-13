@@ -64,6 +64,10 @@
 \usetikzlibrary{trees, positioning}
 \usetikzlibrary{shapes.geometric}
 
+\usepackage{isabelle,isabellesym}
+\isabellestyle{it}
+\def\isacartoucheopen{}%
+\def\isacartoucheclose{}%
 
 \newcommand{\NN}{\mathbb{N}}
 \newcommand{\QQ}{\mathbb{Q}}
@@ -148,7 +152,7 @@ Reasons:
 	\item find mistakes in algorithm explanations\pause
 	\item prove that verification of executable programs
 	is feasible\ % when using a modern tool like
-	 (when using \includegraphics[height=1em]{isabelle.pdf}Isabelle)\pause
+	 when using \includegraphics[height=1em]{isabelle.pdf}Isabelle\pause
 \end{itemize}
 Mathematical results might be a requirement.
 %In this case here, from graph theory.
@@ -163,6 +167,97 @@ Mathematical results might be a requirement.
 	\vspace{1em}\pause %Since we consider undirected graphs, the reverse of a TSP tour is also a TSP tour (I omitted these duplicates in the graphic)
 	
 	\high{Good solutions for NP-complete problems in polynomial time!}
+\end{frame}
+
+\section{Algorithm Explanation}
+\begin{frame}
+\begin{center}
+	\huge\high{Algorithm Explanation}
+\end{center}
+\end{frame}
+
+\subsection{MST Generation}
+\begin{frame}{MST Generation}\pause
+Consider a complete undirected graph and its minimum spanning tree $T$.\pause%or rather one of its minimum spanning trees
+
+
+to-do: graphic
+\begin{isabelle}
+\isacommand{lemma}\isamarkupfalse%
+\ minimum{\isacharunderscore}spanning{\isacharunderscore}tree{\isacharunderscore}le{\isacharunderscore}OPTWEIGHT{\isacharcolon}\isanewline
+\ \ \isakeyword{assumes}\ {\isacartoucheopen}minimum{\isacharunderscore}spanning{\isacharunderscore}tree\ {\isacharparenleft}ind\ F{\isacharparenright}\ {\isacharparenleft}ind\ {\isacharparenleft}symhull\ E{\isacharparenright}{\isacharparenright}{\isacartoucheclose}\isanewline
+\ \ \isakeyword{assumes}\ {\isacartoucheopen}{\isadigit{2}}\ {\isasymle}\ card\ V{\isacartoucheclose}\isanewline
+\ \ \isakeyword{shows}\ {\isacartoucheopen}set{\isacharunderscore}cost\ F\ {\isasymle}\ OPTWEIGHT{\isacartoucheclose}
+\end{isabelle}
+\end{frame}
+
+\subsection{Tour Search}
+\begin{frame}{Tour Search}
+Find an edge sequence which\pause
+\begin{itemize}
+	\item uses exactly the MST's edges, each of which twice\pause
+	\item visits every node\pause
+	\item starts and ends at the same node\pause
+\end{itemize}
+This sequence is then called a \textit{pretour}.\pause
+
+Its cost is twice the cost of the MST's edges.
+%Which is, as mentioned, less than the cost of an optimal tour.
+\end{frame}
+
+\subsection{Duplicate Removal}
+\begin{frame}{Duplicate Removal}
+Transform the pretour into a TSP tour:
+%typically we require TSP tours to visits each node exactly once. Our sequence doesn't do that yet.
+\begin{itemize}
+	\item remove duplicate visits, replace them by shortcuts.
+	%That means that when the sequence goes to am already visited node, we instead jump to the next one
+\end{itemize}
+These shortcuts always exist and do not increase the cost. %That is why we require a complete metric graph
+\end{frame}
+
+\subsection{Resource Usage}
+\begin{frame}{Resource Usage}
+\begin{itemize}
+	\item MST generation: $\mathcal{O}(|E| \log |E|) = \mathcal{O}(n^2 \log (n^2)) = \mathcal{O}(2(n^2 \log n)) = \mathcal{O}(n^2 \log n)$%We use Kruskal's, which sorts edges by comparisons
+	\item Tour: $\mathcal{O}(n)$ %This is the number of edges in the MST. We discuss later how we can arrange the edges in time linear to this.
+\end{itemize}
+overall: $\mathcal{O}(n^2 \log n)$
+\end{frame}
+
+\section{Results}
+%What I did in the setting of this algorithm
+\begin{frame}
+\huge\high{Results}
+\end{frame}
+
+\subsection{Algorithm Sketch}
+\begin{frame}{Algorithm Sketch}
+\begin{isabelle}
+	SPEC\ {\isacharparenleft}{\isasymlambda}T{\isachardot}\ is{\isacharunderscore}hamiltonian{\isacharunderscore}circuit\ T\ {\isasymand}\ cost\ T\ {\isasymle}\ OPTWEIGHT\ {\isacharplus}\ OPTWEIGHT{\isacharparenright}{\isacartoucheclose}
+\end{isabelle}
+\begin{isabelle}
+	\isacommand{definition}\isamarkupfalse%
+	\ algo{\isacharunderscore}sketch\ \isakeyword{where}\ {\isacartoucheopen}algo{\isacharunderscore}sketch\ {\isacharequal}\isanewline
+	do\ {\isacharbraceleft}\isanewline
+	\ \ MST\ {\isasymleftarrow}\ SPEC\ {\isacharparenleft}{\isasymlambda}E{\isacharprime}{\isachardot}\ minimum{\isacharunderscore}spanning{\isacharunderscore}tree\ {\isacharparenleft}ind\ E{\isacharprime}{\isacharparenright}\ {\isacharparenleft}G\ %
+	\isamarkupcmt{it might save some steps to replace this with \isa{ind\ {\isacharparenleft}symhull\ E{\isacharparenright}}%
+	}{\isacharparenright}{\isacharparenright}{\isacharsemicolon}\isanewline
+	\ \ pretour\ {\isasymleftarrow}\ SPEC\ {\isacharparenleft}{\isasymlambda}pT{\isachardot}\ int{\isacharunderscore}vertices\ pT\ {\isacharequal}\ nodes\ G\ {\isasymand}\ cost\ pT\ {\isasymle}\ set{\isacharunderscore}cost\ MST\ {\isacharplus}\ set{\isacharunderscore}cost\ MST{\isacharparenright}{\isacharsemicolon}\isanewline
+	\ \ Tour\ {\isasymleftarrow}\ SPEC\ {\isacharparenleft}{\isasymlambda}T{\isachardot}\ is{\isacharunderscore}hamiltonian{\isacharunderscore}circuit\ T\ {\isasymand}\ cost\ T\ {\isasymle}\ cost\ pretour{\isacharparenright}{\isacharsemicolon}\isanewline
+	\ \ RETURN\ Tour\isanewline
+	{\isacharbraceright}{\isacartoucheclose}
+\end{isabelle}
+\end{frame}
+
+\subsection{Libraries}
+\begin{frame}{Libraries}
+\begin{enumerate}
+	\item \textit{Kruskal}: edges with weight, undirected/directed
+	%to-do: vielleicht unterringeln?
+	% I had to reorganise this one to get what I want without unnecessary assumptions.
+	\item \textit{DSF-Framework}:
+\end{enumerate}
 \end{frame}
 
 \section{------very old from here------}
