@@ -20,17 +20,17 @@ text \<open>
 
 subsection \<open>Including empty Path\<close>
 record 'v fp0_state = "'v state" +
-  ppath :: "'v list"
+  tour_list :: "'v list"
 
 type_synonym 'v fp0_param = "('v, ('v,unit) fp0_state_ext) parameterization"
 
-lemma [simp]: "s\<lparr> state.more := \<lparr> ppath = foo \<rparr> \<rparr> = s \<lparr> ppath := foo \<rparr>"
+lemma [simp]: "s\<lparr> state.more := \<lparr> tour_list = foo \<rparr> \<rparr> = s \<lparr> tour_list := foo \<rparr>"
   by (cases s) simp
 
 definition fp0_params :: "'v fp0_param"
 where "fp0_params \<equiv> dflt_parametrization state.more
-  (RETURN \<lparr> ppath = [] \<rparr>)
-  \<lparr> on_discover := \<lambda>_ n s. RETURN \<lparr>ppath = ppath s @ [n]\<rparr> \<rparr>"
+  (RETURN \<lparr> tour_list = [] \<rparr>)
+  \<lparr> on_discover := \<lambda>_ n s. RETURN \<lparr>tour_list = tour_list s @ [n]\<rparr> \<rparr>"
 
 lemmas fp0_params_simp[simp] =
   gen_parameterization.simps[mk_record_simp, OF fp0_params_def[simplified]]
@@ -103,11 +103,11 @@ lemma finite_dfsgraph_reachable: \<open>finite dfs.reachable\<close>
   using dfs.finite_E by (simp add: T'_def)
 
   lemma [simp]: 
-    "ppath (dfs.empty_state \<lparr>ppath = e\<rparr>) = e"
+    "tour_list (dfs.empty_state \<lparr>tour_list = e\<rparr>) = e"
     by (simp add: dfs.empty_state_def)
 
   lemma [simp]: 
-    "ppath (s\<lparr>state.more := state.more s'\<rparr>) = ppath s'"
+    "tour_list (s\<lparr>state.more := state.more s'\<rparr>) = tour_list s'"
     by (cases s, cases s') auto
 
 (* This was above the simp lemmas, but isn't it superseded anyway by the sublocale statement?
@@ -199,7 +199,7 @@ proof (induction rule: dfs.establish_invarI)
 qed auto
 lemmas (in fp0_invar) discovered_sane = i_discovered_sane[THEN make_invar_thm, rule_format]
 
-lemma \<open>dfs.is_invar (\<lambda>s. valid_graph.tour (ind' (dom (discovered s))) (ppath s))\<close>
+lemma \<open>dfs.is_invar (\<lambda>s. valid_graph.tour (ind' (dom (discovered s))) (tour_list s))\<close>
 proof (induction rule: dfs.establish_invarI)
   case (discover s s' u v) then interpret fp0_invar where s=s
     using node_and_MST_in_graph_axioms by blast
@@ -211,18 +211,18 @@ proof (induction rule: dfs.establish_invarI)
     using discover[unfolded dfs.discover_def] by auto
   interpret s': complete_finite_metric_graph \<open>ind' (insert v (dom (discovered s)))\<close>
     using discover snd_pending_sane discovered_sane by (auto intro!: subgraph_complete_metric)
-  have ppath': \<open>ppath s' = ppath s\<close>
+  have tour_list': \<open>tour_list s' = tour_list s\<close>
     using discover[unfolded dfs.discover_def] by auto
-  have a: \<open>on_discover fp0_params u v s' \<le> SPEC (\<lambda>r. r = \<lparr>ppath = ppath s' @ [v]\<rparr>)\<close>
+  have a: \<open>on_discover fp0_params u v s' \<le> SPEC (\<lambda>r. r = \<lparr>tour_list = tour_list s' @ [v]\<rparr>)\<close>
     by simp
-  then have b: \<open>on_discover fp0_params u v s' \<le>\<^sub>n SPEC (\<lambda>r. r = \<lparr>ppath = ppath s' @ [v]\<rparr>)\<close>
+  then have b: \<open>on_discover fp0_params u v s' \<le>\<^sub>n SPEC (\<lambda>r. r = \<lparr>tour_list = tour_list s' @ [v]\<rparr>)\<close>
     using leof_lift by blast
-  have c: \<open>on_discover fp0_params u v s' \<le> SPEC (\<lambda>r. r = \<lparr>ppath = ppath s @ [v]\<rparr>)\<close>
-    by (simp add: ppath')
-  then have d: \<open>on_discover fp0_params u v s' \<le>\<^sub>n SPEC (\<lambda>r. r = \<lparr>ppath = ppath s @ [v]\<rparr>)\<close>
+  have c: \<open>on_discover fp0_params u v s' \<le> SPEC (\<lambda>r. r = \<lparr>tour_list = tour_list s @ [v]\<rparr>)\<close>
+    by (simp add: tour_list')
+  then have d: \<open>on_discover fp0_params u v s' \<le>\<^sub>n SPEC (\<lambda>r. r = \<lparr>tour_list = tour_list s @ [v]\<rparr>)\<close>
     using leof_lift by blast
-  have \<open>s'.tour (ppath s @ [v])\<close>
-  proof (cases \<open>ppath s\<close>)
+  have \<open>s'.tour (tour_list s @ [v])\<close>
+  proof (cases \<open>tour_list s\<close>)
     case (Cons p ps)
     show ?thesis
     proof (cases ps)
