@@ -560,11 +560,11 @@ proof -
     by (smt Collect_cong finite_Collect_conjI)
 qed
 
+sublocale complete_finite_weighted_graph \<subseteq> finite_weighted_connected_graph
+  by unfold_locales (metis edge_exists is_path_undir.simps(1) is_path_undir_simps(2))
+
 context complete_finite_weighted_graph
 begin
-
-sublocale finite_weighted_connected_graph \<comment> \<open>rm?\<close>
-  by unfold_locales (metis edge_exists is_path_undir.simps(1) is_path_undir_simps(2))
 
 lemma complete': \<open>v1\<in>V \<Longrightarrow> v2\<in>V \<Longrightarrow> v1\<noteq>v2 \<Longrightarrow> (\<exists>w. (v1,w,v2)\<in>E) \<or> (\<exists>w. (v2,w,v1)\<in>E)\<close>
   using edge_exists by blast
