@@ -303,6 +303,12 @@ We use the \textit{DFS-Framework}. This is the parametrisation:
 %to-do: simplification of Phase II? not really my work, but something which slowed me down...
 
 \section{Plans}
+\begin{frame}
+\begin{center}
+	\huge\high{Plans}%time ran out sadly...
+\end{center}
+\end{frame}
+
 \subsection{Input Generation}% We need a script that generates the edge weights for us.
 \begin{frame}{Input Generation}
 Consider a Euclidean space like $\RR^2$, $\RR^3$,\dots
@@ -319,11 +325,12 @@ Consider a Euclidean space like $\RR^2$, $\RR^3$,\dots
 \subsection{DFS Invariant}
 \begin{frame}{DFS Invariant}
 	finish the proof that
+	\vspace{-2mm}
 	\begin{isabelle}
 		\isacommand{lemma}\isamarkupfalse%
 		\ {\isacartoucheopen}dfs{\isachardot}is{\isacharunderscore}invar\ {\isacharparenleft}{\isasymlambda}s{\isachardot}\ valid{\isacharunderscore}graph{\isachardot}tour\ {\isacharparenleft}ind{\isacharprime}\ {\isacharparenleft}dom\ {\isacharparenleft}discovered\ s{\isacharparenright}{\isacharparenright}{\isacharparenright}\ {\isacharparenleft}tour{\isacharunderscore}list\ s{\isacharparenright}{\isacharparenright}{\isacartoucheclose}
 	\end{isabelle}\pause
-	Advancing this proof already led to generally useful facts like
+	Advancing this proof has already led to generally useful statements for the \textit{DFS-Framework}, e.g.\
 	\begin{isabelle}
 		\isacommand{lemma}\isamarkupfalse%
 		\ i{\isacharunderscore}snd{\isacharunderscore}pending{\isacharunderscore}sane{\isacharcolon}\ {\isacartoucheopen}dfs{\isachardot}is{\isacharunderscore}invar\ {\isacharparenleft}{\isasymlambda}s{\isachardot}\ snd\ {\isacharbackquote}\ {\isacharparenleft}pending\ s{\isacharparenright}\ {\isasymsubseteq}\ V{\isacharparenright}{\isacartoucheclose}
@@ -342,7 +349,7 @@ Consider a Euclidean space like $\RR^2$, $\RR^3$,\dots
 \begin{frame}{Conclusion}
 Even with parts already verified, formal verification can require a lot of work:
 \begin{itemize}
-	\item Different Graph Formalisations\pause!\pause
+	\item Differing graph formalisations\pause!\pause
 	%in particular connecting Digraph.graph_rec to my own finite_complete_weighted...graph
 	\item For this particular algorithm, a lot of assumptions have to be collected and formulated.\pause %complete_finite_weighted is actually complete_finite_weighted_simple_loopfree_metric_graph
 	
