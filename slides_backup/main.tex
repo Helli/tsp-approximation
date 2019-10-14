@@ -123,26 +123,6 @@
 \newcommand{\ltpiv}[1]{{\color{blue}#1}}
 \newcommand{\gtpiv}[1]{{\color{olive}#1}}
 
-\section{Isabelle}
-\section{Metric TSP}
-\section{Approximation Algorithms}
-\section{MST Heuristic} %advance the 2-approx-proof during the phases or maybe add another slide?
-    \subsection{MST Generation}
-    \subsection{Tour Search}
-    \subsection{Duplicate Removal}
-    \subsection{Resource Usage Analysis?}%or maybe at the very end?
-\section{Results}
-    \subsection{Algorithm Sketch} %"to see how the specification and algorithm look in the framework"
-    %to-do: how to handle context here?
-    \subsection{Library Connections}
-    \subsection{Simplification of Phase Two?}% not really my work, but something which slowed me down...
-\section{Plans}
-    \subsection{Input Generation} %how to generate input that fulfils the specification
-    %maybe also mention the drilling robot during this slide
-    \subsection{Last Pieces of a DFS Invariant}
-    
-% add draft slide from the meeting
-
 \section{---------slides from here---------}
 \section{Verification of Algorithms}
 \begin{frame}{Verification of Algorithms}
@@ -271,6 +251,13 @@ overall: $\mathcal{O}(n^2 \log n)$
 \end{theorem}
 \end{frame}
 
+\subsection{Phase I}%MST generation
+%It was already in a library, but had to be adjusted
+\begin{frame}{Phase I}
+
+to-do: How to explain the improvement to \textit{Kruskal} easily?
+\end{frame}
+
 \subsection{Library Connections}
 \begin{frame}{Library Connections}
 \begin{enumerate}
@@ -287,6 +274,8 @@ overall: $\mathcal{O}(n^2 \log n)$
 \end{enumerate}
 to-do: find short lemmas to show here, e.g. with symhull
 \end{frame}
+
+\subsection{Simplification of Phase II?}% not really my work, but something which slowed me down...
 
 \section{Plans}
 \subsection{Input Generation}% We need a script that generates the edge weights for us.
