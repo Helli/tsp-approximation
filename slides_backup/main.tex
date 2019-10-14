@@ -277,14 +277,18 @@ to-do: find short lemmas to show here, e.g. with symhull. also the equivalence o
 \end{frame}
 
 \subsection{Phase II}
-\begin{frame}
+\begin{frame}{Phase II}
+\vspace{8mm}
+We use the \textit{DFS-Framework}. This is the parametrisation:
+\vspace{-2mm}
 \begin{isabelle}
 	\isacommand{definition}\isamarkupfalse%
 	\ fp{\isadigit{0}}{\isacharunderscore}params\ {\isacharcolon}{\isacharcolon}\ {\isachardoublequoteopen}{\isacharprime}v\ fp{\isadigit{0}}{\isacharunderscore}param{\isachardoublequoteclose}\ \isakeyword{where}\isanewline
 	{\isachardoublequoteopen}fp{\isadigit{0}}{\isacharunderscore}params\ {\isasymequiv}\ dflt{\isacharunderscore}parametrization\ state{\isachardot}more\isanewline
 	\ \ {\isacharparenleft}RETURN\ {\isasymlparr}\ tour{\isacharunderscore}list\ {\isacharequal}\ {\isacharbrackleft}{\isacharbrackright}\ {\isasymrparr}{\isacharparenright}\isanewline
-	\ \ {\isasymlparr}\ on{\isacharunderscore}discover\ {\isacharcolon}{\isacharequal}\ {\isasymlambda}{\isacharunderscore}\ n\ s{\isachardot}\ RETURN\ {\isasymlparr}tour{\isacharunderscore}list\ {\isacharequal}\ tour{\isacharunderscore}list\ s\ {\isacharat}\ {\isacharbrackleft}n{\isacharbrackright}{\isasymrparr}\ {\isasymrparr}{\isachardoublequoteclose}
-\end{isabelle}
+	\ \ {\isasymlparr}on{\isacharunderscore}discover\ {\isacharcolon}{\isacharequal}\ {\isasymlambda}{\isacharunderscore}\ n\ s{\isachardot}\ RETURN\ {\isasymlparr}tour{\isacharunderscore}list\ {\isacharequal}\ tour{\isacharunderscore}list\ s\ {\isacharat}\ {\isacharbrackleft}n{\isacharbrackright}{\isasymrparr}\ {\isasymrparr}{\isachardoublequoteclose}
+\end{isabelle}\pause
+\vspace{-5mm}
 \begin{isabelle}
 	\isacommand{locale}\isamarkupfalse%
 	\ node{\isacharunderscore}and{\isacharunderscore}MST{\isacharunderscore}in{\isacharunderscore}graph\ {\isacharequal}\isanewline
