@@ -1,21 +1,3 @@
-%todo: compare to the plan from the meeting:
-%25+5min
-
-%explain in the presentation:
-
-%{Algorithm! abstract aufzeichnen
-%abstracter code (algo_sketch) zusammen mit spezifikation und "l"
-%mit phases
-%refinement von phase 1
-%und bei 2+3 pläne} 5min
-%Bibliotheken vorstellen, Wahl begründen
-%--> Graphformalisierungen: directed vs. undirected edges in both phases. Welche gibt es alle?
-%edge labels, i.e. a third field besides start node and end node 5min
-%MST lemma zeigen, wieso nicht Graph_Theory? 5min
-%was ist der projektstatus? 5min
-%maybe a slide about the commit count?
-%add dfs-sublocale statement to plans. "This is already proven. However, the set membership must be implemented..."
-
 \documentclass[%handout,
 	sans,
 	12pt,
@@ -256,6 +238,22 @@ overall: $\mathcal{O}(n^2 \log n)$
 %It was already in a library, but had to be adjusted
 \begin{frame}{Phase I}
 
+\begin{isabelle}
+	\isacommand{locale}\isamarkupfalse%
+	\ finite{\isacharunderscore}weighted{\isacharunderscore}connected{\isacharunderscore}graph\ {\isacharequal}\ finite{\isacharunderscore}weighted{\isacharunderscore}graph\ {\isacharplus}\ connected{\isacharunderscore}graph\isanewline
+	\isakeyword{begin}\isanewline
+	\isanewline
+	\ \ \isacommand{lemma}\isamarkupfalse%
+	\ kruskal{\isadigit{0}}{\isacharunderscore}MST{\isacharcolon}\ {\isacartoucheopen}s{\isachardot}kruskal{\isadigit{0}}\ {\isasymle}\ SPEC\ {\isacharparenleft}{\isasymlambda}E{\isacharprime}{\isachardot}\ minimum{\isacharunderscore}spanning{\isacharunderscore}tree\ {\isacharparenleft}ind\ E{\isacharprime}{\isacharparenright}\ G{\isacharparenright}{\isacartoucheclose}
+	\isanewline
+	\isanewline
+	\isacommand{end}\isamarkupfalse%
+\end{isabelle}\pause%This also includes that the forest is a tree (simple) and that it still is minimal in the symhull (quite a bit of work...)
+
+\begin{isabelle}
+	\isacommand{sublocale}\isamarkupfalse%
+	\ complete{\isacharunderscore}finite{\isacharunderscore}weighted{\isacharunderscore}graph\ {\isasymsubseteq}\\ \ \ finite{\isacharunderscore}weighted{\isacharunderscore}connected{\isacharunderscore}graph
+	\end{isabelle}
 to-do: How to explain the improvement to \textit{Kruskal} easily?
 \end{frame}
 
@@ -363,3 +361,21 @@ Even with parts already verified, formal verification can require a lot of work:
 %to-do: Problems?
 
 \end{document}
+
+%todo: compare to the plan from the meeting:
+%25+5min
+
+%explain in the presentation:
+
+%{Algorithm! abstract aufzeichnen
+%abstracter code (algo_sketch) zusammen mit spezifikation und "l"
+%mit phases
+%refinement von phase 1
+%und bei 2+3 pläne} 5min
+%Bibliotheken vorstellen, Wahl begründen
+%--> Graphformalisierungen: directed vs. undirected edges in both phases. Welche gibt es alle?
+%edge labels, i.e. a third field besides start node and end node 5min
+%MST lemma zeigen, wieso nicht Graph_Theory? 5min
+%was ist der projektstatus? 5min
+%maybe a slide about the commit count?
+%add dfs-sublocale statement to plans. "This is already proven. However, the set membership must be implemented..."
