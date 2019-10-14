@@ -27,8 +27,8 @@ type_synonym 'v fp0_param = "('v, ('v,unit) fp0_state_ext) parameterization"
 lemma [simp]: "s\<lparr> state.more := \<lparr> tour_list = foo \<rparr> \<rparr> = s \<lparr> tour_list := foo \<rparr>"
   by (cases s) simp
 
-definition fp0_params :: "'v fp0_param"
-where "fp0_params \<equiv> dflt_parametrization state.more
+definition fp0_params :: "'v fp0_param" where
+"fp0_params \<equiv> dflt_parametrization state.more
   (RETURN \<lparr> tour_list = [] \<rparr>)
   \<lparr> on_discover := \<lambda>_ n s. RETURN \<lparr>tour_list = tour_list s @ [n]\<rparr> \<rparr>"
 
