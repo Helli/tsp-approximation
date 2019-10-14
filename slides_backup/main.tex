@@ -204,8 +204,10 @@ Its cost is twice the cost of the MST's edges.
 Transform the pretour into a TSP tour:
 %typically we require TSP tours to visits each node exactly once. Our sequence doesn't do that yet.
 \begin{itemize}
-	\item remove duplicate visits, replace them by shortcuts.
+	\item remove duplicate visits, replace them by shortcuts.\pause
 	%That means that when the sequence goes to an already visited node, we instead jump to the next one
+	
+	\high{This can be done at one go.}
 \end{itemize}
 These shortcuts always exist and do not increase the cost. %That is why we require a complete metric graph
 \end{frame}
@@ -273,6 +275,28 @@ to-do: How to explain the improvement to \textit{Kruskal} easily?
 	%to-do: add Noschinski, a third notion of "undirected".
 \end{enumerate}
 to-do: find short lemmas to show here, e.g. with symhull
+\end{frame}
+
+\subsection{Phase II}
+\begin{frame}
+\begin{isabelle}
+	\isacommand{definition}\isamarkupfalse%
+	\ fp{\isadigit{0}}{\isacharunderscore}params\ {\isacharcolon}{\isacharcolon}\ {\isachardoublequoteopen}{\isacharprime}v\ fp{\isadigit{0}}{\isacharunderscore}param{\isachardoublequoteclose}\ \isakeyword{where}\isanewline
+	{\isachardoublequoteopen}fp{\isadigit{0}}{\isacharunderscore}params\ {\isasymequiv}\ dflt{\isacharunderscore}parametrization\ state{\isachardot}more\isanewline
+	\ \ {\isacharparenleft}RETURN\ {\isasymlparr}\ tour{\isacharunderscore}list\ {\isacharequal}\ {\isacharbrackleft}{\isacharbrackright}\ {\isasymrparr}{\isacharparenright}\isanewline
+	\ \ {\isasymlparr}\ on{\isacharunderscore}discover\ {\isacharcolon}{\isacharequal}\ {\isasymlambda}{\isacharunderscore}\ n\ s{\isachardot}\ RETURN\ {\isasymlparr}tour{\isacharunderscore}list\ {\isacharequal}\ tour{\isacharunderscore}list\ s\ {\isacharat}\ {\isacharbrackleft}n{\isacharbrackright}{\isasymrparr}\ {\isasymrparr}{\isachardoublequoteclose}
+\end{isabelle}
+\begin{isabelle}
+	\isacommand{locale}\isamarkupfalse%
+	\ node{\isacharunderscore}and{\isacharunderscore}MST{\isacharunderscore}in{\isacharunderscore}graph\ {\isacharequal}\isanewline
+	\ \ complete{\isacharunderscore}finite{\isacharunderscore}metric{\isacharunderscore}graph\ G\ {\isacharplus}\isanewline
+	\ \ T{\isacharcolon}\ tree\ T\isanewline
+	\ \ \isakeyword{for}\ G{\isacharcolon}{\isacharcolon}{\isacartoucheopen}{\isacharparenleft}{\isacharprime}v{\isacharcolon}{\isacharcolon}metric{\isacharunderscore}space{\isacharcomma}real{\isacharparenright}\ graph{\isacartoucheclose}\isanewline
+	\ \ \isakeyword{and}\ T{\isacharcolon}{\isacharcolon}{\isacartoucheopen}{\isacharparenleft}{\isacharprime}v{\isacharcomma}real{\isacharparenright}\ graph{\isacartoucheclose}\ {\isacharplus}\isanewline
+	\ \ \isakeyword{fixes}\ v\isactrlsub {\isadigit{0}}{\isacharcolon}{\isacharcolon}{\isacartoucheopen}{\isacharprime}v{\isacartoucheclose}\isanewline
+	\ \ \isakeyword{assumes}\ v{\isacharunderscore}in{\isacharunderscore}V{\isacharcolon}\ {\isacartoucheopen}v\isactrlsub {\isadigit{0}}\ {\isasymin}\ V{\isacartoucheclose}\isanewline
+	\ \ \isakeyword{and}\ mst{\isacharcolon}\ {\isacartoucheopen}minimum{\isacharunderscore}spanning{\isacharunderscore}tree\ T\ G{\isacartoucheclose}
+\end{isabelle}
 \end{frame}
 
 \subsection{Simplification of Phase II?}% not really my work, but something which slowed me down...
