@@ -191,11 +191,13 @@ Transform the pretour into a TSP tour:
 These shortcuts always exist and do not increase the cost. %That is why we require a complete metric graph
 \end{frame}
 
-\subsection{Resource Usage}
-\begin{frame}{Resource Usage}
+\subsection{Time Complexity}%not verified
+\begin{frame}{Time Complexity}\pause
 \begin{itemize}
 	\item MST generation: $\mathcal{O}(|E| \log |E|) = \mathcal{O}(n^2 \log (n^2)) = \mathcal{O}(2(n^2 \log n)) = \mathcal{O}(n^2 \log n)$%We use Kruskal's, which sorts edges by comparisons
+	\pause
 	\item Tour: $\mathcal{O}(n)$ %This is the number of edges in the MST. We discuss later how we can arrange the edges in time linear to this, to-do: Is this actually covered?
+	\pause
 \end{itemize}
 overall: $\mathcal{O}(n^2 \log n)$
 \end{frame}
@@ -209,7 +211,7 @@ overall: $\mathcal{O}(n^2 \log n)$
 \end{frame}
 
 \subsection{Algorithm Sketch}
-\begin{frame}{Algorithm Sketch}%to-do: rename to "Specification"?
+\begin{frame}{Algorithm Sketch} %and its Specification?
 %We have a fixed graph here, OPT depends on it
 \begin{isabelle}
 	\isacommand{definition}\isamarkupfalse%
@@ -408,16 +410,11 @@ Even with parts already verified, formal verification can require a lot of work:
 
 \end{document}
 
-%todo: compare to the plan from the meeting:
+%to-do: compare to the plan from the meeting:
 %25+5min
 
 %explain in the presentation:
 
-%{Algorithm! abstract aufzeichnen
-%abstracter code (algo_sketch) zusammen mit spezifikation und "l"
-%mit phases
-%refinement von phase 1
-%und bei 2+3 pläne} 5min
 %Bibliotheken vorstellen, Wahl begründen
 %--> Graphformalisierungen: directed vs. undirected edges in both phases. Welche gibt es alle?
 %edge labels, i.e. a third field besides start node and end node 5min
