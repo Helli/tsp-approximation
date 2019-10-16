@@ -133,7 +133,7 @@ Mathematical results might be a requirement.
 
 \section{Approximation Algorithms}
 \begin{frame}{Approximation Algorithms}
-	What are Approximation Algorithms?\pause%to-do: explain based on (metric) TSP
+	What are Approximation Algorithms?\pause%based on (metric) TSP
 	\vspace{1em}
 	\includegraphics[width=\linewidth]{OPT_line}
 	%OPT is the performance of an *actual* algorithm, namely the brute-force algorithm that tries all exponentially many node sequences.
@@ -157,12 +157,35 @@ We are going to
 \begin{enumerate}
 	\item find such a $T$\pause
 	\item generate a TSP tour using $T$'s edges
-\end{enumerate}
+\end{enumerate}% and we are going to argue that T has cost less than an optimal TSP tour
 \end{frame}
 
-\subsection{MST Generation}
-\begin{frame}{MST Generation}\pause
-%to-do: graphic
+\subsection{MST vs.\ TSP tour}
+\begin{frame}{MST vs.\ TSP tour}
+\begin{center}
+	\includegraphics[height=2cm]{complete0.png}
+\end{center}
+\end{frame}
+
+\subsection{MST vs.\ TSP tour}
+\begin{frame}{MST vs.\ TSP tour}
+\begin{center}
+	\includegraphics[height=2cm]{complete1.png}
+\end{center}
+\end{frame}
+
+\subsection{MST vs.\ TSP tour}
+\begin{frame}{MST vs.\ TSP tour}
+\begin{center}
+	\includegraphics[height=2cm]{complete2.png}
+\end{center}
+\end{frame}
+
+\subsection{MST vs.\ TSP tour}
+\begin{frame}{MST vs.\ TSP tour}
+\begin{center}
+	\includegraphics[height=2cm]{complete2.png}
+\end{center}
 \begin{isabelle}
 \isacommand{lemma}\isamarkupfalse%
 \ minimum{\isacharunderscore}spanning{\isacharunderscore}tree{\isacharunderscore}le{\isacharunderscore}OPTWEIGHT{\isacharcolon}\isanewline
@@ -261,8 +284,8 @@ overall: $\mathcal{O}(n^2 \log n)$
 \begin{isabelle}
 	\isacommand{sublocale}\isamarkupfalse%
 	\ complete{\isacharunderscore}finite{\isacharunderscore}weighted{\isacharunderscore}graph\ {\isasymsubseteq}\\ \ \ finite{\isacharunderscore}weighted{\isacharunderscore}connected{\isacharunderscore}graph
-	\end{isabelle}
-to-do: How to explain the improvement to \textit{Kruskal} AFP entry easily?
+	\end{isabelle}\pause
+This required a reorganisation in the \textit{Kruskal} AFP entry.
 \end{frame}
 
 \subsection{Library Connections}
