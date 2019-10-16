@@ -296,14 +296,14 @@ to-do: How to explain the improvement to \textit{Kruskal} AFP entry easily?
 \begin{isabelle}
 	\isacommand{lemma}\isamarkupfalse%
 	\ spanning{\isacharunderscore}forest{\isacharunderscore}symhull{\isacharcolon}\isanewline
-	\ \ {\isacartoucheopen}spanning{\isacharunderscore}forest\ F\ {\isasymlparr}nodes{\isacharequal}V{\isacharcomma}\ edges\ {\isacharequal}\ E{\isasymrparr}\ {\isasymLongrightarrow}\ spanning{\isacharunderscore}forest\ F\ {\isasymlparr}nodes{\isacharequal}V{\isacharcomma}\ edges\ {\isacharequal}\ symhull\ E{\isasymrparr}{\isacartoucheclose}
+	\ \ {\isacartoucheopen}spanning{\isacharunderscore}forest\ F\ {\isasymlparr}nodes{\isacharequal}V{\isacharcomma}\ edges\ {\isacharequal}\ E{\isasymrparr}\ \\\ \ \ \ {\isasymLongrightarrow}\ spanning{\isacharunderscore}forest\ F\ {\isasymlparr}nodes{\isacharequal}V{\isacharcomma}\ edges\ {\isacharequal}\ symhull\ E{\isasymrparr}{\isacartoucheclose}
 \end{isabelle}\pause
 \begin{isabelle}
 	\isacommand{lemma}\isamarkupfalse%
-	\ {\isacharparenleft}\isakeyword{in}\ finite{\isacharunderscore}weighted{\isacharunderscore}graph{\isacharparenright}\ spanning{\isacharunderscore}forest{\isacharunderscore}symhull{\isacharunderscore}preimage{\isacharcolon}\isanewline
-	\ \ \isakeyword{assumes}\ {\isacartoucheopen}spanning{\isacharunderscore}forest\ {\isasymlparr}nodes{\isacharequal}V{\isacharcomma}\ edges{\isacharequal}F{\isasymrparr}\ {\isasymlparr}nodes{\isacharequal}V{\isacharcomma}\ edges{\isacharequal}symhull\ E{\isasymrparr}{\isacartoucheclose}\isanewline
-	\ \ \isakeyword{shows}\ {\isacartoucheopen}{\isasymexists}F{\isacharprime}{\isachardot}\ spanning{\isacharunderscore}forest\ {\isasymlparr}nodes{\isacharequal}V{\isacharcomma}\ edges{\isacharequal}F{\isacharprime}{\isasymrparr}\ {\isasymlparr}nodes{\isacharequal}V{\isacharcomma}\ edges{\isacharequal}E{\isasymrparr}\isanewline
-	\ \ \ \ {\isasymand}\ edge{\isacharunderscore}weight\ {\isasymlparr}nodes{\isacharequal}V{\isacharcomma}\ edges{\isacharequal}F{\isacharprime}{\isasymrparr}\ {\isacharequal}\ edge{\isacharunderscore}weight\ {\isasymlparr}nodes{\isacharequal}V{\isacharcomma}\ edges{\isacharequal}F{\isasymrparr}{\isacartoucheclose}
+	\ {\isacharparenleft}\isakeyword{in}\ finite{\isacharunderscore}weighted{\isacharunderscore}graph{\isacharparenright}\\\ \ spanning{\isacharunderscore}forest{\isacharunderscore}symhull{\isacharunderscore}preimage{\isacharcolon}\isanewline
+	\ \ \isakeyword{assumes}\ {\isacartoucheopen}spanning{\isacharunderscore}forest\ {\isasymlparr}nodes{\isacharequal}V{\isacharcomma}\ edges{\isacharequal}F{\isasymrparr}\ {\isasymlparr}nodes{\isacharequal}V{\isacharcomma}\\\ \ \ \  edges{\isacharequal}symhull\ E{\isasymrparr}{\isacartoucheclose}\isanewline
+	\ \ \isakeyword{shows}\ {\isacartoucheopen}{\isasymexists}F{\isacharprime}{\isachardot}\\\ \ \ \ spanning{\isacharunderscore}forest\ {\isasymlparr}nodes{\isacharequal}V{\isacharcomma}\ edges{\isacharequal}F{\isacharprime}{\isasymrparr}\ {\isasymlparr}nodes{\isacharequal}V{\isacharcomma}\ edges{\isacharequal}E{\isasymrparr}\isanewline
+	\ \ \ \ {\isasymand}\ edge{\isacharunderscore}weight\ {\isasymlparr}nodes{\isacharequal}V{\isacharcomma}\ edges{\isacharequal}F{\isacharprime}{\isasymrparr}\ \\\ \ \ \ \ \  {\isacharequal}\ edge{\isacharunderscore}weight\ {\isasymlparr}nodes{\isacharequal}V{\isacharcomma}\ edges{\isacharequal}F{\isasymrparr}{\isacartoucheclose}
 \end{isabelle}
 \end{frame}
 
