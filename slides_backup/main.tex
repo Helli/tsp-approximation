@@ -149,18 +149,26 @@ Mathematical results might be a requirement.
 \end{center}
 \end{frame}
 
+\subsection{Algorithm Overview}
+\begin{frame}{Algorithm Overview}
+Consider a complete undirected graph$G = (V, E)$ and its minimum spanning tree $T$.\pause%or rather: let one of its minimum spanning trees be $T$
+
+We are going to
+\begin{enumerate}
+	\item find such a $T$\pause
+	\item generate a TSP tour using $T$'s edges
+\end{enumerate}
+\end{frame}
+
 \subsection{MST Generation}
 \begin{frame}{MST Generation}\pause
-Consider a complete undirected graph and its minimum spanning tree $T$.\pause%or rather one of its minimum spanning trees
-
-
 %to-do: graphic
 \begin{isabelle}
 \isacommand{lemma}\isamarkupfalse%
 \ minimum{\isacharunderscore}spanning{\isacharunderscore}tree{\isacharunderscore}le{\isacharunderscore}OPTWEIGHT{\isacharcolon}\isanewline
-\ \ \isakeyword{assumes}\ {\isacartoucheopen}minimum{\isacharunderscore}spanning{\isacharunderscore}tree\ {\isacharparenleft}ind\ F{\isacharparenright}\ {\isacharparenleft}ind\ {\isacharparenleft}symhull\ E{\isacharparenright}{\isacharparenright}{\isacartoucheclose}\isanewline
+\ \ \isakeyword{assumes}\ {\isacartoucheopen}minimum{\isacharunderscore}spanning{\isacharunderscore}tree\ T{\isacharprime}\ {\isacharparenleft}symhull\ E{\isacharparenright}{\isacartoucheclose}\isanewline
 \ \ \isakeyword{assumes}\ {\isacartoucheopen}{\isadigit{2}}\ {\isasymle}\ card\ V{\isacartoucheclose}\isanewline
-\ \ \isakeyword{shows}\ {\isacartoucheopen}set{\isacharunderscore}cost\ F\ {\isasymle}\ OPTWEIGHT{\isacartoucheclose}
+\ \ \isakeyword{shows}\ {\isacartoucheopen}set{\isacharunderscore}cost\ T{\isacharprime}\ {\isasymle}\ OPTWEIGHT{\isacartoucheclose}
 \end{isabelle}
 \end{frame}
 
