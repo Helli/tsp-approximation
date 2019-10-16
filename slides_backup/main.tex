@@ -270,8 +270,27 @@ to-do: How to explain the improvement to \textit{Kruskal} AFP entry easily?
 	%Koenigsberg-Friendship also forbids loops, for technical reasons
 	%It also reinterprets..., Kruskal also has a definition "is_path_undir".
 	%to-do: add Noschinski, a third notion of "undirected".
+	%"There are even more graph libraries out there: The somewhat new work by Noschinski starts anew,
+	% with the reasonable modeling of undirected edges as two-element-sets (It sounds reasonable, and is well argued for).
+	%Sadly, the fresh start did not really establish a new standard."
 \end{enumerate}
 to-do: find short lemmas to show here, e.g. with symhull. also the equivalence of node lists and edge lists...
+\end{frame}
+
+\subsection{Library Connections -- Example}
+\begin{frame}{Library Connections -- Example}
+\begin{isabelle}
+	\isacommand{lemma}\isamarkupfalse%
+	\ spanning{\isacharunderscore}forest{\isacharunderscore}symhull{\isacharcolon}\isanewline
+	\ \ {\isacartoucheopen}spanning{\isacharunderscore}forest\ F\ {\isasymlparr}nodes{\isacharequal}V{\isacharcomma}\ edges\ {\isacharequal}\ E{\isasymrparr}\ {\isasymLongrightarrow}\ spanning{\isacharunderscore}forest\ F\ {\isasymlparr}nodes{\isacharequal}V{\isacharcomma}\ edges\ {\isacharequal}\ symhull\ E{\isasymrparr}{\isacartoucheclose}
+\end{isabelle}
+\begin{isabelle}
+	\isacommand{lemma}\isamarkupfalse%
+	\ {\isacharparenleft}\isakeyword{in}\ finite{\isacharunderscore}weighted{\isacharunderscore}graph{\isacharparenright}\ spanning{\isacharunderscore}forest{\isacharunderscore}symhull{\isacharunderscore}preimage{\isacharcolon}\isanewline
+	\ \ \isakeyword{assumes}\ {\isacartoucheopen}spanning{\isacharunderscore}forest\ {\isasymlparr}nodes{\isacharequal}V{\isacharcomma}\ edges{\isacharequal}F{\isasymrparr}\ {\isasymlparr}nodes{\isacharequal}V{\isacharcomma}\ edges{\isacharequal}symhull\ E{\isasymrparr}{\isacartoucheclose}\isanewline
+	\ \ \isakeyword{shows}\ {\isacartoucheopen}{\isasymexists}F{\isacharprime}{\isachardot}\ spanning{\isacharunderscore}forest\ {\isasymlparr}nodes{\isacharequal}V{\isacharcomma}\ edges{\isacharequal}F{\isacharprime}{\isasymrparr}\ {\isasymlparr}nodes{\isacharequal}V{\isacharcomma}\ edges{\isacharequal}E{\isasymrparr}\isanewline
+	\ \ \ \ {\isasymand}\ edge{\isacharunderscore}weight\ {\isasymlparr}nodes{\isacharequal}V{\isacharcomma}\ edges{\isacharequal}F{\isacharprime}{\isasymrparr}\ {\isacharequal}\ edge{\isacharunderscore}weight\ {\isasymlparr}nodes{\isacharequal}V{\isacharcomma}\ edges{\isacharequal}F{\isasymrparr}{\isacartoucheclose}
+\end{isabelle}
 \end{frame}
 
 \subsection{Phase II}
@@ -282,8 +301,8 @@ to-do: find short lemmas to show here, e.g. with symhull. also the equivalence o
 %to-do: attribute "By Sorted_binary_tree.svg: Milesderivative work: Pluke (talk) - Sorted_binary_tree.svg, Public Domain, https://commons.wikimedia.org/w/index.php?curid=10616003"
 \end{frame}
 
-\subsection{Phase II - Parametrisation} %to-do: replace according to e-mail
-\begin{frame}{Phase II - Parametrisation}
+\subsection{Phase II -- Parametrisation} %to-do: replace according to e-mail
+\begin{frame}{Phase II -- Parametrisation}
 \vspace{8mm}
 We use the \textit{DFS-Framework}. This is the parametrisation:
 \vspace{-2mm}
