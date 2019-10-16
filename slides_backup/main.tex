@@ -258,13 +258,13 @@ to-do: How to explain the improvement to \textit{Kruskal} AFP entry easily?
 \end{frame}
 
 \subsection{Library Connections}
-\begin{frame}{Library Connections}
+\begin{frame}{Library Connections}\pause
 \begin{enumerate}
-	\item \textit{Kruskal}: edges with weight field, undirected/directed
+	\item \textit{Kruskal}: edges with weight field, undirected/directed\pause
 	%to-do: vielleicht unterringeln?
 	% I improved this library: I had to reorganise this one to get what I want without unnecessary assumptions.
-	\item \textit{DFS\_Framework}: edges are node relations, directed
-	\item \textit{Koenigsberg\_Friendship}: edges have a label, undirected
+	\item \textit{DFS\_Framework}: edges are node relations, directed\pause
+	\item \textit{Koenigsberg\_Friendship}: edges have a label, undirected\pause
 	%Even worse, there are different notions of "undirected"
 	%So we really have the worst case in terms of compatibility.
 	%Koenigsberg-Friendship also forbids loops, for technical reasons
@@ -274,16 +274,30 @@ to-do: How to explain the improvement to \textit{Kruskal} AFP entry easily?
 	% with the reasonable modeling of undirected edges as two-element-sets (It sounds reasonable, and is well argued for).
 	%Sadly, the fresh start did not really establish a new standard."
 \end{enumerate}
-to-do: find short lemmas to show here, e.g. with symhull. also the equivalence of node lists and edge lists...
+%Example Conversion:\pause
+\begin{isabelle}
+\isacommand{lemma}\isamarkupfalse%
+\ ex{\isadigit{1}}{\isacharunderscore}the{\isacharunderscore}path{\isacharcolon}\isanewline
+\ \ \isakeyword{assumes}\ {\isacartoucheopen}is{\isacharunderscore}path{\isacharunderscore}undir\ G\ v\ ps\ v{\isacharprime}{\isacartoucheclose}\isanewline
+\ \ \isakeyword{shows}\ {\isacartoucheopen}{\isasymexists}{\isacharbang}ps{\isacharprime}{\isachardot}\ map\ fst\ ps{\isacharprime}\ {\isacharequal}\ map\ fst\ ps\ {\isasymand}\ is{\isacharunderscore}path{\isacharunderscore}undir\ G\ v\ ps{\isacharprime}\ v{\isacharprime}{\isacartoucheclose}
+\isanewline \pause
+\isanewline
+	\isacommand{definition}\isamarkupfalse%
+	\ the{\isacharunderscore}path\ \isakeyword{where}\isanewline
+	\ \ {\isacartoucheopen}the{\isacharunderscore}path\ nodelist\ lst\ {\isacharequal}\ {\isacharparenleft}case\ nodelist\ of\isanewline
+	\ \ \ \ {\isacharbrackleft}{\isacharbrackright}\ {\isasymRightarrow}\ {\isacharbrackleft}{\isacharbrackright}\ {\isacharbar}\isanewline
+	\ \ \ \ n\ {\isacharhash}\ ns\ {\isasymRightarrow}\ THE\ ps{\isachardot}\ map\ fst\ ps\ {\isacharequal}\ nodelist\ {\isasymand}\ is{\isacharunderscore}path{\isacharunderscore}undir\ G\ n\ ps\ lst{\isacharparenright}{\isacartoucheclose}
+\end{isabelle}
+
 \end{frame}
 
 \subsection{Library Connections -- Example}
-\begin{frame}{Library Connections -- Example}
+\begin{frame}{Library Connections -- Example}\pause
 \begin{isabelle}
 	\isacommand{lemma}\isamarkupfalse%
 	\ spanning{\isacharunderscore}forest{\isacharunderscore}symhull{\isacharcolon}\isanewline
 	\ \ {\isacartoucheopen}spanning{\isacharunderscore}forest\ F\ {\isasymlparr}nodes{\isacharequal}V{\isacharcomma}\ edges\ {\isacharequal}\ E{\isasymrparr}\ {\isasymLongrightarrow}\ spanning{\isacharunderscore}forest\ F\ {\isasymlparr}nodes{\isacharequal}V{\isacharcomma}\ edges\ {\isacharequal}\ symhull\ E{\isasymrparr}{\isacartoucheclose}
-\end{isabelle}
+\end{isabelle}\pause
 \begin{isabelle}
 	\isacommand{lemma}\isamarkupfalse%
 	\ {\isacharparenleft}\isakeyword{in}\ finite{\isacharunderscore}weighted{\isacharunderscore}graph{\isacharparenright}\ spanning{\isacharunderscore}forest{\isacharunderscore}symhull{\isacharunderscore}preimage{\isacharcolon}\isanewline
