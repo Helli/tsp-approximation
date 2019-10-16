@@ -99,8 +99,6 @@
 \end{center}
 \end{frame}
 
-\tableofcontents	%to-do: remove
-
 \newcommand{\pivot}[1]{{\color{red}#1}}
 \newcommand{\ltpiv}[1]{{\color{blue}#1}}
 \newcommand{\gtpiv}[1]{{\color{olive}#1}}
@@ -364,14 +362,14 @@ Consider a Euclidean space like $\RR^2$, $\RR^3$,\dots
 \end{frame}
 
 \subsection{DFS Invariant}
-\begin{frame}{DFS Invariant}
-	finish the proof that
+\begin{frame}{DFS Invariant}\pause
+	finish this proof\pause
 	\vspace{-2mm}
 	\begin{isabelle}
 		\isacommand{lemma}\isamarkupfalse%
 		\ {\isacartoucheopen}dfs{\isachardot}is{\isacharunderscore}invar\ {\isacharparenleft}{\isasymlambda}s{\isachardot}\ valid{\isacharunderscore}graph{\isachardot}tour\ {\isacharparenleft}ind{\isacharprime}\ {\isacharparenleft}dom\ {\isacharparenleft}discovered\ s{\isacharparenright}{\isacharparenright}{\isacharparenright}\ {\isacharparenleft}tour{\isacharunderscore}list\ s{\isacharparenright}{\isacharparenright}{\isacartoucheclose}
 	\end{isabelle}\pause
-	Advancing this proof has already led to generally useful statements for the \textit{DFS-Framework}, e.g.\
+	Advancing this proof has already led to generally useful statements for the \textit{DFS-Framework}, e.g.\ \pause
 	\begin{isabelle}
 		\isacommand{lemma}\isamarkupfalse%
 		\ i{\isacharunderscore}snd{\isacharunderscore}pending{\isacharunderscore}sane{\isacharcolon}\ {\isacartoucheopen}dfs{\isachardot}is{\isacharunderscore}invar\ {\isacharparenleft}{\isasymlambda}s{\isachardot}\ snd\ {\isacharbackquote}\ {\isacharparenleft}pending\ s{\isacharparenright}\ {\isasymsubseteq}\ V{\isacharparenright}{\isacartoucheclose}
